@@ -4,7 +4,7 @@ import { Image, Text, View, StyleSheet } from 'react-native';
 export default function Home() {
     return (
         <View>
-            <Text>Welcome To SooqNet Mobile App!!!</Text>
+            <Text>Zeinab, Welcome To SooqNet Mobile App!!!</Text>
         </View>
     );
 }
