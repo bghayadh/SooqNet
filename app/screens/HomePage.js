@@ -10,6 +10,8 @@ import {
   View,
 } from 'react-native';
 import axios from 'axios';
+import { useRouter } from 'expo-router';
+
 
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor }]}>
@@ -23,17 +25,16 @@ const HomePage = () => {
   const [selectedId, setSelectedId] = useState();
   const [data, setData] = useState([]); // to store the data array from axios
   const [loading, setLoading] = useState(true); // Loading state
+  const router = useRouter();
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://192.168.0.109:8080/osc/SooqNetGetCat1', {
+        const response = await axios.get('http://192.168.1.109:8080/osc/SooqNetGetCat1', {
           params: {}
         });
-        
-       
-        console.log("API response:", response.data); 
 
         if (response && response.data && response.data.category1List) {
           setData(response.data.category1List); //Append the returned data into flatList
@@ -60,7 +61,10 @@ const HomePage = () => {
     return (
       <Item
         item={item} 
-        onPress={() => setSelectedId(item)}
+        onPress={() => {
+          setSelectedId(item);
+          router.push({ pathname: '/screens/Item/ItemList', params: { catCode: item[1] } });
+        }}
         backgroundColor={backgroundColor}
         textColor={color}
       />

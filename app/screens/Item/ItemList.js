@@ -10,6 +10,9 @@ import {
   View,
 } from 'react-native';
 import axios from 'axios';
+import { useRoute } from '@react-navigation/native';
+import { useLocalSearchParams } from 'expo-router'; // Import the hook
+
 
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor }]}>
@@ -23,14 +26,16 @@ const ItemList = () => {
   const [selectedId, setSelectedId] = useState();
   const [data, setData] = useState([]); // to store the data array from axios
   const [loading, setLoading] = useState(true); // Loading state
-  const [catID, setCatID] = useState("Hoodies"); //cat ID; this id should pass from home page when clicking on cat
+
+  const {catCode} = useLocalSearchParams(); // Get the param sent from home to itemList while navigation
+  const [catID, setCatID] = useState(catCode);
 
   useEffect(() => {
     
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://192.168.0.109:8080/osc/SooqNetGetCatItem', {
+        const response = await axios.get('http://192.168.1.109:8080/osc/SooqNetGetCatItem', {
           params: {
             catID: catID
           }
