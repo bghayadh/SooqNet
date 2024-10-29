@@ -14,9 +14,9 @@ import axios from 'axios';
 import { useRouter } from 'expo-router';
 
 
-const Item = ({ item, onPress, backgroundColor, textColor }) => (
+const Category = ({ item, onPress, backgroundColor, textColor }) => (
 
-    <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor }]}>
+    <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
     <Image
     source={{ uri: 'http://192.168.1.109:8080/osc/resources/images/CategoriesImages/'+item[2] }} 
     style={styles.image}
@@ -60,12 +60,12 @@ const HomePage = () => {
     fetchData(); 
   }, []);
 
-  const renderItem = ({ item }) => {
+  const renderCategory = ({ item }) => {
     const backgroundColor = item === selectedId ? '#6e3b6e' : 'white';
     const color = item === selectedId ? 'white' : 'black';
 
     return (
-      <Item
+      <Category
         item={item} 
         onPress={() => {
           setSelectedId(item);
@@ -91,7 +91,7 @@ const HomePage = () => {
             <FlatList
               numColumns={Math.ceil(data.length / 2)} // Use dynamic data length
               data={data} // Use the fetched category1List data
-              renderItem={renderItem}
+              renderItem={renderCategory}
               keyExtractor={(item, index) => index.toString()} // Use index as key since inner arrays don't have unique IDs
               extraData={selectedId}
               style={{ flexGrow: 0 }} // Ensure FlatList doesn't collapse
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: StatusBar.currentHeight || 0,
   },
-  item: {
+  cat: {
     padding: 2,
     marginVertical: 8,
     marginHorizontal: 16,
