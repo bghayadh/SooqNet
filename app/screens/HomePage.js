@@ -8,17 +8,23 @@ import {
   TouchableOpacity,
   ScrollView,
   View,
+  Image,
 } from 'react-native';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 
 
 const Item = ({ item, onPress, backgroundColor, textColor }) => (
-  <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor }]}>
-    <Text style={[styles.title, { color: textColor }, { marginLeft: 2 }]}>
-      {item[0]} {}
+
+    <TouchableOpacity onPress={onPress} style={[styles.item, { backgroundColor }]}>
+    <Image
+    source={{ uri: 'http://192.168.1.109:8080/osc/resources/images/CategoriesImages/'+item[2] }} 
+    style={styles.image}
+    />
+    <Text style={[styles.title, { color: textColor }]}>
+      {item[0]} 
     </Text>
-  </TouchableOpacity>
+    </TouchableOpacity>
 );
 
 const HomePage = () => {
@@ -55,7 +61,7 @@ const HomePage = () => {
   }, []);
 
   const renderItem = ({ item }) => {
-    const backgroundColor = item === selectedId ? '#6e3b6e' : '#f9c2ff';
+    const backgroundColor = item === selectedId ? '#6e3b6e' : 'white';
     const color = item === selectedId ? 'white' : 'black';
 
     return (
@@ -113,9 +119,20 @@ const styles = StyleSheet.create({
   centeredContainer: {
     flex: 1,
     position: 'absolute',   
-    top: '40%',        
+    top: '30%',        
     backgroundColor:'white'
   },
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 8,
+  },
+  title: {
+    fontSize: 16,
+    textAlign: 'center',
+  },
+
 });
 
 export default HomePage;
