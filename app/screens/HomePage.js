@@ -18,7 +18,7 @@ const Category = ({ item, onPress, backgroundColor, textColor }) => (
 
     <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
     <Image
-    source={{ uri: 'http://192.168.1.109:8080/osc/resources/images/CategoriesImages/'+item[2] }} 
+    source={{ uri: 'http://192.168.0.109:8080/osc/resources/images/CategoriesImages/'+item[2] }} 
     style={styles.image}
     />
     <Text style={[styles.title, { color: textColor }]}>
@@ -38,7 +38,7 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://192.168.1.109:8080/osc/SooqNetGetCat1', {
+        const response = await axios.get('http://192.168.0.109:8080/osc/SooqNetGetCat1', {
           params: {}
         });
 
