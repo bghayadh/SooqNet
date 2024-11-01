@@ -54,7 +54,7 @@ const SearchBar = ({ onSearch }) => {
 const Category = ({ category, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
     <Image
-      source={{ uri: 'http://192.168.1.109:8080/osc/resources/images/CategoriesImages/' + category[2] }}
+      source={{ uri: 'http://192.168.0.108:8080/osc/resources/images/CategoriesImages/' + category[2] }}
       style={styles.image}
     />
     <Text style={[styles.title, { color: textColor }]}>{category[0]}</Text>
@@ -74,7 +74,7 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://192.168.1.109:8080/osc/SooqNetGetCat1');
+        const response = await axios.get('http://192.168.0.108:8080/osc/SooqNetGetCat1');
         if (response && response.data && response.data.category1List) {
           setData(response.data.category1List);
         } else {
@@ -97,7 +97,7 @@ const HomePage = () => {
     if (searchKey) {
       setShowFlatList(false);// Hide the flatList that contains the cat1 with their images
       try {
-        const response = await axios.get('http://192.168.1.109:8080/osc/GetCategory1BySearchKey', {
+        const response = await axios.get('http://192.168.0.108:8080/osc/GetCategory1BySearchKey', {
           params: { searchKey: searchKey },
         });
 
@@ -134,7 +134,7 @@ const HomePage = () => {
         category={item}
         onPress={() => {
           setSelectedId(item);
-          router.push({ pathname: '/screens/Item/ItemList', params: { 
+          router.push({ pathname: '/screens/Item/ItemView', params: { 
             catCode: item[1],
             source: 'category',
            } });
@@ -178,7 +178,7 @@ const HomePage = () => {
                     key={index}
                     style={styles.resultItem}
                     onPress={() => {
-                      router.push({ pathname: '/screens/Item/ItemList', 
+                      router.push({ pathname: '/screens/Item/ItemView', 
                         params: { 
                         catCode: result.categoryCode,
                         source: 'search',  

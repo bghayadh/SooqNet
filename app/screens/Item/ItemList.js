@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   FlatList,
   SafeAreaView,
@@ -10,8 +10,6 @@ import {
   PanResponder,
   Animated,
 } from 'react-native';
-import axios from 'axios';
-import { useLocalSearchParams } from 'expo-router';
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -19,7 +17,7 @@ const Item = React.memo(({ item, textColor }) => {
   const validImages = item.imageData.filter(img => img.name !== null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const renderImage = ({ item, index }) => (
+  const renderImage = ({ item }) => (
     <View style={styles.slide}>
       <Image source={{ uri: item.url }} style={styles.image} />
     </View>
@@ -56,12 +54,8 @@ const Item = React.memo(({ item, textColor }) => {
   );
 });
 
-const ItemList = () => {
+const ItemList = ({ data }) => {
   const [selectedId, setSelectedId] = useState(null);
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { catCode ,source, searchKey } = useLocalSearchParams();
-  const [catID, setCatID] = useState(catCode);
   const [isScrolling, setIsScrolling] = useState(false);
 
   const panResponder = useRef(
@@ -75,56 +69,28 @@ const ItemList = () => {
     })
   ).current;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get('http://192.168.1.109:8080/osc/SooqNetGetCatItem', {
-          params: { catID ,source,searchKey},
-        });
-
-        if (response?.data?.category1List) {
-          setData(response.data.category1List);
-        } else {
-          setData([]);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error.message);
-        setData([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [catID]);
-
   const getColor = (item) => (item === selectedId ? 'white' : 'black');
 
   const renderItem = useCallback(({ item }) => (
     <Item
       item={item}
-      textColor={getColor(item)}
+      textColor={getColor(item.itemCode)} // Assuming itemCode is unique
       {...panResponder.panHandlers} // Pass panResponder handlers
     />
   ), [selectedId]);
 
   return (
     <SafeAreaView style={styles.container}>
-      {loading ? (
-        <Text>Loading...</Text>
-      ) : (
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={item => item.itemCode.toString()}
-          extraData={selectedId}
-          numColumns={2}
-          initialNumToRender={10}
-          windowSize={5}
-          scrollEnabled={!isScrolling} // Disable vertical scrolling while scrolling horizontally
-        />
-      )}
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={item => item.itemCode.toString()}
+        extraData={selectedId}
+        numColumns={2}
+        initialNumToRender={10}
+        windowSize={5}
+        scrollEnabled={!isScrolling} // Disable vertical scrolling while scrolling horizontally
+      />
     </SafeAreaView>
   );
 };
