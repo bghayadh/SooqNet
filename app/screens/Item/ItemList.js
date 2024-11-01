@@ -60,7 +60,7 @@ const ItemList = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { catCode } = useLocalSearchParams();
+  const { catCode ,source, searchKey } = useLocalSearchParams();
   const [catID, setCatID] = useState(catCode);
   const [isScrolling, setIsScrolling] = useState(false);
 
@@ -79,8 +79,8 @@ const ItemList = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://192.168.0.109:8080/osc/SooqNetGetCatItem', {
-          params: { catID },
+        const response = await axios.get('http://192.168.1.109:8080/osc/SooqNetGetCatItem', {
+          params: { catID ,source,searchKey},
         });
 
         if (response?.data?.category1List) {
