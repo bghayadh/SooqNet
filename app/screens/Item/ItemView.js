@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, SafeAreaView, StyleSheet, Text, BackHandler } from 'react-native';
+import { View, SafeAreaView, StyleSheet, Text, BackHandler,Keyboard,TouchableWithoutFeedback,TouchableOpacity } from 'react-native';
 import ItemList from './ItemList';
 import CategoryList from './CategoryList';
 import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
+import { useRouter } from 'expo-router';
+import ItemSearch from './ItemSearch';
 
 function ItemView() {
     const { catCode, source, searchKey } = useLocalSearchParams();
@@ -12,6 +14,10 @@ function ItemView() {
     const [loading, setLoading] = useState(true);
     const [fullCatCode, setFullCatCode] = useState(catCode || ""); // Initialize with catCode
     const [lastCatLevel, setLastCatLevel] = useState(false); 
+    const [showFlatList, setShowFlatList] = useState(true);
+    const [searchText, setSearchText] = useState('');
+    const [searchResults, setSearchResults] = useState([]); 
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -19,7 +25,7 @@ function ItemView() {
 
             try {
                 setLoading(true);
-                const response = await axios.get('http://192.168.0.108:8080/osc/SooqNetGetCatItem', {
+                const response = await axios.get('http://192.168.1.109:8080/osc/SooqNetGetCatItem', {
                     params: { catID: fullCatCode, source, searchKey },
                 });
 
@@ -79,11 +85,36 @@ function ItemView() {
         return () => backHandler.remove(); // Clean up the event listener
     }, [fullCatCode]);
 
+
+ //Update the list of displayed items and toggles the visibility of main flatList before the search
+    const handleSearchResults = (results, showCategories) => {
+        setShowFlatList(showCategories);
+        setSearchResults(results);
+    };
+
     return (
         <SafeAreaView style={styles.container}>
-            {loading ? (
-                <Text>Loading...</Text>
-            ) : (
+             <TouchableWithoutFeedback
+          onPress={() => {
+            if (searchText === '') {
+              Keyboard.dismiss();
+              setShowFlatList(true);
+            }
+          }}
+        >
+          <View>
+            <ItemSearch
+              searchText={searchText}
+              setSearchText={setSearchText}
+              setShowFlatList={setShowFlatList}
+              onSearchResults={handleSearchResults}
+            />
+          </View>
+        </TouchableWithoutFeedback>
+        {loading ? (
+          <Text>Loading...</Text>
+        ) : (
+          showFlatList ? (
                 <View style={styles.listContainer}>
                     <CategoryList 
                         data={catData} 
@@ -93,7 +124,30 @@ function ItemView() {
                     />
                     <ItemList data={itemData} />
                 </View>
-            )}
+           ) : (
+            <View style={styles.resultsContainer}>
+              {searchResults.map((result, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.resultItem}
+                  onPress={() => {
+                    router.push({
+                      pathname: '/screens/Item/ItemView',
+                      params: {
+                        catCode: result.categoryCode,
+                        source: 'search',
+                        searchKey: searchText,
+                      },
+                    });
+                  }}
+                >
+                  <Text style={styles.resultText}>{result.title}</Text>
+                  <Text style={styles.resultCount}>{result.count}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )
+        )}
         </SafeAreaView>
     );
 }
@@ -106,6 +160,26 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
     },
+    resultsContainer: {
+        marginTop: 50,
+        paddingHorizontal: 20,
+    },
+    resultItem: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#e0e0e0',
+    },
+    resultText: {
+        fontSize: 16,
+        color: 'black',
+    },
+    resultCount: {
+        fontSize: 16,
+        color: 'gray',
+    },
+      
 });
 
 export default ItemView;
