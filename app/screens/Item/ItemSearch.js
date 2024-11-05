@@ -42,7 +42,7 @@ const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults
         const cat1ItemsList = response.data.cat1ItemsList;
           
         return [
-          { title: 'All', count: cat1ItemsList.length, categoryCode: 'ALL', searchText },
+          { title: 'All', count: cat1ItemsList.length, categoryCode: 'AllCatOptions', searchText },
           ...cat1TitlesList.map((element) => {
             const cat1Code = element[0];
             const count = cat1ItemsList.reduce((acc, itemCatCode) => 

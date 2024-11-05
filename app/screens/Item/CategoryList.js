@@ -8,7 +8,7 @@ const Category = ({ item, onPress, isSelected }) => {
     return (
         <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
             <Image
-                source={{ uri: 'http://192.168.0.108:8080/osc/resources/images/CategoriesImages/' + item[2] }}
+                source={{ uri: 'http://192.168.1.109:8080/osc/resources/images/CategoriesImages/' + item[2] }}
                 style={styles.image}
             />
             <Text style={[styles.title, { color: textColor }]}>
@@ -31,18 +31,14 @@ const CategoryList = ({ data, onCategoryPress, lastCatLevel, selectedId }) => {
 
     return (
         <View>
-            {data.length === 0 ? (
-                <Text>No categories found</Text>
-            ) : (
                 <FlatList
                     data={data}
                     renderItem={renderCategory}
-                    keyExtractor={(item) => item[0].toString()} 
+                    keyExtractor={(item) => item[4].toString()} 
                     horizontal
                     showsHorizontalScrollIndicator={false}
                     style={styles.horizontalList}
                 />
-            )}
         </View>
     );
 };
