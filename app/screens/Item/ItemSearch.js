@@ -32,7 +32,7 @@ const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults
     if (searchKey) {
 
       setShowFlatList(false);// Hide other flatList (cond. flatList)
-      const response = await axios.get('http://192.168.1.109:8080/osc/GetCategory1BySearchKey', {
+      const response = await axios.get('http://192.168.0.103:8080/osc/GetCategory1BySearchKey', {
         params: { searchKey }
       });
 

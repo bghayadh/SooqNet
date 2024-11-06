@@ -25,7 +25,7 @@ function ItemView() {
 
             try {
                 setLoading(true);
-                const response = await axios.get('http://192.168.1.109:8080/osc/SooqNetGetCatItem', {
+                const response = await axios.get('http://192.168.0.103:8080/osc/SooqNetGetCatItem', {
                     params: { catID: fullCatCode, source, searchKey },
                 });
 

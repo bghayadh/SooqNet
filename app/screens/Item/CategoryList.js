@@ -8,7 +8,7 @@ const Category = ({ item, onPress, isSelected }) => {
     return (
         <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
             <Image
-                source={{ uri: 'http://192.168.1.109:8080/osc/resources/images/CategoriesImages/' + item[2] }}
+                source={{ uri: 'http://192.168.0.103:8080/osc/resources/images/CategoriesImages/' + item[2] }}
                 style={styles.image}
             />
             <Text style={[styles.title, { color: textColor }]}>
