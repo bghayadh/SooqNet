@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {FlatList,SafeAreaView,StatusBar,StyleSheet,Text,TouchableOpacity,ScrollView,View,Image,Keyboard,TouchableWithoutFeedback} from 'react-native';
+import {FlatList,SafeAreaView,StatusBar,StyleSheet,Text,BackHandler, Alert,TouchableOpacity,ScrollView,View,Image,Keyboard,TouchableWithoutFeedback} from 'react-native';
 import axios from 'axios';
 import {useRouter} from 'expo-router';
-import {Ionicons} from '@expo/vector-icons'; 
 import ItemSearch from './Item/ItemSearch';
 
 const Category = ({ category, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
     <Image
-      source={{ uri: 'http://192.168.0.103:8080/osc/resources/images/CategoriesImages/' + category[2] }}
+      source={{ uri: 'http://192.168.98.237:8080/osc/resources/images/CategoriesImages/' + category[2] }}
       style={styles.image}
     />
     <Text style={[styles.title, { color: textColor }]}>{category[0]}</Text>
@@ -28,10 +27,11 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://192.168.0.103:8080/osc/SooqNetGetCat1');
+        const response = await axios.get('http://192.168.98.237:8080/osc/SooqNetGetCat1');
         if (response && response.data && response.data.category1List) {
           setData(response.data.category1List);
-        } else {
+        } 
+        else {
           console.log("No data found.");
           setData([]);
         }
@@ -45,7 +45,7 @@ const HomePage = () => {
 
     fetchData();
   }, []);
-
+ 
   const renderCategory = ({ item }) => {
     return (
       <Category
@@ -63,9 +63,27 @@ const HomePage = () => {
     );
   };
 
+  useEffect(() => {
+    const backAction = () => {
+      if (searchText === '') {
+        // If search is cleared, exit the app
+        BackHandler.exitApp();
+        return true;
+      }
+      // Otherwise, allow the default back behavior
+      return false;
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    // Clean up the event listener
+    return () => backHandler.remove();
+  }, [searchText]);
+
 
  //Update the list of displayed items and toggles the visibility of main flatList before the search
-  const handleSearchResults = (results, showCategoriesState) => {
+  const handleSearchResults = (results, showCategoriesState,sourceType) => {
     setShowFlatList(showCategoriesState);
     setSearchResults(results);
   };
@@ -105,20 +123,21 @@ const HomePage = () => {
           ) : (
             <View style={styles.resultsContainer}>
             {searchResults.map((result, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.resultItem}
-                onPress={() => {
-                  router.push({
-                    pathname: '/screens/Item/ItemView',
-                    params: {
-                      catCode: result.categoryCode,
-                      source: 'search',
-                      searchKey: searchText,
-                    },
-                  });
-                }}
-              >
+            <TouchableOpacity
+               key={index}
+               style={styles.resultItem}
+               onPress={() => {
+                 router.push({
+                   pathname: '/screens/Item/ItemView',
+                   params: {
+                     catCode: result.categoryCode,
+                     source: 'search',
+                     searchKey: searchText,
+                     routeOrigin:'home'
+                   },
+                 });
+               }}
+             >
                 <Text style={styles.resultText}>{result.title}</Text>
                 <Text style={styles.resultCount}>{result.count}</Text>
               </TouchableOpacity>

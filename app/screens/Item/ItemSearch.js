@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect,useRef } from 'react';
 import {View,TextInput,TouchableOpacity,StyleSheet,Keyboard} from 'react-native';
 import axios from 'axios';
 import {Ionicons} from '@expo/vector-icons';
@@ -6,11 +6,13 @@ import {Ionicons} from '@expo/vector-icons';
 
 const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults }) => {
 
+  const inputRef = useRef(null); // Create the ref
+
   // when pressing the search button on the keyboard,this function is called
   const handleSubmitEditing = async () => {
     try {
       const results = await handleSearch(searchText); // calling the function of axios to fetch data
-      onSearchResults(results, false); // sending the result from the search request back to home page
+      onSearchResults(results, false,'search'); // sending the result from the search request back to home page
       Keyboard.dismiss();
     } 
     catch (error) {
@@ -21,8 +23,9 @@ const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults
   //it's called whenever the text in the search input changes
   const handleChangeText = (text) => {
     setSearchText(text); // set the new value
+    
     if (text === '') {
-      onSearchResults([]); // Clear results if input is empty
+      onSearchResults([], true, 'category'); // Clear results and show main categories
     }
   };
 
@@ -30,9 +33,8 @@ const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults
   const handleSearch = async (searchKey) => {
 
     if (searchKey) {
-
       setShowFlatList(false);// Hide other flatList (cond. flatList)
-      const response = await axios.get('http://192.168.0.103:8080/osc/GetCategory1BySearchKey', {
+      const response = await axios.get('http://192.168.98.237:8080/osc/GetCategory1BySearchKey', {
         params: { searchKey }
       });
 
@@ -57,6 +59,17 @@ const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults
     }
     return [];
   };
+
+   // Function to clear the input if `searchText` is empty
+   const clearInputIfEmpty = () => {
+    if (searchText === '' && inputRef.current) {
+        inputRef.current.clear(); // Clear the input visually
+    }
+};
+
+useEffect(() => {
+    clearInputIfEmpty(); // Call this function when `searchText` changes
+}, [searchText]);
 
   return (
     <View style={styles.searchBarContainer}>

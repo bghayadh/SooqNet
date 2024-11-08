@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { View, SafeAreaView, StyleSheet, Text, BackHandler,Keyboard,TouchableWithoutFeedback,TouchableOpacity } from 'react-native';
 import ItemList from './ItemList';
 import CategoryList from './CategoryList';
@@ -6,18 +6,30 @@ import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
 import { useRouter } from 'expo-router';
 import ItemSearch from './ItemSearch';
+import { useNavigation } from '@react-navigation/native';
 
 function ItemView() {
-    const { catCode, source, searchKey } = useLocalSearchParams();
+    const { catCode, source: initialSource, searchKey, savedFullCatCode: routeSavedFullCatCode,routeOrigin } = useLocalSearchParams();
+    const [source, setSource] = useState(initialSource || 'category'); // Use 'category' as a default if no initial value 
     const [itemData, setItemData] = useState([]);
     const [catData, setCatData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [fullCatCode, setFullCatCode] = useState(catCode || ""); // Initialize with catCode
     const [lastCatLevel, setLastCatLevel] = useState(false); 
     const [showFlatList, setShowFlatList] = useState(true);
-    const [searchText, setSearchText] = useState('');
     const [searchResults, setSearchResults] = useState([]); 
+    const [searchText, setSearchText] = useState(searchKey);
+    const savedFullCatCode = useRef(source === 'search' && routeSavedFullCatCode ? routeSavedFullCatCode : fullCatCode);// Conditionally initialize savedFullCatCode with routeSavedFullCatCode if source is "search"
     const router = useRouter();
+    const navigation = useNavigation();
+
+
+    useEffect(() => {//Set the value of previous cat before searching each time the searchKey change
+      if (searchText === '' && savedFullCatCode.current) {
+        setFullCatCode(savedFullCatCode.current);
+      }
+  }, [searchText]);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,7 +37,7 @@ function ItemView() {
 
             try {
                 setLoading(true);
-                const response = await axios.get('http://192.168.0.103:8080/osc/SooqNetGetCatItem', {
+                const response = await axios.get('http://192.168.98.237:8080/osc/SooqNetGetCatItem', {
                     params: { catID: fullCatCode, source, searchKey },
                 });
 
@@ -71,27 +83,77 @@ function ItemView() {
 
     // BackHandler to manage back button behavior
     useEffect(() => {
-        const backAction = () => {
-            const codes = fullCatCode.split('-');
+      const backAction = async () => {
+        const codes = fullCatCode.split('-');
             if (codes.length > 1) {
                 const updatedCatCode = codes.slice(0, -1).join('-'); // Remove the last category code
                 setFullCatCode(updatedCatCode);
                 return true; 
             }
-            return false; 
+            else {
+              if (source==='search' ) {
+                try {
+                  setLoading(true);
+                  // Make an Axios request to refetch search results based on the searchKey
+                  const response = await axios.get('http://192.168.98.237:8080/osc/GetCategory1BySearchKey', {
+                      params: { searchKey },
+                  });
+  
+                  // Process and set the search results, similar to handleSearch in ItemSearch
+                  const cat1TitlesList = response.data.cat1TitlesList || [];
+                  const cat1ItemsList = response.data.cat1ItemsList || [];
+                  
+                  const results = [
+                      { title: 'All', count: cat1ItemsList.length, categoryCode: 'AllCatOptions', searchText: searchKey },
+                      ...cat1TitlesList.map((element) => {
+                          const cat1Code = element[0];
+                          const count = cat1ItemsList.reduce((acc, itemCatCode) => 
+                              itemCatCode[0] === cat1Code ? acc + 1 : acc, 0);
+                          return { title: element[1], count, categoryCode: cat1Code, searchText: searchKey };
+                      }),
+                  ];
+  
+                  setSearchResults(results);
+                  setShowFlatList(false); 
+                  setLoading(false);
+                  return true; // Indicate we handled the back action
+  
+              } catch (error) {
+                  console.error("Error fetching search results:", error);
+                  setLoading(false);
+                  return false; // Let the back action continue if there's an error
+              }
+            }
+            else {
+              navigation.navigate('screens/HomePage'); // Navigate to HomePage screen
+            }            
+            }
+           // return false; 
         };
 
         const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
         return () => backHandler.remove(); // Clean up the event listener
-    }, [fullCatCode]);
+    }, [fullCatCode,searchKey,source]);
 
 
  //Update the list of displayed items and toggles the visibility of main flatList before the search
-    const handleSearchResults = (results, showCategories) => {
-        setShowFlatList(showCategories);
-        setSearchResults(results);
-    };
+ const handleSearchResults = (results, showCategories, sourceType) => {
+  setShowFlatList(showCategories);
+  setSearchResults(results);
 
+  if (sourceType === 'category') {
+      setSource('category');
+      setSearchText(() => {
+          return '';
+      });
+      if(routeOrigin ==='home') {
+        navigation.navigate('screens/HomePage'); // Navigate to HomePage screen
+      }
+    }
+  else  {
+      savedFullCatCode.current = fullCatCode; // Save `fullCatCode` before search
+  }
+};
     return (
         <SafeAreaView style={styles.container}>
              <TouchableWithoutFeedback
@@ -128,19 +190,21 @@ function ItemView() {
             <View style={styles.resultsContainer}>
               {searchResults.map((result, index) => (
                 <TouchableOpacity
-                  key={index}
-                  style={styles.resultItem}
-                  onPress={() => {
-                    router.push({
-                      pathname: '/screens/Item/ItemView',
-                      params: {
-                        catCode: result.categoryCode,
-                        source: 'search',
-                        searchKey: searchText,
-                      },
-                    });
-                  }}
-                >
+                key={index}
+                style={styles.resultItem}
+                onPress={() => {
+                  router.push({
+                    pathname: '/screens/Item/ItemView',
+                    params: {
+                      catCode: result.categoryCode,
+                      source: 'search',
+                      searchKey: searchText,
+                      savedFullCatCode: savedFullCatCode.current,
+                      routeOrigin:'itemView'
+                    },
+                  });
+                }}
+              >
                   <Text style={styles.resultText}>{result.title}</Text>
                   <Text style={styles.resultCount}>{result.count}</Text>
                 </TouchableOpacity>
