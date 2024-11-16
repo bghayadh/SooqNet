@@ -7,10 +7,11 @@ const Category = ({ item, onPress, isSelected }) => {
 
     return (
         <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
+                  <View style={styles.imageContainer} >
             <Image
-                source={{ uri: 'http://192.168.0.103:8080/osc/resources/images/CategoriesImages/' + item[2] }}
+                source={{ uri: 'http://192.168.1.108:8080/osc/resources/images/CategoriesImages/' + item[2] }}
                 style={styles.image}
-            />
+            /></View>
             <Text style={[styles.title, { color: textColor }]}>
                 {item[1]} 
             </Text>
@@ -52,14 +53,23 @@ const styles = StyleSheet.create({
         margin: 5,
         borderRadius: 5,
         alignItems: 'center',
-        height: 100,
+        height: 130,
     },
-    image: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        marginBottom: 5,
-    },
+    imageContainer: {
+        width: 75,
+        height:90,               
+        aspectRatio: 1,              
+        borderRadius: 50,         
+        overflow: 'hidden',       
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'white',   
+      },
+      image: {
+        width: '100%',          
+        height: '100%',
+        resizeMode:'stretch',
+      },
     horizontalList: {
         paddingVertical: 5,
     },

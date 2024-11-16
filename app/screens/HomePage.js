@@ -6,10 +6,11 @@ import ItemSearch from './Item/ItemSearch';
 
 const Category = ({ category, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
-    <Image
-      source={{ uri: 'http://192.168.98.237:8080/osc/resources/images/CategoriesImages/' + category[2] }}
-      style={styles.image}
-    />
+      <View style={styles.imageContainer} >
+      <Image
+        source={{ uri: 'http://192.168.1.108:8080/osc/resources/images/CategoriesImages/' + category[2] }}
+        style={styles.image}
+      /></View>
     <Text style={[styles.title, { color: textColor }]}>{category[0]}</Text>
   </TouchableOpacity>
 );
@@ -27,7 +28,7 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://192.168.98.237:8080/osc/SooqNetGetCat1');
+        const response = await axios.get('http://192.168.1.108:8080/osc/SooqNetGetCat1');
         if (response && response.data && response.data.category1List) {
           setData(response.data.category1List);
         } 
@@ -189,11 +190,20 @@ const styles = StyleSheet.create({
     top: '30%',
     backgroundColor: 'white',
   },
+  imageContainer: {
+    width: 70,
+    aspectRatio: 1,              
+    borderRadius: 45,         
+    overflow: 'hidden',       
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',   
+
+  },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: 8,
+    width: '100%', 
+    height: '100%',
+    resizeMode:'stretch',
   },
 });
 
