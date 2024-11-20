@@ -9,7 +9,10 @@ import {
   Image,
   PanResponder,
   Animated,
+  Dimensions,
 } from 'react-native';
+
+const { width: screenWidth } = Dimensions.get('window'); // Get screen width
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
@@ -20,7 +23,11 @@ const Item = React.memo(({ item, textColor }) => {
 
   const renderImage = ({ item }) => (
     <View style={styles.slide}>
-      <Image source={{ uri: item.url }} style={styles.image} />
+      <Image
+        source={{ uri: item.url }}
+        style={styles.image} // Use the Image style here
+        resizeMode="contain" // Makes sure the image fits inside the container without distortion
+      />
     </View>
   );
 
@@ -34,7 +41,7 @@ const Item = React.memo(({ item, textColor }) => {
   };
 
   // Parse the old price (ensure it's a number)
-  const oldPrice = parseFloat(item.itemPriceStr.replace(/[^0-9.-]+/g, "")); // Removing currency symbols, if any
+  const oldPrice = parseFloat(item.itemPriceStr.replace(/[^0-9.-]+/g, "")); 
   const discount = item.itemDiscount;
   const newPrice = calculateDiscountedPrice(oldPrice, discount);
 
@@ -53,7 +60,7 @@ const Item = React.memo(({ item, textColor }) => {
             }}
             snapToAlignment="center"
             decelerationRate={0.4}
-            snapToInterval={200} // Adjust this based on your image width
+            snapToInterval={screenWidth / 2 - 4} // Adjust this based on your image width (50% of screen width)
             showsHorizontalScrollIndicator={false}
           />
         ) : (
@@ -63,13 +70,11 @@ const Item = React.memo(({ item, textColor }) => {
         )}
       </View>
 
-      
       <View style={styles.textContainer}>
         <Text numberOfLines={1} style={[styles.title, { color: textColor, marginLeft: 2 }]}>
           {item.itemDescription ? item.itemDescription : item.itemName}
         </Text>
 
-       
         <View style={styles.priceContainer}>
           {discount ? (
             <>
@@ -82,9 +87,7 @@ const Item = React.memo(({ item, textColor }) => {
                 {oldPrice ? `$${oldPrice.toFixed(2)}` : 'N/A'}
               </Text>
 
-              
               <View style={styles.discountContainer}>
-              
                 <Text style={[styles.title, { color: textColor, marginHorizontal: 2 }]}>
                   {`- ${discount}%`}
                 </Text>
@@ -110,6 +113,9 @@ const ItemList = ({ data }) => {
   const [selectedId, setSelectedId] = useState(null);
   const [isScrolling, setIsScrolling] = useState(false);
 
+  // Adjust the data to prevent the last item from overflowing into both columns
+  const adjustedData = data.length % 2 === 0 ? data : [...data, { itemCode: 'empty', imageData: [] }];
+
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (evt, gestureState) => {
@@ -123,25 +129,32 @@ const ItemList = ({ data }) => {
 
   const getColor = (item) => (item === selectedId ? 'white' : 'black');
 
-  const renderItem = useCallback(({ item }) => (
-    <Item
-      item={item}
-      textColor={getColor(item.itemCode)} // Assuming itemCode is unique
-      {...panResponder.panHandlers} // Pass panResponder handlers
-    />
-  ), [selectedId]);
+  const renderItem = useCallback(({ item }) => {
+    if (item.itemCode === 'empty') {
+      return <View style={styles.emptyItem} />;
+    }
+
+    return (
+      <Item
+        item={item}
+        textColor={getColor(item.itemCode)} 
+        {...panResponder.panHandlers} // Pass panResponder handlers
+      />
+    );
+  }, [selectedId]);
 
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-        data={data}
+        data={adjustedData}
         renderItem={renderItem}
-        keyExtractor={item => item.itemCode.toString()}
+        keyExtractor={(item) => item.itemCode.toString()}
         extraData={selectedId}
         numColumns={2}
         initialNumToRender={10}
         windowSize={5}
         scrollEnabled={!isScrolling} // Disable vertical scrolling while scrolling horizontally
+        contentContainerStyle={styles.flatListContent}
       />
     </SafeAreaView>
   );
@@ -155,56 +168,64 @@ const styles = StyleSheet.create({
   },
   item: {
     flex: 1,
-    padding: 2,
-    margin: 4,
+    paddingVertical: 2,
+    margin: 2,
     borderRadius: 5,
   },
   title: {
     fontSize: 15,
   },
   swiperContainer: {
-    height: 250, // Fixed height for the image container
+    height: 290, 
     overflow: 'hidden',
   },
   slide: {
-    width: 200, // Adjust width based on your design
+    width: screenWidth / 2 - 4, 
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 2, 
   },
   image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    width: '100%', 
+    height: '100%', 
   },
   noImageContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'lightgray',
-    height: 250, // Fixed height for "no image" container
+    height: 290,
   },
   noImageText: {
     fontSize: 16,
     fontWeight: 'bold',
   },
   priceContainer: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     alignItems: 'center',
     marginTop: 5,
-    flexWrap: 'wrap', // Allow the content to wrap to the next line if needed
+    flexWrap: 'wrap', 
   },
   discountContainer: {
-    borderColor: 'red', 
-    borderWidth: 1, 
-    padding: 3, 
+    borderColor: 'red',
+    borderWidth: 1,
+    padding: 3,
     borderRadius: 5,
-    flexDirection: 'row', 
+    flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 5, // Space between old price and the discount block
+    marginLeft: 5, 
   },
   textContainer: {
     paddingHorizontal: 5,
-    marginTop: 5, // Ensure some space between image and text
+    marginTop: 5, 
+  },
+  flatListContent: {
+    paddingBottom: 10, 
+  },
+  emptyItem: {
+    flex: 1,
+    height: 290,
+    backgroundColor: 'transparent', 
   },
 });
 

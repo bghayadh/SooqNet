@@ -37,7 +37,7 @@ function ItemView() {
 
             try {
                 setLoading(true);
-                const response = await axios.get('http://192.168.98.237:8080/osc/SooqNetGetCatItem', {
+                const response = await axios.get('http://192.168.1.75:8080/osc/SooqNetGetCatItem', {
                     params: { catID: fullCatCode, source, searchKey },
                 });
 
@@ -95,7 +95,7 @@ function ItemView() {
                 try {
                   setLoading(true);
                   // Make an Axios request to refetch search results based on the searchKey
-                  const response = await axios.get('http://192.168.98.237:8080/osc/GetCategory1BySearchKey', {
+                  const response = await axios.get('http://192.168.1.75:8080/osc/GetCategory1BySearchKey', {
                       params: { searchKey },
                   });
   
