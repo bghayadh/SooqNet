@@ -94,7 +94,7 @@ function ItemView() {
     useEffect(() => {
       const backAction = async () => {
         setSelectedSort(null);
-
+        setSelectedSizes([]);
         const codes = fullCatCode.split('-');
             if (codes.length > 1) {
                 const updatedCatCode = codes.slice(0, -1).join('-'); // Remove the last category code
