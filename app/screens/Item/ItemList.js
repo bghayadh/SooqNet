@@ -53,7 +53,7 @@ const Item = React.memo(({ item, textColor }) => {
             horizontal
             data={validImages}
             renderItem={renderImage}
-            keyExtractor={(item) => item.url}
+            keyExtractor={(item, index) => `item.url-${index}`}
             onMomentumScrollEnd={(event) => {
               const index = Math.floor(event.nativeEvent.contentOffset.x / event.nativeEvent.layoutMeasurement.width);
               setCurrentIndex(index);
