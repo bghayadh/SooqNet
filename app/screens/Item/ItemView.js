@@ -29,6 +29,7 @@ function ItemView() {
     const [selectedSizes, setSelectedSizes] = useState([]);
     const [colorsOptions, setColorsOptions] = useState([]); 
     const [selectedColors, setSelectedColors] = useState([]);
+    const [selectedPriceRange, setSelectedPriceRange] = useState([0,500]);
 
 
     useEffect(() => {//Set the value of previous cat before searching each time the searchKey change
@@ -76,6 +77,7 @@ function ItemView() {
       setSelectedSort(null);
       setSelectedSizes([]);
       setSelectedColors([]);
+      setSelectedPriceRange([0,500]);
         const codes = fullCatCode.split('-');
 
         if (lastCatLevel && codes.length > 0) {
@@ -102,6 +104,8 @@ function ItemView() {
         setSelectedSort(null);
         setSelectedSizes([]);
         setSelectedColors([]);
+        setSelectedPriceRange([0,500]);
+
         const codes = fullCatCode.split('-');
             if (codes.length > 1) {
                 const updatedCatCode = codes.slice(0, -1).join('-'); // Remove the last category code
@@ -157,7 +161,12 @@ function ItemView() {
 
     const handleSizeChange = (sizes) => {
       setSelectedSizes(sizes);  
-      fetchItems(selectedSort,sizes,selectedColors);
+      fetchItems(selectedSort,sizes,selectedColors,selectedPriceRange);
+    };
+
+    const handleRangeChange =(priceRange)  => {
+      setSelectedPriceRange(priceRange);  
+      fetchItems(selectedSort,selectedSizes,selectedColors,priceRange);
     };
 
     // Sorting function for sizeOptions
@@ -183,11 +192,11 @@ function ItemView() {
     };
 
     const handleColorChange = (updatedColors) => {    
-      setSelectedColors(updatedColors); // Update parent state
-     fetchItems(selectedSort, selectedSizes, updatedColors);
+      setSelectedColors(updatedColors);
+     fetchItems(selectedSort, selectedSizes, updatedColors,selectedPriceRange);
   
   };
-    const fetchItems = async (sortOption,sizes = [],colors =[]) => {
+    const fetchItems = async (sortOption,sizes = [],colors =[],price=[]) => {
       setLoading(true);
       setIsDropdownOpen(false); // Close the overlay when fetching items
 
@@ -198,6 +207,7 @@ function ItemView() {
             catID: fullCatCode,
             sizes: sizes.join(','),
             colors: colors.join(','),
+            price:price.join(','),
 
            },
       });      
@@ -211,7 +221,7 @@ function ItemView() {
 
   const handleSortChange = (sortOption) => {
     setSelectedSort(sortOption);
-    fetchItems(sortOption,selectedSizes,selectedColors);
+    fetchItems(sortOption,selectedSizes,selectedColors,selectedPriceRange);
   };
 
  //Update the list of displayed items and toggles the visibility of main flatList before the search
@@ -273,7 +283,8 @@ function ItemView() {
                     <View>
                       <ItemFilter
                         onSortChange={handleSortChange} selectedSort={selectedSort} onDropdownToggle={setIsDropdownOpen}
-                        sizeOptions={sizeOptions} selectedSizes={selectedSizes}  onSizeChange={handleSizeChange}   colorsOptions={colorsOptions} selectedColors={selectedColors} onColorChange={handleColorChange}     
+                        sizeOptions={sizeOptions} selectedSizes={selectedSizes}  onSizeChange={handleSizeChange}   colorsOptions={colorsOptions} selectedColors={selectedColors} onColorChange={handleColorChange} 
+                         onRangeChange={handleRangeChange} selectedPriceRange={selectedPriceRange}    
                       />
                     </View>
                     <ItemList data={itemData} />

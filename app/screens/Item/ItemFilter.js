@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions,Image } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import MultiSlider from '@ptomasroos/react-native-multi-slider';
 
-const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions, selectedSizes, onSizeChange,colorsOptions ,selectedColors, onColorChange}) => {
+const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions, selectedSizes, onSizeChange,colorsOptions ,selectedColors, onColorChange,onRangeChange,selectedPriceRange}) => {
     const [activeDropdown, setActiveDropdown] = useState(null); // To track active dropdown
     const [buttonPositions, setButtonPositions] = useState({ sort: 0, size: 0 }); // To store button positions
     const sortOptions = ['Name A to Z', 'Name Z to A', 'Price Low to High', 'Price High to Low'];
     const screenHeight = Dimensions.get('window').height; // To get the screen height
     const [sortedColors, setSortedColors] = useState({}); // To store the categorized colors
+    const [range, setRange] = useState([0, 500]);
 
     const handleSizeToggle = (size) => {
         const updatedSizes = selectedSizes.includes(size)
@@ -143,6 +145,23 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
         return categorized;
        
     };
+
+   // Update range state when selectedPriceRange prop changes
+  useEffect(() => {
+    if (selectedPriceRange && selectedPriceRange.length === 2) {
+      setRange(selectedPriceRange);
+    }
+  }, [selectedPriceRange]);
+
+    const handleValuesChange = (values) => {//To set the values of start/end price while moving the slider
+        setRange(values);
+    };
+  
+    const handleValuesChangeFinish = (values) => {// It updates the parent with the new range after changing the value from slider
+        onRangeChange(values);
+     };
+
+
     return (
         <View style={styles.container}>
             {/* Horizontal ScrollView for filter buttons */}
@@ -179,7 +198,29 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                         <Icon name={activeDropdown === 'color' ? 'up' : 'down'} size={14} color="black" />
                     </TouchableOpacity>
                 </View>  
-
+            {/* Dual-slider for price */}
+            <View style={styles.filterContainer}>      
+            <MultiSlider
+                values={range}
+                sliderLength={200} 
+                onValuesChange={handleValuesChange}
+                onValuesChangeFinish={handleValuesChangeFinish} 
+                min={0} max={500} step={1} allowOverlap={false}
+                markerStyle={{
+                height:18,     
+                width: 18,      
+                borderRadius: 15, 
+                backgroundColor:'#efebe0'
+            }}
+            selectedStyle={{
+                backgroundColor: '#71797E',
+            }}
+                snapped
+            />
+            <Text style={styles.minValue}>{`${range[0]}`}</Text>
+            <Text style={styles.priceLabel}> Price (USD) </Text>
+            <Text style={styles.maxValue}>{`${range[1]}`}</Text>
+            </View>
         </ScrollView>
 
             {/* Common Dropdown Content View (its content depends on the activeDropdown ) */}
@@ -240,8 +281,8 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                                     >
                                         {colorKey === 'Multicolor' ? (
                                             <Image
-                                                source={require('./Images/multicolor.gif')} // Replace with actual path
-                                                style={styles.multicolorImage}
+                                            source={require('../../Images/multicolor.gif')}
+                                            style={styles.multicolorImage}
                                                 resizeMode="contain"
                                             />
                                         ) : (
@@ -359,7 +400,7 @@ const styles = StyleSheet.create({
     optionText: {
         fontSize: 16,
     },
- scrollableDropdown: {
+    scrollableDropdown: {
     flexGrow: 1, 
     overflow: 'scroll',
     },
@@ -399,15 +440,53 @@ const styles = StyleSheet.create({
         height: 20,         
         marginRight: 5,
         borderRadius: 2,
-    },
-    
-   
+    }, 
     colorText: {
         fontSize: 12,
         color: '#333',
         fontWeight: '500',
         textAlign: 'center',
     },
+    label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 10,
+      },
+      rangeValues: {
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+        marginTop: -10,
+      },
+      value: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        width: 60, 
+      },
+      maxValue: {
+        position: 'absolute',
+        right: 0,  
+        top: 35,   
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333',
+      },
+      minValue: {
+        position: 'absolute',
+        left: 0,  // Align it to the right
+        top: 35,  
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333',
+      },
+      priceLabel: {
+        position: 'absolute',
+        top: -5,  
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333',
+        textAlign: 'center', 
+        width:'100%'
+    }
 });
 
 export default ItemFilter; 
