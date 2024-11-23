@@ -280,6 +280,7 @@ function ItemView() {
                         lastCatLevel={lastCatLevel} 
                         selectedId={fullCatCode.split('-').pop()} 
                     />
+                    <Text></Text>
                     <View>
                       <ItemFilter
                         onSortChange={handleSortChange} selectedSort={selectedSort} onDropdownToggle={setIsDropdownOpen}

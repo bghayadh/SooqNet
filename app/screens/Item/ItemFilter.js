@@ -308,10 +308,10 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
 
 const styles = StyleSheet.create({
     container: {
-        padding: 10,
         top:-20,
         position: 'absolute', // Ensure dropdown aligns relative on ItemList
         zIndex: 10000, // High enough to prevent interference
+        width:'100%'
         
     },
     scrollContainer: {
