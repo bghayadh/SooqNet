@@ -208,7 +208,8 @@ function ItemView() {
             sizes: sizes.join(','),
             colors: colors.join(','),
             price:price.join(','),
-
+            source:source,
+            searchKey:searchKey,
            },
       });      
       setItemData(response?.data?.category1List || []);
@@ -234,6 +235,8 @@ function ItemView() {
       setSearchText(() => {
           return '';
       });
+      setFullCatCode(savedFullCatCode.current); 
+
       if(routeOrigin ==='home') {
         navigation.navigate('screens/HomePage'); // Navigate to HomePage screen
       }
