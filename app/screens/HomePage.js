@@ -8,7 +8,7 @@ const Category = ({ category, onPress, backgroundColor, textColor }) => (
   <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
       <View style={styles.imageContainer} >
       <Image
-        source={{ uri: 'http://192.168.1.109:8080/osc/resources/images/CategoriesImages/' + category[2] }}
+        source={{ uri: 'http://192.168.1.75:8080/osc/resources/images/CategoriesImages/' + category[2] }}
         style={styles.image}
       /></View>
     <Text style={[styles.title, { color: textColor }]}>{category[0]}</Text>
@@ -28,7 +28,7 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://192.168.1.109:8080/osc/SooqNetGetCat1');
+        const response = await axios.get('http://192.168.1.75:8080/osc/SooqNetGetCat1');
         if (response && response.data && response.data.category1List) {
           setData(response.data.category1List);
         } 
@@ -55,6 +55,7 @@ const HomePage = () => {
           setSelectedId(item);
           router.push({ pathname: '/screens/Item/ItemView', params: { 
             catCode: item[1],
+            catTitle: item[0],
             source: 'category',
            } });
         }}

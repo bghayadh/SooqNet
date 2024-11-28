@@ -8,9 +8,10 @@ import { useRouter } from 'expo-router';
 import ItemSearch from './ItemSearch';
 import { useNavigation } from '@react-navigation/native';
 import ItemFilter from './ItemFilter';
+import CategoryPath from './CategoryPath';
 
 function ItemView() {
-    const { catCode, source: initialSource, searchKey, savedFullCatCode: routeSavedFullCatCode,routeOrigin } = useLocalSearchParams();
+    const { catCode,catTitle, source: initialSource, searchKey, savedFullCatCode: routeSavedFullCatCode,routeOrigin } = useLocalSearchParams();
     const [source, setSource] = useState(initialSource || 'category'); // Use 'category' as a default if no initial value 
     const [itemData, setItemData] = useState([]);
     const [catData, setCatData] = useState([]);
@@ -30,6 +31,7 @@ function ItemView() {
     const [colorsOptions, setColorsOptions] = useState([]); 
     const [selectedColors, setSelectedColors] = useState([]);
     const [selectedPriceRange, setSelectedPriceRange] = useState([0,500]);
+    const [fullCatTitles, setFullCatTitles] = useState(catTitle);
 
 
     useEffect(() => {//Set the value of previous cat before searching each time the searchKey change
@@ -45,7 +47,7 @@ function ItemView() {
 
             try {
                 setLoading(true);
-                const response = await axios.get('http://192.168.1.109:8080/osc/SooqNetGetCatItem', {
+                const response = await axios.get('http://192.168.1.75:8080/osc/SooqNetGetCatItem', {
                     params: { catID: fullCatCode, source, searchKey },
                 });
 
@@ -73,12 +75,13 @@ function ItemView() {
     }, [fullCatCode, source, searchKey]); 
 
     // Function to handle category selection
-    const handleCategoryPress = (newCatCode) => {
+    const handleCategoryPress = (newCatCode,newCatTitle) => {
       setSelectedSort(null);
       setSelectedSizes([]);
       setSelectedColors([]);
       setSelectedPriceRange([0,500]);
         const codes = fullCatCode.split('-');
+        const titles = fullCatTitles.split('-');
 
         if (lastCatLevel && codes.length > 0) {
             // Replace the last category if lastCatLevel is true
@@ -89,13 +92,28 @@ function ItemView() {
                 // Replace the last category with the new category
                 codes[codes.length - 1] = newCatCode;
             }
+            if (titles[titles.length - 1] === newCatTitle) {
+              // If the new category is the same as the last one, do nothing
+              return;
+          } else {
+              // Replace the last category with the new category
+              titles[titles.length - 1] = newCatTitle;
+          }
         } else {
             // Combine with dash if not empty
             codes.push(newCatCode);
+            titles.push(newCatTitle)
         }
 
         const combinedCatCode = codes.join('-'); // Join back into a single string
+        const combinedCatTitle = titles.join('-'); // Join back into a single string
         setFullCatCode(combinedCatCode); // This will trigger the useEffect to fetch data
+        setFullCatTitles(combinedCatTitle);
+    };
+
+    const handlePathPress = (newCatCode,newCatTitle) => {
+      setFullCatCode(newCatCode);  // This updates the fullCatCode, triggering a re-fetch of data
+      setFullCatTitles(newCatTitle);
     };
 
     // BackHandler to manage back button behavior
@@ -107,7 +125,11 @@ function ItemView() {
         setSelectedPriceRange([0,500]);
 
         const codes = fullCatCode.split('-');
+        const titles = fullCatTitles.split('-');
             if (codes.length > 1) {
+                const updatedCatTitle = titles.slice(0, -1).join('-'); // Remove the last category Title
+                setFullCatTitles(updatedCatTitle);
+
                 const updatedCatCode = codes.slice(0, -1).join('-'); // Remove the last category code
                 setFullCatCode(updatedCatCode);
                 return true; 
@@ -117,7 +139,7 @@ function ItemView() {
                 try {
                   setLoading(true);
                   // Make an Axios request to refetch search results based on the searchKey
-                  const response = await axios.get('http://192.168.1.109:8080/osc/GetCategory1BySearchKey', {
+                  const response = await axios.get('http://192.168.1.75:8080/osc/GetCategory1BySearchKey', {
                       params: { searchKey },
                   });
   
@@ -201,7 +223,7 @@ function ItemView() {
       setIsDropdownOpen(false); // Close the overlay when fetching items
 
       try {
-        const response = await axios.get('http://192.168.1.109:8080/osc/GetSooqNetFilteredItems', {
+        const response = await axios.get('http://192.168.1.75:8080/osc/GetSooqNetFilteredItems', {
           params: {   
             sort: sortOption,
             catID: fullCatCode,
@@ -283,6 +305,8 @@ function ItemView() {
                         lastCatLevel={lastCatLevel} 
                         selectedId={fullCatCode.split('-').pop()} 
                     />
+
+                    <CategoryPath fullCatCode={fullCatCode}  fullCatTitle={fullCatTitles} categories={catData} onCategoryPress={handlePathPress} />
                     <Text></Text>
                     <View>
                       <ItemFilter

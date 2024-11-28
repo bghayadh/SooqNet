@@ -9,7 +9,7 @@ const Category = ({ item, onPress, isSelected }) => {
         <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
                   <View style={styles.imageContainer} >
             <Image
-                source={{ uri: 'http://192.168.1.109:8080/osc/resources/images/CategoriesImages/' + item[2] }}
+                source={{ uri: 'http://192.168.1.75:8080/osc/resources/images/CategoriesImages/' + item[2] }}
                 style={styles.image}
             /></View>
             <Text style={[styles.title, { color: textColor }]}>
@@ -24,7 +24,7 @@ const CategoryList = ({ data, onCategoryPress, lastCatLevel, selectedId }) => {
         <Category
             item={item}
             onPress={() => {
-                onCategoryPress(item[0]); 
+                onCategoryPress(item[0],item[1]); 
             }}
             isSelected={lastCatLevel && selectedId === item[0]} 
         />
