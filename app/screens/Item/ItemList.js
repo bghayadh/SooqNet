@@ -17,14 +17,14 @@ const { width: screenWidth } = Dimensions.get('window'); // Get screen width
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 // Item Component
-const Item = React.memo(({ item, textColor }) => {
+const Item = React.memo(({ item,itemImagesPath, textColor }) => {
   const validImages = item.imageData.filter(img => img.name !== null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const renderImage = ({ item }) => (
     <View style={styles.slide}>
       <Image
-        source={{ uri: item.url }}
+        source={{ uri: itemImagesPath+item.name }}
         style={styles.image} // Use the Image style here
         resizeMode="contain" // Makes sure the image fits inside the container without distortion
       />
@@ -53,7 +53,7 @@ const Item = React.memo(({ item, textColor }) => {
             horizontal
             data={validImages}
             renderItem={renderImage}
-            keyExtractor={(item, index) => `item.url-${index}`}
+            keyExtractor={(item, index) => `item.name-${index}`}
             onMomentumScrollEnd={(event) => {
               const index = Math.floor(event.nativeEvent.contentOffset.x / event.nativeEvent.layoutMeasurement.width);
               setCurrentIndex(index);
@@ -109,7 +109,7 @@ const Item = React.memo(({ item, textColor }) => {
 });
 
 // ItemList Component
-const ItemList = ({ data }) => {
+const ItemList = ({ data ,itemImagesPath}) => {
   const [selectedId, setSelectedId] = useState(null);
   const [isScrolling, setIsScrolling] = useState(false);
 
@@ -137,6 +137,7 @@ const ItemList = ({ data }) => {
     return (
       <Item
         item={item}
+        itemImagesPath={itemImagesPath}
         textColor={getColor(item.itemCode)} 
         {...panResponder.panHandlers} // Pass panResponder handlers
       />

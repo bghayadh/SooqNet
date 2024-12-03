@@ -9,6 +9,7 @@ import ItemSearch from './ItemSearch';
 import { useNavigation } from '@react-navigation/native';
 import ItemFilter from './ItemFilter';
 import CategoryPath from './CategoryPath';
+import {ipAddress,port,webAppPath} from "@env";
 
 function ItemView() {
     const { catCode,catTitle, source: initialSource, searchKey, savedFullCatCode: routeSavedFullCatCode,routeOrigin } = useLocalSearchParams();
@@ -32,7 +33,9 @@ function ItemView() {
     const [selectedColors, setSelectedColors] = useState([]);
     const [selectedPriceRange, setSelectedPriceRange] = useState([0,500]);
     const [fullCatTitles, setFullCatTitles] = useState(catTitle);
-
+    const [itemImagesPath, setItemImagesPath] = useState("");
+    const [catImagesPath, setCatImagesPath] = useState("");
+   
 
     useEffect(() => {//Set the value of previous cat before searching each time the searchKey change
       if (searchText === '' && savedFullCatCode.current) {
@@ -47,8 +50,8 @@ function ItemView() {
 
             try {
                 setLoading(true);
-                const response = await axios.get('http://192.168.1.75:8080/osc/SooqNetGetCatItem', {
-                    params: { catID: fullCatCode, source, searchKey },
+                const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/SooqNetGetCatItem', {
+                  params: { catID: fullCatCode, source, searchKey },
                 });
 
                 // Handle item data
@@ -58,14 +61,28 @@ function ItemView() {
                 // Set lastCatLevel from server response
                 setLastCatLevel(response?.data?.lastCatLevel || false);
              
-              const sortedSizeOptions = sortSizes(response?.data?.sizeOptions || []);// Sort sizeOptions from smallest to largest
-              setSizeOptions(sortedSizeOptions);            
-              setColorsOptions(response?.data?.colorsOptions);
+                const itemImageBasePath = response?.data?.relativePath === "1"
+                ? 'http://'+ipAddress+':'+port+webAppPath+response?.data?.itemImagesPath
+                : 'http://'+ipAddress+':'+port+response?.data?.itemImagesPath;
+                setItemImagesPath(itemImageBasePath);
+
+                const catImageBasePath = response?.data?.relativePath === "1"
+                ? 'http://'+ipAddress+':'+port+webAppPath+response?.data?.catImagesPath
+                : 'http://'+ipAddress+':'+port+response?.data?.catImagesPath;
+                setCatImagesPath(catImageBasePath);
+
+                const sortedSizeOptions = sortSizes(response?.data?.sizeOptions || []);// Sort sizeOptions from smallest to largest
+                setSizeOptions(sortedSizeOptions);            
+                setColorsOptions(response?.data?.colorsOptions);
 
             } catch (error) {
                 console.error("Error fetching data:", error.message);
                 setItemData([]);
                 setCatData([]); 
+                setItemImagesPath("");
+                setCatImagesPath("");
+                setSizeOptions([]);
+                setColorsOptions([]);
             } finally {
                 setLoading(false);
             }
@@ -139,7 +156,7 @@ function ItemView() {
                 try {
                   setLoading(true);
                   // Make an Axios request to refetch search results based on the searchKey
-                  const response = await axios.get('http://192.168.1.75:8080/osc/GetCategory1BySearchKey', {
+                  const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/GetCategory1BySearchKey', {
                       params: { searchKey },
                   });
   
@@ -198,13 +215,13 @@ function ItemView() {
       const numericSizes = sizes.filter((size) => /^\d/.test(size));
       const alphabeticSizes = sizes.filter((size) => /^[a-zA-Z]/.test(size));
 
-      // Sort numeric sizes
-      numericSizes.sort((a, b) => {
-          const [aMain, aSub] = a.split("/").map(Number);
-          const [bMain, bSub] = b.split("/").map(Number);
-          return aMain - bMain || (aSub || 0) - (bSub || 0);
-      });
-
+      if(numericSizes.length>0){
+        numericSizes.sort((a, b) => {
+            const [aMain, aSub] = a.split("/").map(Number);
+            const [bMain, bSub] = b.split("/").map(Number);
+            return aMain - bMain || (aSub || 0) - (bSub || 0);
+        });
+    }
       // Define custom order for alphabetic sizes
       const sizeOrder = ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"];
       alphabeticSizes.sort((a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
@@ -223,7 +240,7 @@ function ItemView() {
       setIsDropdownOpen(false); // Close the overlay when fetching items
 
       try {
-        const response = await axios.get('http://192.168.1.75:8080/osc/GetSooqNetFilteredItems', {
+        const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/GetSooqNetFilteredItems', {
           params: {   
             sort: sortOption,
             catID: fullCatCode,
@@ -235,6 +252,16 @@ function ItemView() {
            },
       });      
       setItemData(response?.data?.category1List || []);
+      const itemImageBasePath = response?.data?.relativePath === "1"
+      ? 'http://'+ipAddress+':'+port+webAppPath+response?.data?.itemImagesPath
+      : 'http://'+ipAddress+':'+port+response?.data?.itemImagesPath;
+      setItemImagesPath(itemImageBasePath);
+
+      const catImageBasePath = response?.data?.relativePath === "1"
+      ? 'http://'+ipAddress+':'+port+webAppPath+response?.data?.catImagesPath
+      : 'http://'+ipAddress+':'+port+response?.data?.catImagesPath;
+      setCatImagesPath(catImageBasePath);
+
     } catch (error) {
           console.error("Error fetching items:", error);
       } finally {
@@ -279,11 +306,7 @@ function ItemView() {
           accessible={false} // Prevent accessibility conflicts
         >
           <View>
-            <ItemSearch
-              searchText={searchText}
-              setSearchText={setSearchText}
-              setShowFlatList={setShowFlatList}
-              onSearchResults={handleSearchResults}
+            <ItemSearch searchText={searchText} setSearchText={setSearchText} setShowFlatList={setShowFlatList} onSearchResults={handleSearchResults}
             />
           </View>
         </TouchableWithoutFeedback>
@@ -301,6 +324,7 @@ function ItemView() {
                 }
                     <CategoryList 
                         data={catData} 
+                        catImagesPath={catImagesPath}
                         onCategoryPress={handleCategoryPress} 
                         lastCatLevel={lastCatLevel} 
                         selectedId={fullCatCode.split('-').pop()} 
@@ -315,7 +339,7 @@ function ItemView() {
                          onRangeChange={handleRangeChange} selectedPriceRange={selectedPriceRange}    
                       />
                     </View>
-                    <ItemList data={itemData} />
+                    <ItemList data={itemData} itemImagesPath={itemImagesPath} />
                 </View>
            ) : (
             <View style={styles.resultsContainer}>

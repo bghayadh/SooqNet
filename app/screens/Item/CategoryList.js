@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 
-const Category = ({ item, onPress, isSelected }) => {
+const Category = ({ item, onPress, isSelected ,catImagesPath}) => {
     const backgroundColor = isSelected ? '#d3d3d3' : 'white'; // Highlight color for selected category
     const textColor = isSelected ? 'black' : 'black'; // Text color
 
@@ -9,7 +9,7 @@ const Category = ({ item, onPress, isSelected }) => {
         <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
                   <View style={styles.imageContainer} >
             <Image
-                source={{ uri: 'http://192.168.1.75:8080/osc/resources/images/CategoriesImages/' + item[2] }}
+                source={{ uri: catImagesPath+ item[2] }}
                 style={styles.image}
             /></View>
             <Text style={[styles.title, { color: textColor }]}>
@@ -19,7 +19,7 @@ const Category = ({ item, onPress, isSelected }) => {
     );
 };
 
-const CategoryList = ({ data, onCategoryPress, lastCatLevel, selectedId }) => {
+const CategoryList = ({ data, onCategoryPress, lastCatLevel, selectedId ,catImagesPath}) => {
     const renderCategory = ({ item }) => (
         <Category
             item={item}
@@ -27,6 +27,7 @@ const CategoryList = ({ data, onCategoryPress, lastCatLevel, selectedId }) => {
                 onCategoryPress(item[0],item[1]); 
             }}
             isSelected={lastCatLevel && selectedId === item[0]} 
+            catImagesPath={catImagesPath}
         />
     );
 

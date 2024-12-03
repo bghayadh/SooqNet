@@ -2,7 +2,7 @@ import React, { useEffect,useRef } from 'react';
 import {View,TextInput,TouchableOpacity,StyleSheet,Keyboard} from 'react-native';
 import axios from 'axios';
 import {Ionicons} from '@expo/vector-icons';
-
+import {ipAddress,port,webAppPath} from "@env";
 
 const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults }) => {
 
@@ -34,7 +34,7 @@ const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults
 
     if (searchKey) {
       setShowFlatList(false);// Hide other flatList (cond. flatList)
-      const response = await axios.get('http://192.168.1.75:8080/osc/GetCategory1BySearchKey', {
+      const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/GetCategory1BySearchKey', {
         params: { searchKey }
       });
 

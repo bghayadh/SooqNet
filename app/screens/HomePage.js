@@ -3,15 +3,15 @@ import {FlatList,SafeAreaView,StatusBar,StyleSheet,Text,BackHandler, Alert,Touch
 import axios from 'axios';
 import {useRouter} from 'expo-router';
 import ItemSearch from './Item/ItemSearch';
+import {ipAddress,port,webAppPath} from "@env";
 
-const Category = ({ category, onPress, backgroundColor, textColor }) => (
-  <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
+const Category = ({ category,imageBasePath, onPress }) => (
+
+  <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor:'white' }]}>
       <View style={styles.imageContainer} >
-      <Image
-        source={{ uri: 'http://192.168.1.75:8080/osc/resources/images/CategoriesImages/' + category[2] }}
-        style={styles.image}
-      /></View>
-    <Text style={[styles.title, { color: textColor }]}>{category[0]}</Text>
+      <Image source={{ uri: imageBasePath+ category[2] }} style={styles.image} />
+      </View>
+    <Text style={[styles.title, { color: 'black' }]}>{category[0]}</Text>
   </TouchableOpacity>
 );
 
@@ -22,18 +22,28 @@ const HomePage = () => {
   const [showFlatList, setShowFlatList] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [searchResults, setSearchResults] = useState([]); 
+  const [imageBasePath, setImageBasePath] = useState('');
   const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://192.168.1.75:8080/osc/SooqNetGetCat1');
+        const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/getCat1DetailsAndPaths'); 
+        
+        if (response?.data?.imageBasePathDetails) {
+          const details = response.data.imageBasePathDetails;
+          const [categoriesImagesPath, relPath] = details[0]; 
+         
+          const basePath = relPath === "1"
+          ? 'http://'+ipAddress+':'+port+webAppPath+categoriesImagesPath
+          : 'http://'+ipAddress+':'+port+categoriesImagesPath;
+          setImageBasePath(basePath); 
+        } 
         if (response && response.data && response.data.category1List) {
           setData(response.data.category1List);
         } 
         else {
-          console.log("No data found.");
           setData([]);
         }
       } catch (error) {
@@ -51,6 +61,7 @@ const HomePage = () => {
     return (
       <Category
         category={item}
+        imageBasePath={imageBasePath}
         onPress={() => {
           setSelectedId(item);
           router.push({ pathname: '/screens/Item/ItemView', params: { 
@@ -59,8 +70,6 @@ const HomePage = () => {
             source: 'category',
            } });
         }}
-        backgroundColor='white'
-        textColor='black'
       />
     );
   };
@@ -100,12 +109,7 @@ const HomePage = () => {
       }}
     >
     <SafeAreaView style={styles.container}>
-    <ItemSearch
-        searchText={searchText}
-        setSearchText={setSearchText}
-        setShowFlatList={setShowFlatList}
-        onSearchResults={handleSearchResults}
-      />
+    <ItemSearch searchText={searchText}  setSearchText={setSearchText} setShowFlatList={setShowFlatList} onSearchResults={handleSearchResults} />
         {loading ? (
           <Text>Loading...</Text>
         ) : (
@@ -135,7 +139,7 @@ const HomePage = () => {
                      catCode: result.categoryCode,
                      source: 'search',
                      searchKey: searchText,
-                     routeOrigin:'home'
+                     routeOrigin:'home',
                    },
                  });
                }}
