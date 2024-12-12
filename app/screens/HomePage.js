@@ -137,6 +137,7 @@ const HomePage = () => {
                    pathname: '/screens/Item/ItemView',
                    params: {
                      catCode: result.categoryCode,
+                     catTitle:result.title,
                      source: 'search',
                      searchKey: searchText,
                      routeOrigin:'home',
