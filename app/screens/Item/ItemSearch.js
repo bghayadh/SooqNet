@@ -34,6 +34,7 @@ const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults
 
     if (searchKey) {
       setShowFlatList(false);// Hide other flatList (cond. flatList)
+      
       const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/GetCategory1BySearchKey', {
         params: { searchKey }
       });

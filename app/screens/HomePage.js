@@ -28,6 +28,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+       
         setLoading(true);
         const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/getCat1DetailsAndPaths'); 
         
