@@ -62,7 +62,12 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
         };
 
         colorsArray.forEach(([colorCode, colorName]) => {
-            const colorLowerCase = colorName.toLowerCase();
+            try {
+                colorLowerCase = colorName.toLowerCase();
+            } catch (error) {
+                return; // Skip to the next iteration
+            }
+          //  const colorLowerCase = colorName.toLowerCase();
             
             if (colorLowerCase.includes('black')) {
                 if (!categorized.Black.includes(colorName)) {

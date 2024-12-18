@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {FlatList,SafeAreaView,StatusBar,StyleSheet,Text,BackHandler, Alert,TouchableOpacity,ScrollView,View,Image,Keyboard,TouchableWithoutFeedback} from 'react-native';
+import {FlatList,SafeAreaView,StatusBar,StyleSheet,Text,BackHandler, Dimensions,TouchableOpacity,ScrollView,View,Image,Keyboard,TouchableWithoutFeedback} from 'react-native';
 import axios from 'axios';
 import {useRouter} from 'expo-router';
 import ItemSearch from './Item/ItemSearch';
@@ -11,9 +11,12 @@ const Category = ({ category,imageBasePath, onPress }) => (
       <View style={styles.imageContainer} >
       <Image source={{ uri: imageBasePath+ category[2] }} style={styles.image} />
       </View>
-    <Text style={[styles.title, { color: 'black' }]}>{category[0]}</Text>
+      <Text style={styles.title} adjustsFontSizeToFit>
+      {category[0]}
+    </Text>
   </TouchableOpacity>
 );
+
 
 const HomePage = () => {
   const [selectedId, setSelectedId] = useState();
@@ -24,6 +27,10 @@ const HomePage = () => {
   const [searchResults, setSearchResults] = useState([]); 
   const [imageBasePath, setImageBasePath] = useState('');
   const router = useRouter();
+  
+  const screenWidth = Dimensions.get('window').width;
+  const itemWidth = 100 + 16; 
+  const numColumns = Math.floor(screenWidth / itemWidth);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,9 +43,11 @@ const HomePage = () => {
           const details = response.data.imageBasePathDetails;
           const [categoriesImagesPath, relPath] = details[0]; 
          
-          const basePath = relPath === "1"
-          ? 'http://'+ipAddress+':'+port+webAppPath+categoriesImagesPath
-          : 'http://'+ipAddress+':'+port+categoriesImagesPath;
+          const basePath =
+          relPath === '1'
+            ? 'http://' + ipAddress + ':' + port + webAppPath + categoriesImagesPath
+            : 'http://' + ipAddress + ':' + port + categoriesImagesPath;
+        
           setImageBasePath(basePath); 
         } 
         if (response && response.data && response.data.category1List) {
@@ -59,6 +68,10 @@ const HomePage = () => {
   }, []);
  
   const renderCategory = ({ item }) => {
+    if (item.empty) {
+      return <View style={{ flex: 1, margin: 8 }} />;
+    }
+
     return (
       <Category
         category={item}
@@ -74,6 +87,10 @@ const HomePage = () => {
       />
     );
   };
+ const adjustedData = [...data];
+  while (adjustedData.length % numColumns !== 0) {
+    adjustedData.push({ empty: true });
+  }
 
   useEffect(() => {
     const backAction = () => {
@@ -115,18 +132,19 @@ const HomePage = () => {
           <Text>Loading...</Text>
         ) : (
           showFlatList ? (
-            <View style={styles.centeredContainer}>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <FlatList
-                  numColumns={Math.ceil(data.length / 2)}
-                  data={data}
-                  renderItem={renderCategory}
-                  keyExtractor={(item, index) => index.toString()}
-                  extraData={selectedId}
-                  style={{ flexGrow: 0 }}
-                />
-              </ScrollView>
-            </View>
+            <FlatList
+                data={adjustedData}
+                renderItem={renderCategory}
+                keyExtractor={(item, index) => index.toString()}
+                numColumns={numColumns}
+                columnWrapperStyle={{
+                  justifyContent: 'space-between',
+                  paddingHorizontal: 16,
+                }}
+                contentContainerStyle={{
+                  top:'25%'
+                }}
+          />
           ) : (
             <View style={styles.resultsContainer}>
             {searchResults.map((result, index) => (
@@ -183,13 +201,18 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   cat: {
-    padding: 2,
-    marginVertical: 8,
-    marginHorizontal: 16,
+    flex: 1,
+    margin: 8,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     textAlign: 'center',
+    flexShrink: 1,
+    maxWidth: 100,
+    marginTop: 5,
+    height: 36, 
   },
   centeredContainer: {
     flex: 1,
@@ -210,7 +233,7 @@ const styles = StyleSheet.create({
   image: {
     width: '100%', 
     height: '100%',
-    resizeMode:'stretch',
+    resizeMode:'contain',
   },
 });
 
