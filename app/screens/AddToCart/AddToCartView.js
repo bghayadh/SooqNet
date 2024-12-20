@@ -96,7 +96,7 @@ const AddToCartView = () => {
 
       <ScrollView
         contentContainerStyle={styles.detailsContainer}
-        scrollEventThrottle={16} // Increase throttle for smoother scrolling
+        scrollEventThrottle={1000} // Increase throttle for smoother scrolling
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
