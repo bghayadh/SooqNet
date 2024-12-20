@@ -4,7 +4,8 @@ import ItemDetails from './ItemDetails/ItemDetails';
 import ItemColors from './ItemDetails/ItemColors';
 import ItemSizes from './ItemDetails/ItemSizes';
 
-const ItemDetailsComponent = ({ itemData, itemColors, itemSizes, selectedColorID, setSelectedColorID }) => {
+const ItemDetailsComponent = ({ itemData, itemColors, itemSizes, selectedColorID, setSelectedColorID ,colorImagePath}) => {
+ 
   return (
     <View style={styles.container}>
       <ItemDetails itemData={itemData} />
@@ -12,6 +13,7 @@ const ItemDetailsComponent = ({ itemData, itemColors, itemSizes, selectedColorID
         itemColors={itemColors} 
         selectedColorID={selectedColorID} // Pass the selectedColorID
         setSelectedColorID={setSelectedColorID} // Pass the function to set selectedColorID
+        colorImagePath ={colorImagePath}
       />
 
       <ItemSizes

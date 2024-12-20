@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, TouchableOpacity, BackHandler } from 'react-native';
 import Carousel from 'react-native-reanimated-carousel';
-import {ipAddress,port,webAppPath} from "@env";
+//import {ipAddress,port,webAppPath} from "@env";
 
-const baseUrl = 'http://'+ipAddress+':'+port+webAppPath;  // Base URL for image path
 const { width, height } = Dimensions.get('window'); 
 
-const ItemImages = ({ imageData, onFullScreenToggle }) => {
+const ItemImages = ({ imageData, onFullScreenToggle,itemImagePath }) => {
   const [currentIndex, setCurrentIndex] = useState(0); 
   const [isFullScreen, setIsFullScreen] = useState(false); 
   const [clickedIndex, setClickedIndex] = useState(null); 
-
+//console.log("itemImagePath "+itemImagePath)
   // Handle the back button event
   const handleBackPress = () => {
     if (isFullScreen) {
@@ -31,12 +30,11 @@ const ItemImages = ({ imageData, onFullScreenToggle }) => {
   }, [isFullScreen]);
 
   const renderImage = (item, index) => {
-    const imagePath = item.IMAGE_PATH ? item.IMAGE_PATH.replace(/\\/g, '/') : ''; 
     const imageName = item.IMAGE_NAME || '';
 
     // Construct the full URL for the image
-    const imageUrl = imagePath && imageName ? `${baseUrl}${imagePath}/${imageName}` : '';
-
+    const imageUrl = itemImagePath && imageName ? itemImagePath+`${imageName}` : '';
+//console.log("imageUrl "+imageUrl)
     return (
       <TouchableOpacity
         onPress={() => {

@@ -50,7 +50,7 @@ function ItemView() {
 
             try {
                 setLoading(true);
-
+                console.log("ipAddress "+ipAddress)
                 const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/SooqNetGetCatItem', {
                   params: { catID: fullCatCode, source, searchKey },
                 });

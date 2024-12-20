@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
-import {ipAddress,port,webAppPath} from "@env";
+//import {ipAddress,port,webAppPath} from "@env";
 
 // Handler when color is pressed to set the selected color
 const onColorPress = (colorID, setSelectedColorID) => {
   setSelectedColorID(colorID);
 };
 
-const Color = ({ item, onPress, isSelected }) => {
-  const imagePath = item[1] ? item[1].replace(/\\/g, '/') : ''; 
-
+const Color = ({ item, onPress, isSelected,colorImagePath }) => {
+  
   return (
     <TouchableOpacity onPress={onPress} style={[styles.color]}>
       <View
@@ -19,7 +18,7 @@ const Color = ({ item, onPress, isSelected }) => {
         ]}
       >
         <Image
-          source={{ uri: 'http://'+ipAddress+':'+port+'/'+webAppPath+imagePath + '/' + item[0] }}
+          source={{ uri: colorImagePath+ item[0] }}
           style={styles.image}
         />
       </View>
@@ -27,8 +26,8 @@ const Color = ({ item, onPress, isSelected }) => {
   );
 };
 
-const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID }) => {
-
+const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID ,colorImagePath}) => {
+console.log("color colorImagePath "+colorImagePath)
   useEffect(() => {
     if (itemColors.length > 0 && !selectedColorID) {
       setSelectedColorID(itemColors[0][2]); // Ensure the first color is selected
@@ -42,6 +41,7 @@ const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID }) => {
         onColorPress(item[2], setSelectedColorID); // Update selected color when pressed
       }}
       isSelected={item[2] === selectedColorID} // Determine if this color is selected
+      colorImagePath={colorImagePath}
     />
   );
 
@@ -77,20 +77,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
   },
   imageContainer: {
-    width: 60,                    
-    height: 60,                    
+    width: 40,                    
+    height: 40,                    
     borderRadius: 30,              
     overflow: 'hidden',            
     justifyContent: 'center',
     alignItems: 'center',
   },
   selectedImageContainer: {
-    borderWidth: 2,                
+    borderWidth: 1,                
     borderColor: 'black',          
   },
   image: {
-    width: '150%',                
-    height: '150%',                
+    width: '95%',                
+    height: '95%',                
     resizeMode: 'cover',           
   },
 });
