@@ -29,13 +29,14 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
     };
 
     const calculateDropdownHeight = () => {
-        const itemsPerRow = 4; // Number of items per row
-        const rowHeight = 60 + 15; // Item height + row gap
+        const itemsPerRow = 4; 
+        const rowHeight = 60 + 15; 
         const numberOfRows = Math.ceil(sizeOptions.length / itemsPerRow);
         const totalHeight = numberOfRows * rowHeight;
-        const maxHeight = screenHeight * 0.5; // Limit to 50% of screen height
-        return totalHeight > maxHeight ? maxHeight : totalHeight;
+        const maxHeight = screenHeight * 0.5; 
+        return totalHeight > maxHeight ? maxHeight : Math.max(totalHeight, 180); // Set a minimum height of 150
     };
+    
 
     const handleColorToggle = (colorKey) => {
        
