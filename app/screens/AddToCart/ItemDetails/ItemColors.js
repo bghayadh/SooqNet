@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react
 //import {ipAddress,port,webAppPath} from "@env";
 
 // Handler when color is pressed to set the selected color
-const onColorPress = (colorID, setSelectedColorID) => {
+const onColorPress = (colorID, setSelectedColorID,colorName,setSelectedColorName,setSelectedItemSize) => {
   setSelectedColorID(colorID);
+  setSelectedColorName(colorName);
+  setSelectedItemSize('');
 };
 
 const Color = ({ item, onPress, isSelected,colorImagePath }) => {
@@ -26,7 +28,7 @@ const Color = ({ item, onPress, isSelected,colorImagePath }) => {
   );
 };
 
-const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID ,colorImagePath}) => {
+const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID ,colorImagePath,selectedColorName,setSelectedColorName,setSelectedItemSize}) => {
 console.log("color colorImagePath "+colorImagePath)
   useEffect(() => {
     if (itemColors.length > 0 && !selectedColorID) {
@@ -38,7 +40,7 @@ console.log("color colorImagePath "+colorImagePath)
     <Color
       item={item}
       onPress={() => {
-        onColorPress(item[2], setSelectedColorID); // Update selected color when pressed
+        onColorPress(item[2], setSelectedColorID,item[3],setSelectedColorName,setSelectedItemSize); // Update selected color when pressed
       }}
       isSelected={item[2] === selectedColorID} // Determine if this color is selected
       colorImagePath={colorImagePath}

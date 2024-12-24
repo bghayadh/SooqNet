@@ -6,6 +6,15 @@ import ItemDetailsComponent from './ItemDetailsComponent';
 import { useLocalSearchParams } from 'expo-router';
 import { ipAddress, port, webAppPath } from '@env';
 
+
+const onAddCartPress = (itemCode,selectedColorID,selectedColorName,selectedItemSize) => {
+  
+  console.log("item code  "+itemCode)
+  console.log("selectedColorName "+selectedColorName)
+  console.log("selectedColorID "+selectedColorID)
+  console.log("selected size "+selectedItemSize)
+};
+
 const AddToCartView = () => {
   const { itemCode } = useLocalSearchParams();
 
@@ -16,8 +25,11 @@ const AddToCartView = () => {
   const [loading, setLoading] = useState(true);
   const [isFullScreen, setIsFullScreen] = useState(false); // State to track if image is in full-screen mode
   const [selectedColorID, setSelectedColorID] = useState(null); // State for selected color ID
+  const [selectedColorName, setSelectedColorName] = useState('');
   const [itemImageBasePath, setItemImageBasePath] = useState('');
   const [colorImageBasePath, setColorImageBasePath] = useState('');
+  const [selectedItemSize, setSelectedItemSize] = useState('');
+
 
   const scrollY = new Animated.Value(0); // Track scroll position
   const screenHeight = Dimensions.get('window').height; // Get screen height to calculate dynamic sizes
@@ -41,6 +53,7 @@ const AddToCartView = () => {
         setItemSizes(itemSizeTypeList || []);
         setItemColorsImage(itemColorImages || []);
         setSelectedColorID(itemColorsList[0][2] || null); // Set the first color as the default selected color
+        setSelectedColorName(itemColorsList[0][3] || null); 
 
         if (response?.data?.imageBasePathDetails) {
             const details = response.data.imageBasePathDetails;
@@ -96,28 +109,31 @@ const AddToCartView = () => {
 
       <ScrollView
         contentContainerStyle={styles.detailsContainer}
-        scrollEventThrottle={1000} // Increase throttle for smoother scrolling
+        scrollEventThrottle={1000}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
       >
-        {/* Item Details Component */}
+
         {!isFullScreen && (
           <ItemDetailsComponent
             itemData={itemData}
             itemColors={itemColors}
             itemSizes={itemSizes[selectedColorID]}
             selectedColorID={selectedColorID} // Pass the selected color
-            setSelectedColorID={setSelectedColorID} // Pass the function to update selected color
+            setSelectedColorID={setSelectedColorID} 
             colorImagePath={colorImageBasePath}
+            selectedColorName={selectedColorName} // Pass the selected color
+            setSelectedColorName={setSelectedColorName} 
+            setSelectedItemSize={setSelectedItemSize}
+
           />
         )}
 
-        {/* Add To Cart Button will now appear only when not in full screen */}
         {!isFullScreen && (
           <View style={styles.addToCartButtonContainer}>
-            <TouchableOpacity style={styles.addToCartButton} onPress={() => { alert('Added to Cart!'); }}>
+            <TouchableOpacity style={styles.addToCartButton} onPress={() => {onAddCartPress(itemCode,selectedColorID,selectedColorName,selectedItemSize); }}>
               <Text style={styles.addToCartText}>Add to Cart</Text>
             </TouchableOpacity>
           </View>

@@ -1,18 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 
 // Handler when size is pressed to set the selected size
-const onSizePress = (sizeID, sizeDimensionOne, sizeDimensionTwo, setSelectedSize) => {
+const onSizePress = (sizeID, sizeDimensionOne, sizeDimensionTwo, setSelectedSize,setSelectedItemSize) => {
   setSelectedSize(sizeID);  // Set the clicked size as selected
+  
+  if(sizeDimensionTwo==null||sizeDimensionTwo=='null' || sizeDimensionTwo==''){
+      setSelectedItemSize(sizeDimensionOne)//set clicked size to be used in addtocart
+  }
+  else {
+    setSelectedItemSize(sizeDimensionOne+'-'+sizeDimensionTwo)//set clicked size to be used in addtocart
+}
   //console.log(`onSizePress - SizeID: ${sizeID}, Dimension 1: ${sizeDimensionOne}, Dimension 2: ${sizeDimensionTwo}`);
 };
 
 const Size = ({ item, onPress, isSelected }) => {
   return (
     <TouchableOpacity onPress={onPress} style={[styles.size]}>
-      <View style={[styles.sizeContainer, isSelected && styles.selectedSize]}>
+      <View style={[styles.sizeContainer, isSelected && styles.selectedSize,item.SIZE_DIMENSION_TWO && item.SIZE_DIMENSION_TWO !== '' ? { width: 90 } : { width: 60 }]}>
         {item.SIZE_DIMENSION_ONE || item.SIZE_DIMENSION_TWO ? (
-          <Text style={styles.sizeText}>
+          <Text style={[styles.sizeText , isSelected && styles.selectedSizeText]}>
             {item.SIZE_DIMENSION_ONE}
             {item.SIZE_DIMENSION_ONE && item.SIZE_DIMENSION_TWO ? ' | ' : ''}
             {item.SIZE_DIMENSION_TWO}
@@ -25,14 +32,19 @@ const Size = ({ item, onPress, isSelected }) => {
   );
 };
 
-const ItemSizes = ({ itemSizes }) => {
+const ItemSizes = ({ itemSizes,setSelectedItemSize }) => {
   const [selectedSize, setSelectedSize] = useState(null); // State to track selected size
+
+  useEffect(() => {
+    // Reset selected size when itemSizes changes(when color changes)
+    setSelectedSize(null);
+  }, [itemSizes]); 
 
   const renderSize = ({ item }) => (
     <Size
       item={item}
       onPress={() => {
-        onSizePress(item.ID, item.SIZE_DIMENSION_ONE, item.SIZE_DIMENSION_TWO, setSelectedSize);
+        onSizePress(item.ID, item.SIZE_DIMENSION_ONE, item.SIZE_DIMENSION_TWO, setSelectedSize,setSelectedItemSize);
       }}
       isSelected={selectedSize === item.ID} // Highlight if selected
     />
@@ -78,12 +90,22 @@ const styles = StyleSheet.create({
   selectedSize: {
     borderWidth: 1, // Thicker border for selected size
     borderColor: '#000', // Black color for selected size's border
+    backgroundColor: '#000',
+    
+    
   },
   sizeText: {
     fontSize: 14,
     color: '#333',
     textAlign: 'center',
   },
+
+  selectedSizeText: {
+    fontSize: 14,
+    color: '#fff',
+    textAlign: 'center',
+  },
+  
 });
 
 export default ItemSizes;
