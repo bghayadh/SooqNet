@@ -187,7 +187,8 @@ function ItemView() {
               }
             }
             else {
-              navigation.navigate('screens/HomePage'); // Navigate to HomePage screen
+              //navigation.navigate('screens/HomePage'); // Navigate to HomePage screen
+              router.back();
             }            
             }
            // return false; 
