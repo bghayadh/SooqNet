@@ -5,15 +5,73 @@ import ItemImages from './ItemImages';
 import ItemDetailsComponent from './ItemDetailsComponent';
 import { useLocalSearchParams } from 'expo-router';
 import { ipAddress, port, webAppPath } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const onAddCartPress = (itemCode,selectedColorID,selectedColorName,selectedItemSize) => {
-  
-  console.log("item code  "+itemCode)
-  console.log("selectedColorName "+selectedColorName)
-  console.log("selectedColorID "+selectedColorID)
-  console.log("selected size "+selectedItemSize)
+const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName) => {
+  // Validate itemSize to make sure it's not null or empty
+  if (!itemSize || itemSize === "") {
+    // Display an alert or message
+    alert("Please select a size before adding to the cart.");
+    return; // Stop further execution
+  }
+
+  // Generate unique ID for the item based on itemCode, colorID, and itemSize
+  const ID = itemCode + "_" + colorID + "_" + itemSize;
+  const quentity = 1; // Initial quantity for a new item
+  const itemName = itemData[0][1];
+  const rate = itemData[0][2];
+  const discount = itemData[0][3];
+
+  // Create the cart item object
+  const cartItem = {
+    ID,
+    itemCode,
+    colorID,
+    colorName,
+    itemSize,
+    imagePath,
+    imageName,
+    itemName,
+    rate,
+    discount,
+    quentity,
+  };
+
+  try {
+    // Get the existing cart data from AsyncStorage
+    const existingCartData = await AsyncStorage.getItem('cartData');
+    
+    // Initialize cartArray as an empty array if no data exists
+    let cartArray = existingCartData ? JSON.parse(existingCartData) : [];
+
+    // Make sure cartArray is an array
+    if (!Array.isArray(cartArray)) {
+      cartArray = [];
+    }
+
+    // Check if the item already exists in the cart based on the ID
+    const existingItemIndex = cartArray.findIndex(item => item.ID === ID);
+
+    if (existingItemIndex !== -1) {
+      // Item already exists in the cart, so increment its quantity
+      cartArray[existingItemIndex].quentity += 1;
+    } else {
+      // Item does not exist, so add it to the cart with quantity 1
+      cartArray.push(cartItem);
+    }
+
+    // Save the updated cartArray back to AsyncStorage
+    await AsyncStorage.setItem('cartData', JSON.stringify(cartArray));
+
+    // Optional: Confirm that the cart data has been updated
+    //console.log("Updated cart: ", cartArray);
+
+  } catch (error) {
+    console.error("Error saving data: ", error);
+  }
 };
+
 
 const AddToCartView = () => {
   const { itemCode } = useLocalSearchParams();
@@ -29,6 +87,7 @@ const AddToCartView = () => {
   const [itemImageBasePath, setItemImageBasePath] = useState('');
   const [colorImageBasePath, setColorImageBasePath] = useState('');
   const [selectedItemSize, setSelectedItemSize] = useState('');
+  
 
 
   const scrollY = new Animated.Value(0); // Track scroll position
@@ -73,6 +132,7 @@ const AddToCartView = () => {
 
             setColorImageBasePath(colorImagePath);
         } 
+      
       } catch (error) {
         console.error('Error fetching data:', error.message);
         setItemData([]);
@@ -94,7 +154,7 @@ const AddToCartView = () => {
       </View>
     );
   }
-
+   
   // Adjusting height of ItemImages based on scroll position
   const imageHeight = scrollY.interpolate({
     inputRange: [0, screenHeight * 0.7], // Start shrinking at 70% of the screen height
@@ -133,7 +193,7 @@ const AddToCartView = () => {
 
         {!isFullScreen && (
           <View style={styles.addToCartButtonContainer}>
-            <TouchableOpacity style={styles.addToCartButton} onPress={() => {onAddCartPress(itemCode,selectedColorID,selectedColorName,selectedItemSize); }}>
+            <TouchableOpacity style={styles.addToCartButton} onPress={() => {onAddCartPress(itemCode,itemData,selectedColorID,selectedColorName,selectedItemSize,itemImageBasePath,itemColorsImage[selectedColorID][0].IMAGE_NAME); }}>
               <Text style={styles.addToCartText}>Add to Cart</Text>
             </TouchableOpacity>
           </View>
