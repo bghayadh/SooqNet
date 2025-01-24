@@ -4,6 +4,7 @@ import axios from 'axios';
 import {useRouter} from 'expo-router';
 import ItemSearch from './Item/ItemSearch';
 import {ipAddress,port,webAppPath} from "@env";
+import Navbar from '../Navigations/Navbar';
 
 const Category = ({ category,imageBasePath, onPress }) => (
 
@@ -170,6 +171,7 @@ const HomePage = () => {
           </View>
           )
         )}
+         <Navbar activetab="home" />
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   flatListContent: {
-    paddingBottom: 10,
+    paddingBottom: 40,
   },
   emptyItem: {
     flex: 1,

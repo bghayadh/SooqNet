@@ -6,6 +6,7 @@ import ItemDetailsComponent from './ItemDetailsComponent';
 import { useLocalSearchParams } from 'expo-router';
 import { ipAddress, port, webAppPath } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Navbar from '../../Navigations/Navbar';
 
 
 const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName) => {
@@ -199,6 +200,7 @@ const AddToCartView = () => {
           </View>
         )}
       </ScrollView>
+      <Navbar activetab="" />
     </View>
   );
 };
@@ -224,6 +226,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 5,
     marginHorizontal: 20, // Optional: Add horizontal margin for button spacing
+    marginBottom:35,
   },
   addToCartText: {
     color: '#fff',

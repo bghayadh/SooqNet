@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import ItemFilter from './ItemFilter';
 import CategoryPath from './CategoryPath';
 import {ipAddress,port,webAppPath} from "@env";
+import Navbar from '../../Navigations/Navbar';
 
 function ItemView() {
     const { catCode,catTitle, source: initialSource, searchKey, savedFullCatCode: routeSavedFullCatCode,routeOrigin } = useLocalSearchParams();
@@ -370,6 +371,7 @@ function ItemView() {
             </View>
           )
         )}
+         <Navbar activetab="" />
         </SafeAreaView>
     );
 }

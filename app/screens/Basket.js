@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Garbage icon
-
+import Navbar from '../Navigations/Navbar';
 const Basket = () => {
   const [basketData, setBasketData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -201,6 +201,7 @@ const Basket = () => {
   return (
     <SafeAreaView style={styles.container}>
       <VirtualizedList
+       style={styles.virtualizedList} 
         data={basketData}
         initialNumToRender={10}
         renderItem={renderItem}
@@ -208,6 +209,8 @@ const Basket = () => {
         getItemCount={getItemCount}
         getItem={getItem}
       />
+
+      <Navbar activetab="basket" />
     </SafeAreaView>
   );
 };
@@ -315,6 +318,10 @@ const styles = StyleSheet.create({
     width: 30,
     textAlign: 'center',
   },
+  virtualizedList: {
+    marginBottom: 40, // this margin add to avoid conflict between conten of virtualizedlist and Navbar
+  },
+
 });
 
 
