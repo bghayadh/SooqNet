@@ -1,10 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';  
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Navbar = ({ activetab }) => { 
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loggedClientFullName, setLoggedClientFullName] = useState("");
+  const [loginIdentifier, setLoginIdentifier] = useState("");
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const storedLoginDetails = await AsyncStorage.getItem('loginDetails');
+      
+        if (storedLoginDetails) {
+          const userData = JSON.parse(storedLoginDetails);
+          if (userData.isLoggedIn === "true") {
+            setLoggedClientFullName(userData.clientName);
+            setLoginIdentifier(userData.loginIdentifier);
+            setIsLoggedIn(true);
+          }
+        }
+      } catch (error) {
+        console.error("Error reading login data:", error);
+      }
+    };
+    checkLoginStatus();
+  }, []);
 
   return (
     <View style={styles.navbar}>
@@ -37,6 +61,46 @@ const Navbar = ({ activetab }) => {
           Basket
         </Text>
       </TouchableOpacity>
+
+       {/* Conditionally render Login or My Account */}
+       {isLoggedIn ? (
+        <TouchableOpacity 
+          style={[styles.navItemContainer, activetab === 'myaccount']}  
+          onPress={() => router.push({   pathname: '/screens/Login/MyAccount',
+            params: {
+              loggedClientFullName:loggedClientFullName,loginIdentifier:loginIdentifier,
+            },
+           })        
+        }
+
+        
+        >
+          <Ionicons 
+            name="person" 
+            size={17}
+            color={activetab === 'myaccount' ? 'black' : '#aaa'}
+          />
+          <Text style={[styles.navItem, activetab === 'myaccount' && styles.activeText]}>
+            My Account
+          </Text>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity 
+          style={[styles.navItemContainer, activetab === 'login']}  
+          onPress={() => router.push('/screens/Login/LoginView')}
+        >
+          <Ionicons 
+            name="person"
+            size={17}
+            color={activetab === 'login' ? 'black' : '#aaa'}
+          />
+          <Text style={[styles.navItem, activetab === 'login' && styles.activeText]}>
+            Login
+          </Text>
+        </TouchableOpacity>
+      )}
+
+
     </View>
   );
 };
