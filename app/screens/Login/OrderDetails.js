@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
 import {ipAddress,port,webAppPath} from "@env";
 import { MaterialIcons } from '@expo/vector-icons'; 
+import Navbar from '../../Navigations/Navbar';
 
 const OrderDetails = () => {
   //const [orderDetails, setOrderDetails] = useState(null);
@@ -154,6 +155,7 @@ const OrderDetails = () => {
       ) : (
         <Text style={styles.noOrders}>No order details found.</Text>
       )}
+    <Navbar activetab="" />
     </View>
   );
 };

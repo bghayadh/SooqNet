@@ -6,6 +6,7 @@ import axios from 'axios';
 import {ipAddress,port,webAppPath} from "@env";
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Navbar from '../../Navigations/Navbar';
 
 const CreateAccount = () => {
   const [firstName, setFirstName] = useState("");
@@ -147,13 +148,14 @@ const CreateAccount = () => {
         <TouchableOpacity style={styles.loginButton} onPress={handleLoginAction}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
-      </View>
+      </View>    
+
     );
   
   }
 
   return (
-    <ScrollView
+    <><ScrollView
       style={styles.container}
       contentContainerStyle={styles.scrollViewContent}
       keyboardShouldPersistTaps="handled"
@@ -281,7 +283,8 @@ const CreateAccount = () => {
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
-    </ScrollView>
+    </ScrollView><Navbar activetab="" /></>
+
   );
 };
 
@@ -292,7 +295,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   scrollViewContent: {
-    paddingBottom: 20,
+    paddingBottom: 100,
   },
   header: {
     fontSize: 28,

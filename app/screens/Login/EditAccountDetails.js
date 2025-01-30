@@ -5,6 +5,7 @@ import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 import {ipAddress,port,webAppPath} from "@env";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Navbar from '../../Navigations/Navbar';
 
 const EditAccountDetails = () => {
   const {loginIdentifier} = useLocalSearchParams();
@@ -93,7 +94,7 @@ const EditAccountDetails = () => {
   };
 
   return (
-    <ScrollView
+    <><ScrollView
       style={styles.container}
       contentContainerStyle={styles.scrollViewContent}
       keyboardShouldPersistTaps="handled"
@@ -195,11 +196,14 @@ const EditAccountDetails = () => {
 
       </View>
 
-      
+      <View style={{ marginBottom: 20 }}> 
       <TouchableOpacity style={styles.button} onPress={saveChanges}>
         <Text style={styles.buttonText}>Save changes</Text>
       </TouchableOpacity>
-    </ScrollView>
+      </View>
+
+      </ScrollView><Navbar activetab="" /></>
+    
   );
 };
 
@@ -210,7 +214,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   scrollViewContent: {
-    paddingBottom: 20,
+    paddingBottom: 100,
   },
   header: {
     fontSize: 28,

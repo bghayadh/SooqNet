@@ -7,6 +7,7 @@ import { useRouter } from "expo-router";
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 import {ipAddress,port,webAppPath} from "@env";
+import Navbar from '../../Navigations/Navbar';
 
 const EditAddress = () => {
   const {loginIdentifier,loggedClientFullName} = useLocalSearchParams();
@@ -190,7 +191,8 @@ const EditAddress = () => {
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollViewContent} keyboardShouldPersistTaps="handled">
+    <>
+    <ScrollView style={styles.container}   contentContainerStyle={{ flexGrow: 1, paddingBottom: 80 }} keyboardShouldPersistTaps="handled">
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0d6efd" />
@@ -246,7 +248,7 @@ const EditAddress = () => {
           </TouchableOpacity>
         </>
       )}
-    </ScrollView>
+      </ScrollView><Navbar activetab="" /></>
   );
 };
 

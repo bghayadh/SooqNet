@@ -4,6 +4,7 @@ import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 import { ipAddress, port, webAppPath } from "@env";
 import { useRouter } from "expo-router";
+import Navbar from '../../Navigations/Navbar';
 
 const MyOrders = () => {
   const { loginIdentifier } = useLocalSearchParams();
@@ -76,6 +77,7 @@ const MyOrders = () => {
           You haven't placed any orders yet! All your orders will be listed here for you.
         </Text>
       )}
+    <Navbar activetab="" />
     </View>
   );
 };

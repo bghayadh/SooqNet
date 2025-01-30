@@ -10,7 +10,6 @@ const MyAccount = () => {
   const router = useRouter();
   const {loggedClientFullName,loginIdentifier } = useLocalSearchParams();
   const [loggedUser, setLoggedUser] = useState(loggedClientFullName || "");
-  const [loginUsernameEmailIdentifier, setLoginUsernameEmailIdentifier] = useState(loginIdentifier || "");
 
   const handleSignOut = async () => {
     try {

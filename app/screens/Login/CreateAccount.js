@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import axios from "axios";
 import { ipAddress, port, webAppPath } from "@env";
+import Navbar from '../../Navigations/Navbar';
 
 const CreateAccount = () => {
   const router = useRouter();
@@ -52,7 +53,7 @@ const handleContinueAction = async () => {
   };
 
   return (
-    <ScrollView style={styles.container}>    
+    <><ScrollView style={styles.container}>    
       <Text style={styles.title}>Create Account</Text>      
       <View style={styles.privacyContainer}>
         <Ionicons name="lock-closed-outline" size={18} color="green" />
@@ -88,8 +89,9 @@ const handleContinueAction = async () => {
           <Ionicons name="logo-facebook" color="blue" size={20}  style={styles.socialIcon} />
           <Text style={styles.socialButtonText}>Continue with Facebook</Text>
         </View>
-      </TouchableOpacity>      
-    </ScrollView>
+      </TouchableOpacity>  
+      </ScrollView><Navbar activetab="" /></>
+
   );
 };
 

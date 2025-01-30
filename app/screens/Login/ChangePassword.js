@@ -6,6 +6,7 @@ import axios from 'axios';
 import {ipAddress,port,webAppPath} from "@env";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
+import Navbar from '../../Navigations/Navbar';
 
 const ChangePassword = () => {
 
@@ -94,6 +95,7 @@ const ChangePassword = () => {
       <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
         <Text style={styles.buttonText}>Change Password</Text>
       </TouchableOpacity>
+      <Navbar activetab="" />
     </View>
   );
 };
