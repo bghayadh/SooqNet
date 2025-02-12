@@ -13,9 +13,12 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Garbage icon
 import Navbar from '../Navigations/Navbar';
+import { useRouter } from 'expo-router';
+
 const Basket = () => {
   const [basketData, setBasketData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,6 +122,17 @@ const Basket = () => {
     }
   };
 
+  const handleCheckoutPress = () => {
+    if (basketData.length > 0) {
+      // Proceed to checkout if there are items in the basket
+      router.push('/screens/Checkout/CheckoutLogin');
+    } else {
+      // Show an alert if the basket is empty
+      alert('Your basket is empty. Add some items before proceeding to checkout.');
+    }
+  };
+
+
   const renderItem = ({ item }) => {
     const imagePath = item.imagePath + item.imageName;
 
@@ -200,6 +214,18 @@ const Basket = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+
+      <View style={styles.header}>
+          <Icon name="shopping-cart" size={24} color="#000" style={styles.icon} />
+          <Text style={styles.headerTitle}>Basket</Text>
+          <TouchableOpacity
+            style={styles.checkoutButton}
+            onPress={handleCheckoutPress}
+          >
+            <Text style={styles.checkoutButtonText}>Checkout</Text>
+          </TouchableOpacity>
+      </View>
+
       <VirtualizedList
        style={styles.virtualizedList} 
         data={basketData}
@@ -321,7 +347,33 @@ const styles = StyleSheet.create({
   virtualizedList: {
     marginBottom: 40, // this margin add to avoid conflict between conten of virtualizedlist and Navbar
   },
-
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 5,
+    backgroundColor: '#f8f8f8',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  icon: {
+    marginRight: 10, // Space between icon and title
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    flex: 1, // Allows title to take available space
+  },
+  checkoutButton: {
+    padding: 5,
+    backgroundColor: '#000',
+    borderRadius: 5,
+  },
+  checkoutButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
 });
 
 

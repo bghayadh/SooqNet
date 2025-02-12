@@ -34,7 +34,7 @@ const Navbar = ({ activetab }) => {
     <View style={styles.navbar}>
       {/* Home Button */}
       <TouchableOpacity 
-        style={[styles.navItemContainer, activetab === 'home']} 
+        style={[styles.navItemContainer]} 
         onPress={() => router.push('/screens/HomePage')}
       >
         <Ionicons 
@@ -49,7 +49,7 @@ const Navbar = ({ activetab }) => {
 
       {/* Basket Button */}
       <TouchableOpacity 
-        style={[styles.navItemContainer, activetab === 'basket']}  
+        style={[styles.navItemContainer]}  
         onPress={() => router.push('/screens/Basket')}
       >
         <Ionicons 
@@ -65,7 +65,7 @@ const Navbar = ({ activetab }) => {
        {/* Conditionally render Login or My Account */}
        {isLoggedIn ? (
         <TouchableOpacity 
-          style={[styles.navItemContainer, activetab === 'myaccount']}  
+          style={[styles.navItemContainer]}  
           onPress={() => router.push({   pathname: '/screens/Login/MyAccount',
             params: {
               loggedClientFullName:loggedClientFullName,loginIdentifier:loginIdentifier,
@@ -86,7 +86,7 @@ const Navbar = ({ activetab }) => {
         </TouchableOpacity>
       ) : (
         <TouchableOpacity 
-          style={[styles.navItemContainer, activetab === 'login']}  
+          style={[styles.navItemContainer]}  
           onPress={() => router.push('/screens/Login/LoginView')}
         >
           <Ionicons 
@@ -131,10 +131,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textTransform: 'uppercase',
   },
-  activeTab: {
-    backgroundColor: '#f5f5f5', 
-    borderRadius: 10,
-  },
+ 
   activeText: {
     color: 'black',  
   },
