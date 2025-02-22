@@ -3,13 +3,18 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';  
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
 
 const Navbar = ({ activetab }) => { 
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedClientFullName, setLoggedClientFullName] = useState("");
   const [loginIdentifier, setLoginIdentifier] = useState("");
-
+  const { t, i18n } = useTranslation();
+  const lang =i18next.language;
+  const isRTL = lang === 'ar';
+  
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
@@ -31,8 +36,8 @@ const Navbar = ({ activetab }) => {
   }, []);
 
   return (
-    <View style={styles.navbar}>
-      {/* Home Button */}
+<View style={[styles.navbar, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>      
+  {/* Home Button */}
       <TouchableOpacity 
         style={[styles.navItemContainer]} 
         onPress={() => router.push('/screens/HomePage')}
@@ -43,7 +48,7 @@ const Navbar = ({ activetab }) => {
           color={activetab === 'home' ? 'black' : '#aaa'}  
         />
         <Text style={[styles.navItem, activetab === 'home' && styles.activeText]}>
-          Home
+       {t('home')}
         </Text>
       </TouchableOpacity>
 
@@ -58,7 +63,7 @@ const Navbar = ({ activetab }) => {
           color={activetab === 'basket' ? 'black' : '#aaa'}  
         />
         <Text style={[styles.navItem, activetab === 'basket' && styles.activeText]}> 
-          Basket
+        {t('basket')}
         </Text>
       </TouchableOpacity>
 
@@ -95,7 +100,7 @@ const Navbar = ({ activetab }) => {
             color={activetab === 'login' ? 'black' : '#aaa'}
           />
           <Text style={[styles.navItem, activetab === 'login' && styles.activeText]}>
-            Login
+          {t('login')}
           </Text>
         </TouchableOpacity>
       )}

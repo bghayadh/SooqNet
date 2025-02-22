@@ -5,6 +5,8 @@ import {useRouter} from 'expo-router';
 import ItemSearch from './Item/ItemSearch';
 import {ipAddress,port,webAppPath} from "@env";
 import Navbar from '../Navigations/Navbar';
+import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
+import i18next from 'i18next';
 
 const Category = ({ category,imageBasePath, onPress }) => (
 
@@ -13,7 +15,7 @@ const Category = ({ category,imageBasePath, onPress }) => (
       <Image source={{ uri: imageBasePath+ category[2] }} style={styles.image} />
       </View>
       <Text style={styles.title} adjustsFontSizeToFit>
-      {category[0]}
+      {i18next.language === 'en' ? category[0] : category[4]}
     </Text>
   </TouchableOpacity>
 );
@@ -28,7 +30,9 @@ const HomePage = () => {
   const [searchResults, setSearchResults] = useState([]); 
   const [imageBasePath, setImageBasePath] = useState('');
   const router = useRouter();
-  
+  const { t, i18n } = useTranslation();  // Access translation function
+  const currentLang = i18next.language;
+
   const screenWidth = Dimensions.get('window').width;
   const itemWidth = 100 + 16; 
   const numColumns = Math.floor(screenWidth / itemWidth);
@@ -66,6 +70,7 @@ const HomePage = () => {
 
     fetchData();
   }, []);
+
  
   const renderCategory = ({ item }) => {
     if (item.empty) {
@@ -129,7 +134,8 @@ const HomePage = () => {
     <SafeAreaView style={styles.container}>
     <ItemSearch searchText={searchText}  setSearchText={setSearchText} setShowFlatList={setShowFlatList} onSearchResults={handleSearchResults} />
         {loading ? (
-          <Text>Loading...</Text>
+         
+          <Text>{t('loadingText')}</Text>  
         ) : (
           showFlatList ? (
             <FlatList
@@ -140,9 +146,10 @@ const HomePage = () => {
                 columnWrapperStyle={{
                   justifyContent: 'space-between',
                   paddingHorizontal: 16,
+                  flexDirection: i18next.language === 'ar' ? 'row-reverse' : 'row', // Handle RTL layout
                 }}
                 contentContainerStyle={{
-                  top:'25%'
+                  top:'25%',
                 }}
           />
           ) : (

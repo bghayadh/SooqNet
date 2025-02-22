@@ -1,13 +1,17 @@
-import React, { useEffect,useRef } from 'react';
-import {View,TextInput,TouchableOpacity,StyleSheet,Keyboard} from 'react-native';
+import React, { useEffect,useRef ,} from 'react';
+import {View,TextInput,TouchableOpacity,StyleSheet,Keyboard,I18nManager } from 'react-native';
 import axios from 'axios';
 import {Ionicons} from '@expo/vector-icons';
 import {ipAddress,port,webAppPath} from "@env";
+import i18next from 'i18next';
 
 const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults }) => {
 
   const inputRef = useRef(null); // Create the ref
-
+ 
+  const lang = i18next.language;
+  const isRTL = lang === 'ar'; 
+ 
   // when pressing the search button on the keyboard,this function is called
   const handleSubmitEditing = async () => {
     try {
@@ -73,17 +77,21 @@ useEffect(() => {
 }, [searchText]);
 
   return (
-    <View style={styles.searchBarContainer}>
+    <View style={styles.searchBarContainer}>            
       <TextInput
-        style={styles.searchInput}
-        placeholder="Search"
+        style={[styles.searchInput,{ textAlign: isRTL ? 'right' : 'left' }]}
+        placeholder={i18next.t('searchPlaceholder')}
         placeholderTextColor="#999"
         onChangeText={handleChangeText}
         onSubmitEditing={handleSubmitEditing}
         value={searchText}
         returnKeyType="search"
       />
-      <TouchableOpacity onPress={handleSubmitEditing} style={styles.iconContainer}>
+      <TouchableOpacity onPress={handleSubmitEditing} 
+      style={[styles.iconContainer,
+      { position: 'absolute',
+      [isRTL ? 'left' : 'right']: 0, // Align left for Arabic, right for English
+    }]}>
         <Ionicons name="search" size={20} color="#fff" style={styles.searchIcon} />
       </TouchableOpacity>
     </View>
@@ -105,6 +113,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     height: 30,
+    marginHorizontal:2,
   },
   iconContainer: {
     backgroundColor: 'black',

@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, TextInput, Button, Alert } from "react-native";
+import { StyleSheet, Text, View, TextInput, Button, Alert  } from "react-native";
 import axios from "axios";
 import { ipAddress, port, webAppPath } from "@env";
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
+import { Picker } from '@react-native-picker/picker'
+import { I18nManager } from 'react-native';
 
 const LoginScreen = () => {
   const [loginIdentifier, setLoginIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();  // useTranslation hook to handle transla
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -74,6 +79,19 @@ const LoginScreen = () => {
     }
   };
 
+  const handleLanguageChange = (lang) => {
+    i18next.changeLanguage(lang);
+
+    if (lang === 'ar') {
+      I18nManager.forceRTL(true);
+      I18nManager.allowRTL(true);
+    } else {
+      I18nManager.forceRTL(false);
+      I18nManager.allowRTL(false);
+    }
+    
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
@@ -90,6 +108,20 @@ const LoginScreen = () => {
         Don't have an account?{" "}
         <Text style={styles.link} onPress={() => router.push({ pathname: '/screens/Login/CreateAccount' })}>Sign up here</Text>
       </Text>
+
+      <View style={[styles.languageContainer, { flexDirection: i18next.language === 'ar' ? 'row-reverse' : 'row' }]}>
+        <Text style={styles.languageLabel}>{t('language')}</Text>
+        <Picker
+          selectedValue={i18next.language}
+          style={styles.languageDropdown}
+          onValueChange={handleLanguageChange}
+        >
+          <Picker.Item label="English" value="en" />
+          <Picker.Item label="Arabic" value="ar" />
+        </Picker>
+      </View>
+
+
       <Navbar activetab="login" />
     </View>
     
@@ -156,6 +188,25 @@ const styles = StyleSheet.create({
       textDecorationLine: "underline",
       fontWeight: "bold",
     },
+    languageContainer: {
+      marginTop: 20,
+      width: '100%',
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center', 
+    },
+    languageLabel: {
+      marginRight: 10,  
+      fontWeight: 'bold',  
+      fontSize: 16,  
+    },
+    
+    languageDropdown: {
+      height: 40,
+      width: 150,
+    }
+    
+
   });
   
 
