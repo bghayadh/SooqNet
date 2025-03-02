@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
+import i18next from 'i18next';
 
-const Category = ({ item, onPress, isSelected ,catImagesPath}) => {
+ 
+ 
+const Category = ({ item,isRTL, onPress, isSelected ,catImagesPath}) => {
     const backgroundColor = isSelected ? '#d3d3d3' : 'white'; // Highlight color for selected category
     const textColor = isSelected ? 'black' : 'black'; // Text color
 
@@ -13,18 +16,22 @@ const Category = ({ item, onPress, isSelected ,catImagesPath}) => {
                 style={styles.image}
             /></View>
             <Text style={[styles.title, { color: textColor }]}>
-                {item[1]} 
+            {isRTL ? item[5] : item[1]}
             </Text>
         </TouchableOpacity>
     );
 };
 
-const CategoryList = ({ data, onCategoryPress, lastCatLevel, selectedId ,catImagesPath}) => {
+const CategoryList = ({ data, onCategoryPress, lastCatLevel, selectedId, catImagesPath }) => {
+    const lang = i18next.language;
+    const isRTL = lang === 'ar'; 
+
     const renderCategory = ({ item }) => (
         <Category
             item={item}
+            isRTL={isRTL}
             onPress={() => {
-                onCategoryPress(item[0],item[1]); 
+                onCategoryPress(item[0], item[1],item[5]); 
             }}
             isSelected={lastCatLevel && selectedId === item[0]} 
             catImagesPath={catImagesPath}
@@ -33,17 +40,22 @@ const CategoryList = ({ data, onCategoryPress, lastCatLevel, selectedId ,catImag
 
     return (
         <View>
-                <FlatList
-                    data={data}
-                    renderItem={renderCategory}
-                    keyExtractor={(item) => item[4].toString()} 
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    style={styles.horizontalList}
-                />
+            <FlatList
+                data={data}
+                renderItem={renderCategory}
+                keyExtractor={(item) => item[4].toString()} 
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={[
+                    styles.horizontalList,
+                    isRTL && { alignSelf: 'flex-start', marginRight: 0, marginLeft: 'auto' }, // Align the whole FlatList container
+                ]}
+                contentContainerStyle={isRTL ? { flexDirection: 'row-reverse' } : {}}
+            />
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     title: {

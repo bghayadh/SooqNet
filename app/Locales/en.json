@@ -9,5 +9,35 @@
 "home":"HOME",
 "basket":"BASKET",
 "login":"LOGIN",
-"myaccount":"My Account"
+"myaccount":"My Account",
+
+"sortby":"Sort By",
+"size":"Size",
+"color":"Color",
+"priceusd":"Price (USD)",
+
+
+"Black": "Black",
+  "Blue": "Blue",
+  "Red": "Red",
+  "Green": "Green",
+  "Yellow": "Yellow",
+  "Beige": "Beige",
+  "Gold": "Gold",
+  "Silver": "Silver",
+  "Brown": "Brown",
+  "Orange": "Orange",
+  "Pink": "Pink",
+  "Purple": "Purple",
+  "White": "White",
+  "Grey": "Grey",
+  "Multicolor": "Multicolor",
+
+
+  "Name A to Z": "Name A to Z",
+  "Name Z to A": "Name Z to A",
+  "Price Low to High": "Price Low to High",
+  "Price High to Low": "Price High to Low"
+
+
 }

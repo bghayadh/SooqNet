@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions,Image } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MultiSlider from '@ptomasroos/react-native-multi-slider';
+import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
+import i18next from 'i18next';
+
 
 const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions, selectedSizes, onSizeChange,colorsOptions ,selectedColors, onColorChange,onRangeChange,selectedPriceRange}) => {
     const [activeDropdown, setActiveDropdown] = useState(null); // To track active dropdown
@@ -10,6 +13,10 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
     const screenHeight = Dimensions.get('window').height; // To get the screen height
     const [sortedColors, setSortedColors] = useState({}); // To store the categorized colors
     const [range, setRange] = useState([0, 500]);
+    const { t, i18n } = useTranslation(); 
+
+    const lang = i18next.language;
+    const isRTL = lang === 'ar'; //
 
     const handleSizeToggle = (size) => {
         const updatedSizes = selectedSizes.includes(size)
@@ -169,7 +176,7 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
 
 
     return (
-        <View style={styles.container}>
+        <View style={styles.container }>
             {/* Horizontal ScrollView for filter buttons */}
             <ScrollView 
                 horizontal={true}
@@ -179,17 +186,18 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                     activeDropdown ? styles.overlayScrollContainer : styles.scrollContainer,
                 ]}
             >
+        <View style={{ flexDirection: isRTL ? 'row-reverse' : 'row', flexWrap: 'nowrap' }}>
             {/* Sort By filter button */}
                 <View style={styles.filterContainer}>
-                    <TouchableOpacity onLayout={(e) => capturePosition('sort', e)} style={styles.filterButton} onPress={() => toggleDropdown('sort')} >
-                        <Text style={styles.filterText}>Sort By  </Text>
+                    <TouchableOpacity onLayout={(e) => capturePosition('sort', e)} style={[styles.filterButton, {flexDirection: isRTL ? 'row-reverse' : 'row'}]} onPress={() => toggleDropdown('sort')} >
+                        <Text style={styles.filterText}>{t('sortby')}  </Text>
                         <Icon name={activeDropdown === 'sort' ? 'up' : 'down'} size={14} color="black" />
                     </TouchableOpacity>
                 </View>
             {/* Size filter button */}
                 <View style={styles.filterContainer}>
-                    <TouchableOpacity onLayout={(e) => capturePosition('size', e)} style={styles.filterButton} onPress={() => toggleDropdown('size')} >
-                        <Text style={styles.filterText}>Size  </Text>
+                    <TouchableOpacity onLayout={(e) => capturePosition('size', e)} style={[styles.filterButton, {flexDirection: isRTL ? 'row-reverse' : 'row'}]} onPress={() => toggleDropdown('size')} >
+                        <Text style={styles.filterText}>{t('size')}  </Text>
                         <Icon name={activeDropdown === 'size' ? 'up' : 'down'} size={14} color="black" />
                     </TouchableOpacity>
                 </View>
@@ -197,10 +205,10 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                 <View style={styles.filterContainer}>
                     <TouchableOpacity
                         onLayout={(e) => capturePosition('color', e)}
-                        style={styles.filterButton}
+                        style={[styles.filterButton, {flexDirection: isRTL ? 'row-reverse' : 'row'}]}
                         onPress={() => toggleDropdown('color')}
                     >
-                        <Text style={styles.filterText}>Color  </Text>
+                        <Text style={styles.filterText}>{t('color')}  </Text>
                         <Icon name={activeDropdown === 'color' ? 'up' : 'down'} size={14} color="black" />
                     </TouchableOpacity>
                 </View>  
@@ -224,18 +232,20 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                 snapped
             />
             <Text style={styles.minValue}>{`${range[0]}`}</Text>
-            <Text style={styles.priceLabel}> Price (USD) </Text>
+            <Text style={styles.priceLabel}> {t('priceusd')} </Text>
             <Text style={styles.maxValue}>{`${range[1]}`}</Text>
             </View>
+        </View>
         </ScrollView>
-
+        
+    
             {/* Common Dropdown Content View (its content depends on the activeDropdown ) */}
             {activeDropdown && (
                 <View
                     style={[
                         styles.dropdown,
                         {
-                            width: activeDropdown === 'sort' ? 200 : 330, // Small width for the sortBy content
+                            width: activeDropdown === 'sort' ? 230 : 330, // Small width for the sortBy content
                             maxHeight: calculateDropdownHeight(), 
                             top:
                                 activeDropdown === 'sort'
@@ -249,11 +259,11 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                     {activeDropdown === 'sort' ? (
                         <ScrollView contentContainerStyle={styles.scrollableDropdown} keyboardShouldPersistTaps="handled" >
                             {sortOptions.map((option, index) => (
-                                <TouchableOpacity key={index} onPress={() => onSortChange(option)} style={styles.optionContainer} >
+                                <TouchableOpacity key={index} onPress={() => onSortChange(option)} style={[styles.optionContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' } ]} >
                                     <View style={styles.radioButton}>
                                         {selectedSort === option && <View style={styles.radioButtonSelected} />}
                                     </View>
-                                    <Text style={styles.optionText}>{option}</Text>
+                                    <Text style={styles.optionText}>{t(option)}</Text>
                                 </TouchableOpacity>
                             ))}
                         </ScrollView>
@@ -274,7 +284,7 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                         </ScrollView>
                     ) : (
                       <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled" nestedScrollEnabled={true}>
-                        <View style={styles.colorOptionsContainer}>
+                        <View style={[styles.colorOptionsContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' } ]}>
                             {Object.keys(sortedColors).map((colorKey) => (
                                 sortedColors[colorKey].length > 0 && (
                                     <TouchableOpacity
@@ -283,6 +293,7 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                                         style={[
                                             styles.colorOption,
                                             selectedColors.some((el) => sortedColors[colorKey].includes(el)) && styles.selectedFilterOption, 
+                                            { flexDirection: isRTL ? 'row-reverse' : 'row'}
                                         ]}
                                     >
                                         {colorKey === 'Multicolor' ? (
@@ -299,7 +310,7 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                                                 ]}
                                             />
                                         )}
-                                        <Text style={styles.colorText}>{colorKey}</Text>
+                                        <Text style={styles.colorText}>{t(colorKey)}</Text>
                                     </TouchableOpacity>
                                 )
                             ))}
@@ -334,7 +345,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F5F5F5',
         height: 40,
-        width: 100,
+        width: 110,
         justifyContent: 'center',
     },
     filterText: {
@@ -402,13 +413,16 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 10,
         paddingHorizontal: 10,
+        width: 'auto',
     },
     optionText: {
         fontSize: 16,
     },
     scrollableDropdown: {
-    flexGrow: 1, 
-    overflow: 'scroll',
+   // flexGrow: 1, 
+    //overflow: 'scroll',
+    paddingHorizontal: 10, // Optional, to add padding to content
+    paddingVertical: 5,
     },
     colorOptionsContainer: {
         flexDirection: 'row',
@@ -434,7 +448,7 @@ const styles = StyleSheet.create({
         aspectRatio: 3,  
         borderWidth: 1,
         borderColor: '#ddd',
-        padding: 5, 
+        padding: 1, 
         justifyContent: 'flex-start', 
         backgroundColor: '#FFFFFF',
         height: 40,
@@ -452,6 +466,7 @@ const styles = StyleSheet.create({
         color: '#333',
         fontWeight: '500',
         textAlign: 'center',
+        marginHorizontal:2,
     },
     label: {
         fontSize: 16,

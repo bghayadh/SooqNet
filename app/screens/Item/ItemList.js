@@ -13,13 +13,14 @@ import {
   Dimensions,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import i18next from 'i18next';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 // Item Component
-const Item = React.memo(({ item, itemImagesPath, textColor }) => {
+const Item = React.memo(({ item,isRTL, itemImagesPath, textColor }) => {
   const validImages = item.imageData.filter(img => img.name !== null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
@@ -97,10 +98,11 @@ const Item = React.memo(({ item, itemImagesPath, textColor }) => {
         }}
       >
         <Text numberOfLines={1} style={[styles.title, { color: textColor, marginLeft: 2 }]}>
-          {item.itemDescription ? item.itemDescription : item.itemName}
+          {isRTL ? item.arabicItemName:item.itemName}
         </Text>
 
-        <View style={styles.priceContainer}>
+        <View style={[styles.priceContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+
           {discount ? (
             <>
               <Text
@@ -134,6 +136,9 @@ const Item = React.memo(({ item, itemImagesPath, textColor }) => {
 const ItemList = ({ data, itemImagesPath }) => {
   const [selectedId, setSelectedId] = useState(null);
 
+  const lang = i18next.language;
+  const isRTL = lang === 'ar';
+
   // Adjust the data to prevent the last item from overflowing into both columns
   const adjustedData = data.length % 2 === 0 ? data : [...data, { itemCode: 'empty', imageData: [] }];
 
@@ -147,6 +152,7 @@ const ItemList = ({ data, itemImagesPath }) => {
     return (
       <Item
         item={item}
+        isRTL={isRTL}
         itemImagesPath={itemImagesPath}
         textColor={getColor(item.itemCode)}
       />
@@ -164,6 +170,11 @@ const ItemList = ({ data, itemImagesPath }) => {
         initialNumToRender={10}
         windowSize={5}
         contentContainerStyle={styles.flatListContent}
+        columnWrapperStyle={{
+          //justifyContent: 'space-between',
+         // paddingHorizontal: 16,
+          flexDirection: isRTL? 'row-reverse' : 'row', // Handle RTL layout
+        }}
       />
     </SafeAreaView>
   );
@@ -210,7 +221,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   priceContainer: {
-    flexDirection: 'row',
+    //flexDirection: isRTL?'row-reverse' :'row',
     alignItems: 'center',
     marginTop: 5,
     flexWrap: 'wrap',

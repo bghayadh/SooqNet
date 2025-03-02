@@ -13,7 +13,7 @@ import {ipAddress,port,webAppPath} from "@env";
 import Navbar from '../../Navigations/Navbar';
 
 function ItemView() {
-    const { catCode,catTitle, source: initialSource, searchKey, savedFullCatCode: routeSavedFullCatCode,routeOrigin } = useLocalSearchParams();
+    const { catCode,catTitle,arabicCatTitle, source: initialSource, searchKey, savedFullCatCode: routeSavedFullCatCode,routeOrigin } = useLocalSearchParams();
     const [source, setSource] = useState(initialSource || 'category'); // Use 'category' as a default if no initial value 
     const [itemData, setItemData] = useState([]);
     const [catData, setCatData] = useState([]);
@@ -34,6 +34,8 @@ function ItemView() {
     const [selectedColors, setSelectedColors] = useState([]);
     const [selectedPriceRange, setSelectedPriceRange] = useState([0,500]);
     const [fullCatTitles, setFullCatTitles] = useState(catTitle);
+    const [fullArabicCatTitles, setFullArabicCatTitles] = useState(arabicCatTitle);
+
     const [itemImagesPath, setItemImagesPath] = useState("");
     const [catImagesPath, setCatImagesPath] = useState("");
    
@@ -94,13 +96,15 @@ function ItemView() {
     }, [fullCatCode, source, searchKey]); 
 
     // Function to handle category selection
-    const handleCategoryPress = (newCatCode,newCatTitle) => {
+    const handleCategoryPress = (newCatCode,newCatTitle,newArabicCatTitle) => {
       setSelectedSort(null);
       setSelectedSizes([]);
       setSelectedColors([]);
       setSelectedPriceRange([0,500]);
         const codes = fullCatCode.split('-');
         const titles = fullCatTitles.split('-');
+        const arabictitles = fullArabicCatTitles.split('-');
+        
 
         if (lastCatLevel && codes.length > 0) {
             // Replace the last category if lastCatLevel is true
@@ -117,22 +121,31 @@ function ItemView() {
           } else {
               // Replace the last category with the new category
               titles[titles.length - 1] = newCatTitle;
+              arabictitles[arabictitles.length - 1] = newArabicCatTitle;
+
+              
           }
         } else {
             // Combine with dash if not empty
             codes.push(newCatCode);
-            titles.push(newCatTitle)
+            titles.push(newCatTitle);
+            arabictitles.push(newArabicCatTitle)
+
         }
 
         const combinedCatCode = codes.join('-'); // Join back into a single string
         const combinedCatTitle = titles.join('-'); // Join back into a single string
+        const combinedArabicCatTitle = arabictitles.join('-'); // Join back into a single string
+
         setFullCatCode(combinedCatCode); // This will trigger the useEffect to fetch data
         setFullCatTitles(combinedCatTitle);
+        setFullArabicCatTitles(combinedArabicCatTitle)
     };
 
-    const handlePathPress = (newCatCode,newCatTitle) => {
+    const handlePathPress = (newCatCode,newCatTitle,newArabicCatTitle) => {
       setFullCatCode(newCatCode);  // This updates the fullCatCode, triggering a re-fetch of data
       setFullCatTitles(newCatTitle);
+      setFullArabicCatTitles(newArabicCatTitle);
     };
 
     // BackHandler to manage back button behavior
@@ -145,9 +158,14 @@ function ItemView() {
 
         const codes = fullCatCode.split('-');
         const titles = fullCatTitles.split('-');
+        const arabictitles = fullArabicCatTitles.split('-');
+
             if (codes.length > 1) {
                 const updatedCatTitle = titles.slice(0, -1).join('-'); // Remove the last category Title
                 setFullCatTitles(updatedCatTitle);
+
+                const updatedArabicCatTitle = arabictitles.slice(0, -1).join('-'); // Remove the last category Title
+                setFullArabicCatTitles(updatedArabicCatTitle);
 
                 const updatedCatCode = codes.slice(0, -1).join('-'); // Remove the last category code
                 setFullCatCode(updatedCatCode);
@@ -333,7 +351,7 @@ function ItemView() {
                         selectedId={fullCatCode.split('-').pop()} 
                     />
 
-                    <CategoryPath fullCatCode={fullCatCode}  fullCatTitle={fullCatTitles} categories={catData} onCategoryPress={handlePathPress} />
+                    <CategoryPath fullCatCode={fullCatCode}  fullCatTitle={fullCatTitles} fullArabicCatTitle={fullArabicCatTitles} categories={catData} onCategoryPress={handlePathPress} />
                     <Text></Text>
                     <View>
                       <ItemFilter

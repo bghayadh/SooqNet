@@ -86,6 +86,7 @@ const HomePage = () => {
           router.push({ pathname: '/screens/Item/ItemView', params: { 
             catCode: item[1],
             catTitle: item[0],
+            arabicCatTitle:item[4],
             source: 'category',
            } });
         }}
