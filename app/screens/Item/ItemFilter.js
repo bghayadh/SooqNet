@@ -14,6 +14,7 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
     const [sortedColors, setSortedColors] = useState({}); // To store the categorized colors
     const [range, setRange] = useState([0, 500]);
     const { t, i18n } = useTranslation(); 
+    const { width } = Dimensions.get('window'); // Get the screen width
 
     const lang = i18next.language;
     const isRTL = lang === 'ar'; //
@@ -253,14 +254,21 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                                     : activeDropdown === 'size'
                                     ? buttonPositions.size + 5
                                     : buttonPositions.color + 5, // Dynamic top based on button position
-                        },
+                                   
+                            left:
+                                activeDropdown === 'sort'
+                                    ? isRTL ? width-250 : 0
+                                    : activeDropdown === 'size'
+                                    ? isRTL ? width-380 : 10
+                                    :isRTL ? width-400 : 30, 
+                                },
                     ]}
                 >
                     {activeDropdown === 'sort' ? (
                         <ScrollView contentContainerStyle={styles.scrollableDropdown} keyboardShouldPersistTaps="handled" >
                             {sortOptions.map((option, index) => (
                                 <TouchableOpacity key={index} onPress={() => onSortChange(option)} style={[styles.optionContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' } ]} >
-                                    <View style={styles.radioButton}>
+                                    <View style={[styles.radioButton, isRTL ? { marginLeft: 5,marginRight:-10 } : { marginLeft: -10,marginRight:5 }]}>
                                         {selectedSort === option && <View style={styles.radioButtonSelected} />}
                                     </View>
                                     <Text style={styles.optionText}>{t(option)}</Text>
@@ -400,7 +408,6 @@ const styles = StyleSheet.create({
         borderColor: 'black',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 10,
     },
     radioButtonSelected: {
         width: 12,
