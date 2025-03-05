@@ -255,12 +255,18 @@ const ItemFilter = ({ onSortChange, selectedSort, onDropdownToggle, sizeOptions,
                                     ? buttonPositions.size + 5
                                     : buttonPositions.color + 5, // Dynamic top based on button position
                                    
-                            left:
+                           /* left:
                                 activeDropdown === 'sort'
                                     ? isRTL ? width-250 : 0
                                     : activeDropdown === 'size'
                                     ? isRTL ? width-380 : 10
-                                    :isRTL ? width-400 : 30, 
+                                    :isRTL ? width-400 : 30, */
+
+                            left: activeDropdown === 'sort'
+                                ? isRTL ? width * 0.4 : 0
+                                : activeDropdown === 'size'
+                                ? isRTL ? width * 0.09 : width * 0.1
+                                : isRTL ? width * 0.05 : width * 0.15,
                                 },
                     ]}
                 >
