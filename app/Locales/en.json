@@ -37,7 +37,12 @@
   "Name A to Z": "Name A to Z",
   "Name Z to A": "Name Z to A",
   "Price Low to High": "Price Low to High",
-  "Price High to Low": "Price High to Low"
+  "Price High to Low": "Price High to Low",
+
+  "show more":"Show More",
+  "show less":"Show Less",
+   "Add to Cart": "Add to Cart",
+   "addToCartAlert":"Please select a size before adding to the cart."
 
 
 }

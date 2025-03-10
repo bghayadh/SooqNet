@@ -7,13 +7,15 @@ import { useLocalSearchParams } from 'expo-router';
 import { ipAddress, port, webAppPath } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
 
-
-const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName) => {
+const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName,t) => {
   // Validate itemSize to make sure it's not null or empty
   if (!itemSize || itemSize === "") {
     // Display an alert or message
-    alert("Please select a size before adding to the cart.");
+    const msg =t('addToCartAlert');
+    alert(msg);
     return; // Stop further execution
   }
 
@@ -88,9 +90,11 @@ const AddToCartView = () => {
   const [itemImageBasePath, setItemImageBasePath] = useState('');
   const [colorImageBasePath, setColorImageBasePath] = useState('');
   const [selectedItemSize, setSelectedItemSize] = useState('');
+  const { t, i18n } = useTranslation(); 
+
+  const lang = i18next.language;
+  const isRTL = lang === 'ar'; //
   
-
-
   const scrollY = new Animated.Value(0); // Track scroll position
   const screenHeight = Dimensions.get('window').height; // Get screen height to calculate dynamic sizes
 
@@ -101,7 +105,7 @@ const AddToCartView = () => {
       setLoading(true);
 
       try {
-        console.log("ipAddress "+ipAddress)
+       // console.log("ipAddress "+ipAddress)
         const response = await axios.get('http://' + ipAddress + ':' + port + webAppPath + '/GetItemDetails', {
           params: { itemCode: itemCode },
         });
@@ -165,7 +169,7 @@ const AddToCartView = () => {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.carouselContainer, { height: imageHeight }]}>
-        <ItemImages imageData={itemColorsImage[selectedColorID]} onFullScreenToggle={setIsFullScreen} itemImagePath={itemImageBasePath} />
+        <ItemImages imageData={itemColorsImage[selectedColorID]} onFullScreenToggle={setIsFullScreen} itemImagePath={itemImageBasePath}  isRTL ={isRTL} />
       </Animated.View>
 
       <ScrollView
@@ -188,14 +192,15 @@ const AddToCartView = () => {
             selectedColorName={selectedColorName} // Pass the selected color
             setSelectedColorName={setSelectedColorName} 
             setSelectedItemSize={setSelectedItemSize}
+            isRTL ={isRTL}
 
           />
         )}
 
         {!isFullScreen && (
           <View style={styles.addToCartButtonContainer}>
-            <TouchableOpacity style={styles.addToCartButton} onPress={() => {onAddCartPress(itemCode,itemData,selectedColorID,selectedColorName,selectedItemSize,itemImageBasePath,itemColorsImage[selectedColorID][0].IMAGE_NAME); }}>
-              <Text style={styles.addToCartText}>Add to Cart</Text>
+            <TouchableOpacity style={styles.addToCartButton} onPress={() => {onAddCartPress(itemCode,itemData,selectedColorID,selectedColorName,selectedItemSize,itemImageBasePath,itemColorsImage[selectedColorID][0].IMAGE_NAME,t); }}>
+              <Text style={styles.addToCartText}>{t('Add to Cart')}</Text>
             </TouchableOpacity>
           </View>
         )}

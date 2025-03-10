@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
 
-const ItemDetails = ({ itemData }) => {
+const ItemDetails = ({ itemData ,isRTL}) => {
   
+  const { t, i18n } = useTranslation(); 
+
   const ITEM_NAME =itemData[0][1];
+  const ARABIC_ITEM_NAME=itemData[0][6];
   const RATE =itemData[0][2];
   const ITEM_DISCOUNT =itemData[0][3];
-  const ITEM_DESCRIPTION =itemData[0][5];
+  const ENGLISH_ITEM_DESCRIPTION =itemData[0][5];
+  const ARABIC_ITEM_DESCRIPTION =itemData[0][7];
+  const ITEM_DESCRIPTION=isRTL ? ARABIC_ITEM_DESCRIPTION : ENGLISH_ITEM_DESCRIPTION;
 
-//console.log("ITEM_NAMEffff "+ITEM_NAME)
   // Calculate the discount and final price
   const oldPrice = parseFloat(RATE); 
   const discount = ITEM_DISCOUNT ? parseFloat(ITEM_DISCOUNT) : 0; // If no discount, set to 0
@@ -26,14 +31,14 @@ const ItemDetails = ({ itemData }) => {
   return (
     <View style={styles.container}>
       
-      <Text style={styles.itemName}>{ITEM_NAME}</Text>
+      <Text style={[styles.itemName,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>{isRTL ? ARABIC_ITEM_NAME:ITEM_NAME}</Text>
 
      
-      <View style={styles.priceContainer}>
+      <View style={[styles.priceContainer ,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         {discount > 0 ? (
           <>   
             <Text style={styles.oldPrice}>${oldPrice.toFixed(2)}</Text>  
-            <View style={styles.discountContainer}>
+            <View style={[styles.discountContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Text style={styles.discountText}>-{discount}%</Text>
               <Text style={styles.newPrice}>${newPrice.toFixed(2)}</Text>
             </View>
@@ -51,7 +56,7 @@ const ItemDetails = ({ itemData }) => {
 
         {ITEM_DESCRIPTION.length > 100 && (
           <TouchableOpacity onPress={toggleDescription}>
-            <Text style={styles.expandButton}>{expanded ? 'Show Less' : 'Show More'}</Text>
+            <Text style={styles.expandButton}>{expanded ? t('show less') : t('show more') }</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -92,6 +97,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: 5,
     marginRight: 10,
+    marginLeft: 5,
   },
   newPrice: {
     fontSize: 18,

@@ -1,5 +1,7 @@
 import React, { useState ,useEffect} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
+
 
 // Handler when size is pressed to set the selected size
 const onSizePress = (sizeID, sizeDimensionOne, sizeDimensionTwo, setSelectedSize,setSelectedItemSize) => {
@@ -14,7 +16,7 @@ const onSizePress = (sizeID, sizeDimensionOne, sizeDimensionTwo, setSelectedSize
   //console.log(`onSizePress - SizeID: ${sizeID}, Dimension 1: ${sizeDimensionOne}, Dimension 2: ${sizeDimensionTwo}`);
 };
 
-const Size = ({ item, onPress, isSelected }) => {
+const Size = ({ item, onPress, isSelected,isRTL }) => {
   return (
     <TouchableOpacity onPress={onPress} style={[styles.size]}>
       <View style={[styles.sizeContainer, isSelected && styles.selectedSize,item.SIZE_DIMENSION_TWO && item.SIZE_DIMENSION_TWO !== '' ? { width: 90 } : { width: 60 }]}>
@@ -32,8 +34,9 @@ const Size = ({ item, onPress, isSelected }) => {
   );
 };
 
-const ItemSizes = ({ itemSizes,setSelectedItemSize }) => {
+const ItemSizes = ({ itemSizes,setSelectedItemSize ,isRTL}) => {
   const [selectedSize, setSelectedSize] = useState(null); // State to track selected size
+  const { t, i18n } = useTranslation(); 
 
   useEffect(() => {
     // Reset selected size when itemSizes changes(when color changes)
@@ -47,18 +50,21 @@ const ItemSizes = ({ itemSizes,setSelectedItemSize }) => {
         onSizePress(item.ID, item.SIZE_DIMENSION_ONE, item.SIZE_DIMENSION_TWO, setSelectedSize,setSelectedItemSize);
       }}
       isSelected={selectedSize === item.ID} // Highlight if selected
+      isRTL={isRTL}
     />
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sizes:</Text>
+      <Text style={styles.title}>{t('size')}:</Text>
       <FlatList
-        data={itemSizes}
+        data={itemSizes} 
         renderItem={renderSize}
         keyExtractor={(item) => item.ID.toString()} // Unique key for each item
         horizontal
+        inverted={isRTL}
         showsHorizontalScrollIndicator={false}
+        
       />
     </View>
   );
@@ -69,6 +75,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
+    marginRight:5,
   },
   size: {
     padding: 2,

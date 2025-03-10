@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
+import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
 //import {ipAddress,port,webAppPath} from "@env";
+
 
 // Handler when color is pressed to set the selected color
 const onColorPress = (colorID, setSelectedColorID,colorName,setSelectedColorName,setSelectedItemSize) => {
@@ -10,7 +12,7 @@ const onColorPress = (colorID, setSelectedColorID,colorName,setSelectedColorName
 };
 
 const Color = ({ item, onPress, isSelected,colorImagePath }) => {
-  
+ 
   return (
     <TouchableOpacity onPress={onPress} style={[styles.color]}>
       <View
@@ -28,8 +30,11 @@ const Color = ({ item, onPress, isSelected,colorImagePath }) => {
   );
 };
 
-const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID ,colorImagePath,selectedColorName,setSelectedColorName,setSelectedItemSize}) => {
-console.log("color colorImagePath "+colorImagePath)
+const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID ,colorImagePath,selectedColorName,setSelectedColorName,setSelectedItemSize,isRTL}) => {
+
+const { t, i18n } = useTranslation(); 
+
+
   useEffect(() => {
     if (itemColors.length > 0 && !selectedColorID) {
       setSelectedColorID(itemColors[0][2]); // Ensure the first color is selected
@@ -52,14 +57,16 @@ console.log("color colorImagePath "+colorImagePath)
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Color: {selectedColor ? selectedColor[3] : ''}</Text>
+      <Text style={styles.title}>{t('color')}: {selectedColor ? isRTL ? selectedColor[4] : selectedColor[3] : ''}</Text>
       <FlatList
         data={itemColors}
         renderItem={renderColor}
         keyExtractor={(item) => item[2].toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={isRTL ? { transform: [{ scaleX: -1 }] } : {}}
       />
+
     </View>
   );
 };
@@ -67,6 +74,7 @@ console.log("color colorImagePath "+colorImagePath)
 const styles = StyleSheet.create({
   title: {
     fontSize: 16,
+    marginRight:5
   },
   selectedColorText: {
     fontSize: 16,
