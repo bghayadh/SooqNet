@@ -10,7 +10,7 @@ import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
 
-const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName,t) => {
+const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName,t,arabicColorName) => {
   // Validate itemSize to make sure it's not null or empty
   if (!itemSize || itemSize === "") {
     // Display an alert or message
@@ -23,6 +23,7 @@ const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, 
   const ID = itemCode + "_" + colorID + "_" + itemSize;
   const quentity = 1; // Initial quantity for a new item
   const itemName = itemData[0][1];
+  const arabicItemName = itemData[0][6];
   const rate = itemData[0][2];
   const discount = itemData[0][3];
 
@@ -39,6 +40,8 @@ const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, 
     rate,
     discount,
     quentity,
+    arabicColorName,
+    arabicItemName,
   };
 
   try {
@@ -87,6 +90,7 @@ const AddToCartView = () => {
   const [isFullScreen, setIsFullScreen] = useState(false); // State to track if image is in full-screen mode
   const [selectedColorID, setSelectedColorID] = useState(null); // State for selected color ID
   const [selectedColorName, setSelectedColorName] = useState('');
+  const [selectedColorArabicName, setSelectedColorArabicName] = useState('');
   const [itemImageBasePath, setItemImageBasePath] = useState('');
   const [colorImageBasePath, setColorImageBasePath] = useState('');
   const [selectedItemSize, setSelectedItemSize] = useState('');
@@ -118,6 +122,7 @@ const AddToCartView = () => {
         setItemColorsImage(itemColorImages || []);
         setSelectedColorID(itemColorsList[0][2] || null); // Set the first color as the default selected color
         setSelectedColorName(itemColorsList[0][3] || null); 
+        setSelectedColorArabicName(itemColorsList[0][4] || null)
 
         if (response?.data?.imageBasePathDetails) {
             const details = response.data.imageBasePathDetails;
@@ -191,6 +196,8 @@ const AddToCartView = () => {
             colorImagePath={colorImageBasePath}
             selectedColorName={selectedColorName} // Pass the selected color
             setSelectedColorName={setSelectedColorName} 
+            selectedColorArabicName={selectedColorArabicName}//pass selected color arabic name 
+            setSelectedColorArabicName={setSelectedColorArabicName}
             setSelectedItemSize={setSelectedItemSize}
             isRTL ={isRTL}
 
@@ -199,7 +206,7 @@ const AddToCartView = () => {
 
         {!isFullScreen && (
           <View style={styles.addToCartButtonContainer}>
-            <TouchableOpacity style={styles.addToCartButton} onPress={() => {onAddCartPress(itemCode,itemData,selectedColorID,selectedColorName,selectedItemSize,itemImageBasePath,itemColorsImage[selectedColorID][0].IMAGE_NAME,t); }}>
+            <TouchableOpacity style={styles.addToCartButton} onPress={() => {onAddCartPress(itemCode,itemData,selectedColorID,selectedColorName,selectedItemSize,itemImageBasePath,itemColorsImage[selectedColorID][0].IMAGE_NAME,t,selectedColorArabicName); }}>
               <Text style={styles.addToCartText}>{t('Add to Cart')}</Text>
             </TouchableOpacity>
           </View>

@@ -5,9 +5,10 @@ import { useTranslation } from 'react-i18next';  // Importing useTranslation hoo
 
 
 // Handler when color is pressed to set the selected color
-const onColorPress = (colorID, setSelectedColorID,colorName,setSelectedColorName,setSelectedItemSize) => {
+const onColorPress = (colorID, setSelectedColorID,colorName,setSelectedColorName,setSelectedItemSize,arabicColorName,setSelectedColorArabicName) => {
   setSelectedColorID(colorID);
   setSelectedColorName(colorName);
+  setSelectedColorArabicName(arabicColorName)
   setSelectedItemSize('');
 };
 
@@ -30,8 +31,8 @@ const Color = ({ item, onPress, isSelected,colorImagePath }) => {
   );
 };
 
-const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID ,colorImagePath,selectedColorName,setSelectedColorName,setSelectedItemSize,isRTL}) => {
-
+const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID ,colorImagePath,selectedColorName,setSelectedColorName,setSelectedItemSize,isRTL,selectedColorArabicName,setSelectedColorArabicName}) => {
+//console.log("item color "+itemColors)
 const { t, i18n } = useTranslation(); 
 
 
@@ -45,7 +46,7 @@ const { t, i18n } = useTranslation();
     <Color
       item={item}
       onPress={() => {
-        onColorPress(item[2], setSelectedColorID,item[3],setSelectedColorName,setSelectedItemSize); // Update selected color when pressed
+        onColorPress(item[2], setSelectedColorID,item[3],setSelectedColorName,setSelectedItemSize,item[4],setSelectedColorArabicName); // Update selected color when pressed
       }}
       isSelected={item[2] === selectedColorID} // Determine if this color is selected
       colorImagePath={colorImagePath}

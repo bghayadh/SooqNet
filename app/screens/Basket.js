@@ -14,11 +14,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Garbage icon
 import Navbar from '../Navigations/Navbar';
 import { useRouter } from 'expo-router';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const Basket = () => {
   const [basketData, setBasketData] = useState([]);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { t, i18n } = useTranslation(); 
+
+  const lang = i18next.language;
+  const isRTL = lang === 'ar'; //
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,8 +94,6 @@ const Basket = () => {
 
   const handleBlur = async (ID, value) => {
     try {
-      console.log("value "+value)
-      console.log("id "+ID)
 
       if (value === "" || value ==0) {
         value = 1;
@@ -135,48 +139,51 @@ const Basket = () => {
 
   const renderItem = ({ item }) => {
     const imagePath = item.imagePath + item.imageName;
-
+  
     const discount = item.discount || 0;
-    const finalPrice = item.rate - discount;
-
+    const discountAmount = (item.rate * discount) / 100; 
+    const finalPrice = item.rate - discountAmount;
+  
     return (
       <View style={styles.itemContainer}>
-        <View style={styles.itemRow}>
+        <View style={[styles.itemRow, isRTL && { flexDirection: 'row-reverse' }]}>
           <Image
             source={{ uri: imagePath }}
             style={styles.itemImage}
           />
           <View style={styles.itemDetails}>
-            <Text style={styles.itemName}>{item.itemName}</Text>
-
-            <View style={styles.colorSizeRow}>
-              <Text>{item.colorName}</Text>
+            <Text style={styles.itemName}>{isRTL ? item.arabicItemName : item.itemName}</Text>
+  
+            <View style={[styles.colorSizeRow,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+              <Text>{isRTL ? item.arabicColorName : item.colorName}</Text>
               <Text>/</Text>
               <Text>{item.itemSize}</Text>
             </View>
-
-            <View style={styles.priceRow}>
+  
+            <View style={[styles.priceRow,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               {discount > 0 ? (
                 <>
-                  <Text style={styles.originalPrice}>${item.rate}</Text>
-                  <Text style={styles.discount}>-${discount}</Text>
-                  <Text style={styles.finalPrice}>${finalPrice}</Text>
+                  <Text style={[styles.originalPrice,{textDecorationLine: 'line-through'}]}> {isRTL ? `${item.rate} $`:`$${item.rate}`}</Text>
+                  <Text style={styles.discount}>-{isRTL ? `${discount} $` : `-${discount} $`}</Text>
+                  <Text style={styles.finalPrice}>{isRTL ? `${finalPrice} $` : `$${finalPrice}`}</Text>
                 </>
               ) : (
-                <Text style={styles.originalPrice}>${item.rate}</Text>
+                <Text style={styles.originalPrice}>{isRTL ? `${item.rate} $`:`$${item.rate}`}</Text>
               )}
             </View>
-
           </View>
           
           <View style={styles.quantityContainer}>
             <TouchableOpacity
-              style={styles.quantityMinusButton}
+              style={[styles.quantityMinusButton,{
+                [isRTL ? 'borderLeftWidth' : 'borderRightWidth']: 1, 
+                borderColor: '#ddd',  
+              }]}
               onPress={() => updateQuantity(item.ID, -1)}
             >
               <Text style={styles.quantityButtonText}>-</Text>
             </TouchableOpacity>
-
+  
             <TextInput
               style={styles.quantityTextInput}
               value={String(item.quentity)}
@@ -184,15 +191,18 @@ const Basket = () => {
               onChangeText={(text) => updateQuantityInput(item.ID, text)}
               onBlur={(e) => handleBlur(item.ID, item.quentity)}
             />
-
+  
             <TouchableOpacity
-              style={styles.quantityPlusButton}
+              style={[styles.quantityPlusButton, {
+                [isRTL ? 'borderRightWidth' : 'borderLeftWidth']: 1, 
+                borderColor: '#ddd',  
+              }]}
               onPress={() => updateQuantity(item.ID, 1)}
             >
               <Text style={styles.quantityButtonText}>+</Text>
             </TouchableOpacity>
           </View>
-
+  
           <TouchableOpacity
             style={styles.removeIcon}
             onPress={() => removeCartItem(item.ID)}
@@ -215,14 +225,14 @@ const Basket = () => {
   return (
     <SafeAreaView style={styles.container}>
 
-      <View style={styles.header}>
+      <View style={[styles.header,{flexDirection: isRTL ? 'row-reverse' : 'row'}]}>
           <Icon name="shopping-cart" size={24} color="#000" style={styles.icon} />
-          <Text style={styles.headerTitle}>Basket</Text>
+          <Text style={styles.headerTitle}>{t('basket')}</Text>
           <TouchableOpacity
             style={styles.checkoutButton}
             onPress={handleCheckoutPress}
           >
-            <Text style={styles.checkoutButtonText}>Checkout</Text>
+            <Text style={styles.checkoutButtonText}>{t('checkout')}</Text>
           </TouchableOpacity>
       </View>
 
@@ -254,14 +264,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   itemRow: {
-    flexDirection: 'row',
+    flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   itemImage: {
     width: 80,
     height: 80,
-    marginRight: 10,
+    marginLeft: 10, 
+    marginRight: 10, 
     borderRadius: 5,
     resizeMode: "contain",
   },
@@ -279,7 +290,8 @@ const styles = StyleSheet.create({
   originalPrice: {
     fontSize: 14,
     color: '#000',
-    marginRight: 5,
+    marginLeft: 5, 
+    marginRight: 5, 
   },
   discount: {
     fontSize: 14,
@@ -288,7 +300,8 @@ const styles = StyleSheet.create({
     borderColor: 'red',
     borderRadius: 5,
     padding: 5,
-    marginRight: 5,
+    marginLeft: 5, 
+    marginRight: 5, 
   },
   finalPrice: {
     fontSize: 14,
@@ -303,16 +316,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  // Updated colorSizeRow to allow wrapping
   colorSizeRow: {
-    flexDirection: 'row',
+    //flexDirection: 'row',
     marginVertical: 5,
-    flexWrap: 'wrap', // This allows wrapping to the next line
+    flexWrap: 'wrap',
   },
   quantityContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 10,
+    marginRight: 10, 
+    marginLeft: 10, 
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 10,
@@ -323,15 +336,15 @@ const styles = StyleSheet.create({
     padding: 5,
     backgroundColor: '#fff',
     borderRadius: 5,
-    borderRightWidth: 1,
-    borderRightColor: '#ddd',
+   // borderRightWidth: 1, 
+    //borderRightColor: '#ddd',
   },
   quantityPlusButton: {
     padding: 5,
     backgroundColor: '#fff',
     borderRadius: 5,
-    borderLeftWidth: 1,
-    borderLeftColor: '#ddd',
+   // borderLeftWidth: 1, 
+    //borderLeftColor: '#ddd',
   },
   quantityButtonText: {
     fontSize: 14,
@@ -345,7 +358,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   virtualizedList: {
-    marginBottom: 40, // this margin add to avoid conflict between conten of virtualizedlist and Navbar
+    marginBottom: 40,
   },
   header: {
     flexDirection: 'row',
@@ -357,12 +370,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
   },
   icon: {
-    marginRight: 10, // Space between icon and title
+    marginLeft: 10,
+    marginRight: 10, 
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    flex: 1, // Allows title to take available space
+    flex: 1,
   },
   checkoutButton: {
     padding: 5,
