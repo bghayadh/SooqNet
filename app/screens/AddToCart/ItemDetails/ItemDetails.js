@@ -51,10 +51,13 @@ const ItemDetails = ({ itemData ,isRTL}) => {
 
       <View style={styles.descriptionContainer}>
         <Text style={styles.descriptionText}>
-          {expanded ? ITEM_DESCRIPTION : ITEM_DESCRIPTION.slice(0, 100) + '...'}
+          {expanded 
+              ? ITEM_DESCRIPTION 
+              : (ITEM_DESCRIPTION && ITEM_DESCRIPTION !== "" ? ITEM_DESCRIPTION.slice(0, 100) + '...' : "")
+            }
         </Text>
 
-        {ITEM_DESCRIPTION.length > 100 && (
+        {ITEM_DESCRIPTION && ITEM_DESCRIPTION.length > 100 && (
           <TouchableOpacity onPress={toggleDescription}>
             <Text style={styles.expandButton}>{expanded ? t('show less') : t('show more') }</Text>
           </TouchableOpacity>
