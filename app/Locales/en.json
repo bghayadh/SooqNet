@@ -41,10 +41,55 @@
 
   "show more":"Show More",
   "show less":"Show Less",
-   "Add to Cart": "Add to Cart",
-   "addToCartAlert":"Please select a size before adding to the cart.",
+  "Add to Cart": "Add to Cart",
+  "addToCartAlert":"Please select a size before adding to the cart.",
 
-    "checkout":"Checkout"
+  "checkout":"Checkout",
+
+  "signInStat":"Sign In To Your Account",
+  "email":"Email",
+  "password":"Password",
+  "loginn":"Login",
+  "noAccountStat":"Don't have an account",
+  "register":"Register",
+  "coninueasGuest":"Continue as Guest",
+  "PleaseEmailandPasswordStat":"Please fill in both email and password",
+
+  "personalInfo":"Personal Inforamtion",
+  "firstName":"First Name",
+  "lastnNme":"Last Name",
+  "phoneNumber":"Phone Number",
+  "city":"City",
+  "building":"Building",
+  "street":"Street",
+  "latitude":"Latitude",
+  "longitude":"Longitude",
+  "getCurrentLoc":"Get Current Location",
+  "selectFromMap":"Select From Map",
+  "continue":"Continue",
+  "pleaseFillAllFields":"Please fill in all fields",
+  "pleaseEnterValidEmailAddress":"Please enter a valid email address",
+  "pleaseEnterValidPhoneNumber":"Please enter a valid phone number (8 digits)",
+  "pleaseEnterValidLatitude":"Please enter a valid latitude",
+  "pleaseEnterValidLongitude":"Please enter a valid longitude",
+
+  "selectPaymentMethod":"Select Payment Method:",
+  "cashOnDelivery":"Cash On Delivery",
+  "creditCard":"Credit Card",
+  "orderItem":"Order Item",
+  "quantity":"Quantity:",
+  "orderSummary":"Order Summary",
+  "total":"Total:",
+  "totalDiscount":"Total Discount:",
+  "shippingFee":"Shipping Fee:",
+  "totalNetAmount":"Total Net Amount:",
+  "placeOrder":"Place Order",
+  "selectPaymetMethodAlert":"Please select a payment method to place the order.",
+  "placingorderErrorAlert":"Something went wrong while placing the order.",
+
+  "orderConfirmation":"Order Confirmation",
+  "orderRecievedStat":"We've received your order and will begin processing shortly.",
+  "thanksStat":" Thanks for shopping with us!"
 
 
 }

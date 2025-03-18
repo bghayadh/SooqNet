@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const CheckoutLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-    const router = useRouter();
+  const router = useRouter();
+  const { t, i18n } = useTranslation(); 
+
+  const lang = i18next.language;
+  const isRTL = lang === 'ar'; 
 
   const handleLogin = () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in both email and password');
+      Alert.alert('Error', t('PleaseEmailandPasswordStat'));
       return;
     }
     Alert.alert('Login Successful');
@@ -25,11 +31,11 @@ const CheckoutLogin = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign In To Your Account</Text>
+      <Text style={styles.title}>{t('signInStat')}</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder={t('email')}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -37,25 +43,25 @@ const CheckoutLogin = () => {
 
       <TextInput
         style={styles.input}
-        placeholder="Password"
+        placeholder={t('password')}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
+        <Text style={styles.buttonText}>{t('loginn')}</Text>
       </TouchableOpacity>
 
-      <View style={styles.registerContainer}>
-        <Text style={styles.registerText}>Don't have an account? </Text>
+      <View style={[styles.registerContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+        <Text style={styles.registerText}>{t('noAccountStat')}</Text>
         <TouchableOpacity onPress={handleRegister}>
-          <Text style={styles.registerLink}>Register</Text>
+          <Text style={styles.registerLink}>{t('register')}</Text>
         </TouchableOpacity>
       </View>
 
       <TouchableOpacity style={styles.guestButton} onPress={handleGuestLogin}>
-        <Text style={styles.guestButtonText}>Continue as Guest</Text>
+        <Text style={styles.guestButtonText}>{t('coninueasGuest')}</Text>
       </TouchableOpacity>
     </View>
   );

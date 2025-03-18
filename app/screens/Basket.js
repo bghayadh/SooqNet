@@ -24,7 +24,7 @@ const Basket = () => {
   const { t, i18n } = useTranslation(); 
 
   const lang = i18next.language;
-  const isRTL = lang === 'ar'; //
+  const isRTL = lang === 'ar'; 
 
   useEffect(() => {
     const fetchData = async () => {

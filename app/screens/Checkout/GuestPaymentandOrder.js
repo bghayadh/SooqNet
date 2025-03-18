@@ -5,12 +5,18 @@ import {ipAddress,port,webAppPath} from "@env";
 import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router'; 
 import { useRouter } from 'expo-router';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const GuestPaymentandOrder = () => {
   const [basketData, setBasketData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState(null); 
   const router = useRouter();
+  const { t, i18n } = useTranslation(); 
+
+  const lang = i18next.language;
+  const isRTL = lang === 'ar';
 
   const { formData } = useLocalSearchParams(); 
   const parsedFormData = formData ? JSON.parse(formData) : null;
@@ -89,7 +95,7 @@ const GuestPaymentandOrder = () => {
               <Text style={styles.itemDiscount}> ({item.discount}% off)</Text>
             )}
           </View>
-          <Text style={styles.itemQuantity}>Quantity: {item.quentity}</Text>
+          <Text style={styles.itemQuantity}>{t('quantity')} {item.quentity}</Text>
         </View>
       </View>
     );
@@ -105,7 +111,7 @@ const GuestPaymentandOrder = () => {
 
   const handlePlaceOrder = async () => {
     if (!paymentMethod) {
-      Alert.alert('Payment Method Required', 'Please select a payment method to place the order.');
+      Alert.alert('Payment Method Required', t('selectPaymetMethodAlert'));
     } else {
       try {
         console.log("totalQty "+totalQty)
@@ -127,7 +133,7 @@ const GuestPaymentandOrder = () => {
         if (response.status === 200) {
           router.push('/screens/Checkout/ConfirmCheckout');
         } else {
-          Alert.alert('Error', 'Something went wrong while placing the order.');
+          Alert.alert('Error', t('placingorderErrorAlert'));
         }
 
         console.log("Payment Method: " + paymentMethod);
@@ -148,12 +154,13 @@ const GuestPaymentandOrder = () => {
   return (
     <View style={styles.container}>
       <View style={styles.paymentMethodContainer}>
-        <Text style={styles.paymentMethodTitle}>Select Payment Method:</Text>
+        <Text style={styles.paymentMethodTitle}>{t('selectPaymentMethod')}</Text>
 
         <TouchableOpacity
           style={[
             styles.checkboxContainer,
             paymentMethod === 'Cash On Delivery' && styles.selectedCheckbox,
+            { flexDirection: isRTL ? 'row-reverse' : 'row' }
           ]}
           onPress={() => handlePaymentMethodChange('Cash On Delivery')}
         >
@@ -165,13 +172,14 @@ const GuestPaymentandOrder = () => {
           >
             {paymentMethod === 'Cash On Delivery' && <Text style={styles.checkmark}>✓</Text>}
           </View>
-          <Text style={styles.paymentMethodText}>Cash on Delivery</Text>
+          <Text style={styles.paymentMethodText}>{t('cashOnDelivery')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[
             styles.checkboxContainer,
             paymentMethod === 'creditCard' && styles.selectedCheckbox,
+            { flexDirection: isRTL ? 'row-reverse' : 'row' }
           ]}
           onPress={() => handlePaymentMethodChange('creditCard')}
           disabled
@@ -184,7 +192,7 @@ const GuestPaymentandOrder = () => {
           >
             {paymentMethod === 'creditCard' && <Text style={styles.checkmark}>✓</Text>}
           </View>
-          <Text style={[styles.paymentMethodText, styles.disabledText]}>Credit Card</Text>
+          <Text style={[styles.paymentMethodText, styles.disabledText]}> {t('creditCard')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -192,7 +200,7 @@ const GuestPaymentandOrder = () => {
 
       <View style={styles.orderItemsContainer}>
         <Text style={styles.orderItemsTitle}>
-          Order Items ({basketData.length})
+        {t('orderItem')}({basketData.length})
         </Text>
         <FlatList
           data={basketData}
@@ -200,37 +208,38 @@ const GuestPaymentandOrder = () => {
           keyExtractor={(item) => item.ID.toString()}
           horizontal // Display items in a horizontal row
           showsHorizontalScrollIndicator={false} // Hide the horizontal scroll bar
+          inverted={isRTL}
         />
       </View>
 
       <View style={styles.summaryContainer}>
-        <Text style={styles.summaryTitle}>Order Summary</Text>
+        <Text style={styles.summaryTitle}> {t('orderSummary')}</Text>
 
-        <View style={styles.summaryRow}>
-          <Text style={styles.summaryText}>Total:</Text>
+        <View style={[styles.summaryRow,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <Text style={styles.summaryText}>{t('total')}</Text>
           <Text style={styles.summaryValue}>${totalBeforeDiscount.toFixed(2)}</Text>
         </View>
 
-        <View style={styles.summaryRow}>
-          <Text style={styles.summaryText}>Total Discount:</Text>
+        <View style={[styles.summaryRow,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <Text style={styles.summaryText}>{t('totalDiscount')}</Text>
           <Text style={[styles.summaryValue, styles.discountValue]}>-${totalDiscount.toFixed(2)}</Text>
         </View>
 
-        <View style={styles.summaryRow}>
-          <Text style={styles.summaryText}>Shipping Fee:</Text>
+        <View style={[styles.summaryRow,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <Text style={styles.summaryText}>{t('shippingFee')}</Text>
           <Text style={styles.summaryValue}>${shippingFee.toFixed(2)}</Text>
         </View>
 
         <View style={styles.lineDivider}></View>
 
-        <View style={styles.summaryRow}>
-          <Text style={styles.summaryText}>Total Net Amount:</Text>
+        <View style={[styles.summaryRow,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+          <Text style={styles.summaryText}>{t('totalNetAmount')}</Text>
           <Text style={styles.summaryValue}>${totalNetAmount.toFixed(2)}</Text>
         </View>
       </View>
 
       <TouchableOpacity style={styles.placeOrderButton} onPress={handlePlaceOrder}>
-        <Text style={styles.placeOrderText}>Place Order</Text>
+        <Text style={styles.placeOrderText}>{t('placeOrder')}</Text>
       </TouchableOpacity>
     </View>
   );

@@ -4,6 +4,8 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
 import { useRouter } from 'expo-router';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const GuestPersonalInfo = () => {
   const [firstName, setFirstName] = useState('');
@@ -23,6 +25,12 @@ const GuestPersonalInfo = () => {
     longitudeDelta: 0.01,
   });
 
+
+  const { t, i18n } = useTranslation(); 
+  
+    const lang = i18next.language;
+    const isRTL = lang === 'ar'; 
+
   const router = useRouter(); 
 
   const setToCurrentLocation = () => {
@@ -41,19 +49,19 @@ const GuestPersonalInfo = () => {
 
   const handleContinue = () => {
     if (!firstName || !lastName || !phoneNumber || !email || !city || !street || !building || !latitude || !longitude) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert('Error', t('pleaseFillAllFields'));
       return;
     }
 
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      Alert.alert('Error',  t('pleaseEnterValidEmailAddress'));
       return;
     }
 
     const phoneRegex = /^[0-9]{8}$/;
     if (!phoneRegex.test(phoneNumber)) {
-      Alert.alert('Error', 'Please enter a valid phone number (8 digits)');
+      Alert.alert('Error',  t('pleaseEnterValidPhoneNumber'));
       return;
     }
 
@@ -61,12 +69,12 @@ const GuestPersonalInfo = () => {
     const lonRegex = /^[-+]?((1[0-7]\d)|([1-9]?\d))(\.\d+)?$/;
 
     if (!latRegex.test(latitude)) {
-      Alert.alert('Error', 'Please enter a valid latitude');
+      Alert.alert('Error',  t('pleaseEnterValidLatitude'));
       return;
     }
 
     if (!lonRegex.test(longitude)) {
-      Alert.alert('Error', 'Please enter a valid longitude');
+      Alert.alert('Error',  t('pleaseEnterValidLongitude'));
       return;
     }
 
@@ -92,16 +100,16 @@ const GuestPersonalInfo = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Personal Information</Text>
+      <Text style={styles.title}>{t('personalInfo')}</Text>
 
       <View style={styles.formWrapper}>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>First Name</Text>
+          <Text style={styles.label}>{t('firstName')}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="person-outline" size={20} color="#333" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="First name"
+              placeholder={t('firstName')}
               value={firstName}
               onChangeText={setFirstName}
             />
@@ -109,12 +117,12 @@ const GuestPersonalInfo = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Last Name</Text>
+          <Text style={styles.label}>{t('lastnNme')}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="person-outline" size={20} color="#333" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="Last name"
+              placeholder={t('lastnNme')}
               value={lastName}
               onChangeText={setLastName}
             />
@@ -122,12 +130,12 @@ const GuestPersonalInfo = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Phone Number</Text>
+          <Text style={styles.label}>{t('phoneNumber')}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="call-outline" size={20} color="#333" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="Phone number"
+              placeholder={t('phoneNumber')}
               value={phoneNumber}
               onChangeText={setPhoneNumber}
               keyboardType="phone-pad"
@@ -136,12 +144,12 @@ const GuestPersonalInfo = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>{t('email')}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="mail-outline" size={20} color="#333" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="Email"
+              placeholder={t('email')}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -150,12 +158,12 @@ const GuestPersonalInfo = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>City</Text>
+          <Text style={styles.label}>{t('city')}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="location-outline" size={20} color="#333" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="City"
+              placeholder={t('city')}
               value={city}
               onChangeText={setCity}
             />
@@ -163,12 +171,12 @@ const GuestPersonalInfo = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Street</Text>
+          <Text style={styles.label}>{t('street')}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="location-outline" size={20} color="#333" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="Street"
+              placeholder={t('street')}
               value={street}
               onChangeText={setStreet}
             />
@@ -176,12 +184,12 @@ const GuestPersonalInfo = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Building</Text>
+          <Text style={styles.label}>{t('building')}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="business-outline" size={20} color="#333" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="Building"
+              placeholder={t('building')}
               value={building}
               onChangeText={setBuilding}
             />
@@ -189,12 +197,12 @@ const GuestPersonalInfo = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Latitude</Text>
+          <Text style={styles.label}>{t('latitude')}</Text>
           <View style={styles.inputWrapper}>
             <MaterialIcons name="location-on" size={20} color="#333" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="Latitude"
+              placeholder={t('latitude')}
               value={latitude}
               onChangeText={setLatitude}
               keyboardType="numeric"
@@ -203,12 +211,12 @@ const GuestPersonalInfo = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Longitude</Text>
+          <Text style={styles.label}>{t('longitude')}</Text>
           <View style={styles.inputWrapper}>
             <MaterialIcons name="location-on" size={20} color="#333" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder="Longitude"
+              placeholder={t('longitude')}
               value={longitude}
               onChangeText={setLongitude}
               keyboardType="numeric"
@@ -218,11 +226,11 @@ const GuestPersonalInfo = () => {
       </View>
 
       <TouchableOpacity style={styles.button} onPress={setToCurrentLocation}>
-        <Text style={styles.buttonText}>Get Current Location</Text>
+        <Text style={styles.buttonText}>{t('getCurrentLoc')}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.mapButton} onPress={() => setIsMapVisible(true)}>
-        <Text style={styles.buttonText}>Select from Map</Text>
+        <Text style={styles.buttonText}>{t('selectFromMap')}</Text>
       </TouchableOpacity>
 
       {isMapVisible && (
@@ -237,7 +245,7 @@ const GuestPersonalInfo = () => {
       )}
 
       <TouchableOpacity style={styles.button} onPress={handleContinue}>
-        <Text style={styles.buttonText}>Continue</Text>
+        <Text style={styles.buttonText}>{t('continue')}</Text>
       </TouchableOpacity>
     </ScrollView>
   );

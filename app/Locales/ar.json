@@ -41,7 +41,52 @@
    "Add to Cart": "أضف إلى السلة",
   "addToCartAlert":"يرجى اختيار الحجم قبل إضافة العنصر إلى السلة",
 
-  "checkout": "الدفع"
-  
+  "checkout": "الدفع",
+
+  "signInStat": "تسجيل الدخول إلى حسابك",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "loginn": "تسجيل الدخول",
+  "noAccountStat": "ليس لديك حساب؟",
+  "register": "التسجيل",
+  "coninueasGuest": "المتابعة كزائر",
+  "PleaseEmailandPasswordStat": "يرجى ملء كل من البريد الإلكتروني وكلمة المرور",
+
+"personalInfo": "المعلومات الشخصية",
+"firstName": "الاسم الأول",
+"lastnNme": "الاسم الأخير",
+"phoneNumber": "رقم الهاتف",
+"city": "المدينة",
+"building": "المبنى",
+"street": "الشارع",
+"latitude": "خط العرض",
+"longitude": "خط الطول",
+"getCurrentLoc": "احصل على الموقع الحالي",
+"selectFromMap": "اختر من الخريطة",
+"continue": "استمر",
+"pleaseFillAllFields": "يرجى تعبئة جميع الحقول",
+"pleaseEnterValidEmailAddress": "يرجى إدخال بريد إلكتروني صحيح",
+"pleaseEnterValidPhoneNumber": "يرجى إدخال رقم هاتف صحيح (8 أرقام)",
+"pleaseEnterValidLatitude": "يرجى إدخال خط عرض صحيح",
+"pleaseEnterValidLongitude": "يرجى إدخال خط طول صحيح",
+
+"selectPaymentMethod": "اختر وسيلة الدفع",
+"cashOnDelivery": "الدفع عند الاستلام ",
+"creditCard": "بطاقة ائتمان",
+"orderItem": "محتويات الطلب",
+"quantity": "الكمية:",
+"orderSummary": "ملخص الطلب",
+"total": "المجموع:",
+"totalDiscount": "إجمالي الخصم:",
+"shippingFee": "رسوم الشحن:",
+"totalNetAmount": "إجمالي المبلغ الصافي:",
+"placeOrder": "إتمام الطلب",
+"selectPaymetMethodAlert": "يرجى اختيار وسيلة الدفع لإتمام الطلب.",
+"placingorderErrorAlert": "حدث خطأ أثناء إتمام الطلب.",
+
+"orderConfirmation": "تأكيد الطلب",
+"orderRecievedStat": "لقد استلمنا طلبك وسنبدأ في معالجته قريبًا.",
+"thanksStat": "شكرًا لتسوقك معنا!"
+
 }
 

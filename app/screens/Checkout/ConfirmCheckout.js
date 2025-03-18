@@ -2,9 +2,15 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, BackHandler } from 'react-native';
 import { useRouter } from 'expo-router'; 
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const ConfirmCheckout = () => {
   const router = useRouter(); 
+  const { t, i18n } = useTranslation(); 
+
+  const lang = i18next.language;
+  const isRTL = lang === 'ar';
 
   useEffect(() => {
     const backAction = () => {
@@ -35,14 +41,14 @@ const ConfirmCheckout = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Order Confirmation</Text>
+      <Text style={styles.header}>{t('orderConfirmation')}</Text>
       
       <Text style={styles.message}>
-        We've received your order and will begin processing shortly.
+      {t('orderRecievedStat')}
       </Text>
       
       <Text style={styles.thankYou}>
-        Thanks for shopping with us!
+      {t('thanksStat')}
       </Text>
     </View>
   );
