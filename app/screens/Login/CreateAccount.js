@@ -5,10 +5,14 @@ import { useRouter } from "expo-router";
 import axios from "axios";
 import { ipAddress, port, webAppPath } from "@env";
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const CreateAccount = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const { t, i18n } = useTranslation(); 
+
 
 const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -17,10 +21,10 @@ const validateEmail = (email) => {
 
 const handleContinueAction = async () => {
     if (!email.trim()) {
-      Alert.alert("Input Required", "Enter an email to continue");
+      Alert.alert("Input Required", t('enterEmailToContinue'));
     } 
     else if (!validateEmail(email)) {
-      Alert.alert("Invalid Email", "Please enter a valid email address");
+      Alert.alert("Invalid Email", t('pleaseEnterValidEmailAddress'));
     } 
     else {
       try {
@@ -47,31 +51,31 @@ const handleContinueAction = async () => {
         }
       } catch (error) {
         console.error("Error checking user status:", error);
-        Alert.alert("Error", "Unable to check email validation.");
+        Alert.alert("Error", t('unableToCheckEmailValidation'));
       }
     }
   };
 
   return (
     <><ScrollView style={styles.container}>    
-      <Text style={styles.title}>Create Account</Text>      
+      <Text style={styles.title}>{t('createAccount')}</Text>      
       <View style={styles.privacyContainer}>
         <Ionicons name="lock-closed-outline" size={18} color="green" />
-        <Text style={styles.privacyText}>Your data is protected.</Text>
+        <Text style={styles.privacyText}>{t('dataProtected')}</Text>
       </View>
 
       <View style={styles.subtitleView}>
         <View style={styles.subtitleBox}>
-          <Text style={styles.subtitleBoxText}>Register now and end enjoy your tailored experience!</Text>
+          <Text style={styles.subtitleBoxText}>{t('registerEnjoyTailoredExperience')}</Text>
         </View>
       </View>
      
-      <TextInput style={styles.input} placeholder="Email or Phone Number" keyboardType="email-address" onChangeText={setEmail} /> 
+      <TextInput style={styles.input} placeholder={t('emailPhoneNb')} keyboardType="email-address" onChangeText={setEmail} /> 
      
       <TouchableOpacity style={styles.socialButtonEmail} onPress={handleContinueAction} >
         <View style={styles.socialButtonContent}>
         <Ionicons name="mail-outline"  size={20}  style={styles.socialIcon} color="white" />
-        <Text style={styles.emailSocialButtonText}>Continue with Email</Text>
+        <Text style={styles.emailSocialButtonText}>{t('continueWithEmail')}</Text>
         </View>
       </TouchableOpacity>
      
@@ -80,14 +84,14 @@ const handleContinueAction = async () => {
       <TouchableOpacity style={styles.socialButton}>
         <View style={styles.socialButtonContent}>
           <Image source={require('../../Images/GoogleIcon.png')} style={styles.socialImageIcon} />
-          <Text style={styles.socialButtonText}>Continue with Google</Text>
+          <Text style={styles.socialButtonText}>{t('continueWithGoogle')}</Text>
         </View>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.socialButton}>
         <View style={styles.socialButtonContent}>
           <Ionicons name="logo-facebook" color="blue" size={20}  style={styles.socialIcon} />
-          <Text style={styles.socialButtonText}>Continue with Facebook</Text>
+          <Text style={styles.socialButtonText}>{t('continueWithFacebook')}</Text>
         </View>
       </TouchableOpacity>  
       </ScrollView><Navbar activetab="" /></>

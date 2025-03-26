@@ -5,11 +5,16 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const MyAccount = () => {
   const router = useRouter();
   const {loggedClientFullName,loginIdentifier } = useLocalSearchParams();
   const [loggedUser, setLoggedUser] = useState(loggedClientFullName || "");
+  const { t, i18n } = useTranslation(); 
+  const lang = i18next.language;
+  const isRTL = lang === 'ar'; 
 
   const handleSignOut = async () => {
     try {
@@ -25,17 +30,17 @@ const MyAccount = () => {
         pathname: '/screens/Login/LoginView',
       });
 
-      Alert.alert("Signed Out", "You have been signed out.");
+      Alert.alert("Signed Out",t('signedOutStat'));
     } catch (error) {
       console.error("Logout Error:", error);
-      Alert.alert("Error", "Unable to sign out. Please try again.");
+      Alert.alert("Error", t('unableToSignOutStat'));
     }
   };
 
    
     return (
         <><ScrollView style={styles.loggedInContainer}>
-        <View style={styles.greetingView}><Text style={styles.greeting}>Welcome {loggedUser.split(" ")[0]},</Text>
+        <View style={styles.greetingView}><Text style={styles.greeting}>{t('welcome')} {loggedUser.split(" ")[0]},</Text>
         </View>
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
@@ -51,7 +56,7 @@ const MyAccount = () => {
         <View style={styles.optionsContainer}>
           {[
             {
-              title: "Account Details",
+              title: t('accountDetails'),
               icon: "person-circle-outline",
               onPress: () => router.push({
                 pathname: '/screens/Login/EditAccountDetails',
@@ -61,7 +66,7 @@ const MyAccount = () => {
               })
             },
             {
-              title: "My Orders",
+              title: t('myOrders'),
               icon: "file-tray-full-outline",
               onPress: () => router.push({
                 pathname: '/screens/Login/MyOrders',
@@ -72,7 +77,7 @@ const MyAccount = () => {
               })
             },
             {
-              title: "Edit Address",
+              title: t('editAddress'),
               icon: "create-outline",
               onPress: () => router.push({
                 pathname: '/screens/Login/EditAddress',
@@ -83,11 +88,11 @@ const MyAccount = () => {
               })
             },
             {
-              title: "Payment Methods",
+              title: t('paymentMethods'),
               icon: "card-outline"
             },
             {
-              title: "Change Password",
+              title: t('changePassword'),
               icon: "lock-closed-outline",
               onPress: () => router.push({
                 pathname: '/screens/Login/ChangePassword',
@@ -98,19 +103,19 @@ const MyAccount = () => {
               })
             },
             {
-              title: "Logout",
+              title: t('logout'),
               icon: "log-out-outline",
               onPress: () => handleSignOut()
             },
           ].map((item, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.option}
+              style={[styles.option,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}
               onPress={item.onPress} 
             >
               <Ionicons name={item.icon} size={24} color="#555" style={styles.optionIcon} />
               <Text style={styles.optionText}>{item.title}</Text>
-              <Ionicons name="chevron-forward-outline" size={24} color="#555" style={styles.optionArrow} />
+              <Ionicons  name={isRTL ? 'chevron-back-outline' : 'chevron-forward-outline'} size={24} color="#555" style={styles.optionArrow} />
             </TouchableOpacity>
           ))}
         </View>

@@ -46,7 +46,7 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     if (!loginIdentifier || !password) {
-      Alert.alert("", "Please enter both email/username and password.");
+      Alert.alert("", t('Email/userandPasswordStat'));
       return;
     }
     try {
@@ -95,18 +95,18 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>Login</Text>
+        <Text style={styles.titleText}>{t('Login')}</Text>
       </View>
 
       <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder="Email / Username" placeholderTextColor="#ccc" value={loginIdentifier} onChangeText={setLoginIdentifier} autoCapitalize="none" />
-        <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#ccc" value={password} onChangeText={setPassword} secureTextEntry />
-        <Button title="Login" onPress={handleLogin} />
+        <TextInput style={styles.input} placeholder={t('emailUserName')} placeholderTextColor="#ccc" value={loginIdentifier} onChangeText={setLoginIdentifier} autoCapitalize="none" />
+        <TextInput style={styles.input} placeholder={t('password')}  placeholderTextColor="#ccc" value={password} onChangeText={setPassword} secureTextEntry />
+        <Button title={t('login')} onPress={handleLogin} />
       </View>
 
       <Text style={styles.footerText}>
-        Don't have an account?{" "}
-        <Text style={styles.link} onPress={() => router.push({ pathname: '/screens/Login/CreateAccount' })}>Sign up here</Text>
+        {t('noAccountStat')}{" "}
+        <Text style={styles.link} onPress={() => router.push({ pathname: '/screens/Login/CreateAccount' })}>{t('sighnUpHere')}</Text>
       </Text>
 
       <View style={[styles.languageContainer, { flexDirection: i18next.language === 'ar' ? 'row-reverse' : 'row' }]}>

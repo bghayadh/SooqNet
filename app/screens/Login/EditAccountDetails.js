@@ -6,6 +6,8 @@ import axios from 'axios';
 import {ipAddress,port,webAppPath} from "@env";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const EditAccountDetails = () => {
   const {loginIdentifier} = useLocalSearchParams();
@@ -16,9 +18,12 @@ const EditAccountDetails = () => {
   const [mobileNumber, setMobileNumber] = useState("");
   const [selectedGenderOption, setSelectedGenderOption] = useState("Select Gender");
   const [isDropdownVisible, setDropdownVisible] = useState(false); // For gender dropdown
-  const genderOptions = ["Male", "Female"];
   const [email, setEmail] = useState("");
   const [usernameStatus, setUsernameStatus] = useState(null);
+  const { t, i18n } = useTranslation(); 
+  const lang = i18next.language;
+  const isRTL = lang === 'ar'; 
+  const genderOptions = [t('male'), t('female')];
 
   useEffect(() => {
     const GetClientDetails = async () => {
@@ -50,7 +55,7 @@ const EditAccountDetails = () => {
 
   const saveChanges = async () => {
     if (!firstName || !lastName || !mobileNumber) {
-      alert("Please fill out all required fields.");
+      alert(t('pleaseFillAllRequiredFieldStat'));
       return;
     }
     else{
@@ -75,7 +80,7 @@ const EditAccountDetails = () => {
             }));
           }
 
-          Alert.alert("Account Update", "Your account have been successfully updated.");
+          Alert.alert("Account Update", t('accountBeenSuccessfullyUpdatedStat'));
 
         } 
       } catch (error) {
@@ -99,38 +104,38 @@ const EditAccountDetails = () => {
       contentContainerStyle={styles.scrollViewContent}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.header}>My details</Text>
+      <Text style={styles.header}>{t('myDetails')}</Text>
 
       <View style={styles.section}>
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>First Name</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('firstName')}</Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="person-outline" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.inputWithIcon}
             value={firstName}
             onChangeText={setFirstName}
-            placeholder="First Name"
+            placeholder={t('firstName')}
           />
         </View>
         </View>
 
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Last Name</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('lastnNme')}</Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="person-outline" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.inputWithIcon}
             value={lastName}
             onChangeText={setLastName}
-            placeholder="Last Name"
+            placeholder={t('lastnNme')}
           />
         </View>
         </View>
 
 
         <View style={styles.dropdownWrapper}>
-          <Text style={styles.label}>Gender</Text>
+          <Text style={styles.label}>{t('gender')}</Text>
           <TouchableOpacity onPress={toggleDropdown} style={styles.dropdownButton}>
             <View style={styles.dropdownButtonContent}>
                 <Text style={styles.dropdownButtonText}>{selectedGenderOption}</Text>
@@ -154,31 +159,31 @@ const EditAccountDetails = () => {
         </View>
 
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Mobile Number</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('phoneNumber')}</Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="call-outline" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.inputWithIcon}
             value={mobileNumber}
             onChangeText={setMobileNumber}
-            placeholder="Mobile Number"
+            placeholder={t('phoneNumber')}
           />
         </View>
         </View>
 
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Email</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('email')}</Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="mail-outline" size={20} color="#555" style={styles.inputIcon} />
-          <TextInput style={styles.inputWithIcon} value={email} onChangeText={setEmail} placeholder="Email" editable={false}   />
+          <TextInput style={styles.inputWithIcon} value={email} onChangeText={setEmail} placeholder={t('email')} editable={false}   />
         </View>
         </View>
 
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Username</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('userName')}</Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="people-outline" size={20} color="#555" style={styles.inputIcon} />
-          <TextInput style={styles.inputWithIcon} value={username} placeholder="Username" editable={false}
+          <TextInput style={styles.inputWithIcon} value={username} placeholder={t('userName')} editable={false}
             onChangeText={(text) => {
               setUsername(text);
               setUsernameStatus(null);  // Reset status when typing
@@ -198,7 +203,7 @@ const EditAccountDetails = () => {
 
       <View style={{ marginBottom: 20 }}> 
       <TouchableOpacity style={styles.button} onPress={saveChanges}>
-        <Text style={styles.buttonText}>Save changes</Text>
+        <Text style={styles.buttonText}>{t('saveChanges')}</Text>
       </TouchableOpacity>
       </View>
 

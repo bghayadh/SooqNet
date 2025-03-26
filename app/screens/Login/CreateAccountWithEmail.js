@@ -7,6 +7,8 @@ import {ipAddress,port,webAppPath} from "@env";
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const CreateAccount = () => {
   const [firstName, setFirstName] = useState("");
@@ -14,17 +16,21 @@ const CreateAccount = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-  const [selectedGenderOption, setSelectedGenderOption] = useState("Select Gender");
   const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const genderOptions = ["Male", "Female"];
   const {EmailAvailability,email } = useLocalSearchParams();
   const [emailAddress, setEmailAddress] = useState(email || "");
   const [usernameStatus, setUsernameStatus] = useState(null);
   const router = useRouter();
+   const { t, i18n } = useTranslation(); 
+  const lang = i18next.language;
+  const isRTL = lang === 'ar'; 
+  const [selectedGenderOption, setSelectedGenderOption] = useState(t('selectGender'));
+  const genderOptions = [t('male'), t('female')];
 
+   
   const handleRegister = async () => {
     if (!firstName || !lastName || !password || !email || !username || !mobileNumber) {
-      alert("Please fill out all required fields.");
+      alert(t('pleaseFillAllRequiredFieldStat'));
       return;
     }
     else{
@@ -54,14 +60,14 @@ const CreateAccount = () => {
         } 
       } catch (error) {
         console.error("Error checking user status:", error);
-        Alert.alert("Error", "Unable to check email validation.");
+        Alert.alert(t('unableToCheckEmailValidation'));
       }
     }
   };
 
   const handleLoginAction = async () => {
     if (!password) {
-      Alert.alert("Input Required", "Enter your password");
+      Alert.alert("Input Required", t('enterYourPassword'));
     } 
     else {
       try {
@@ -92,7 +98,7 @@ const CreateAccount = () => {
         }
        } catch (error) {
          console.error("Login Error:", error);
-         Alert.alert("Error", "Something went wrong. Please try again.");
+         Alert.alert("Error", t('somethingWentWrong'));
        }
     }
   };
@@ -131,22 +137,22 @@ const CreateAccount = () => {
   if (EmailAvailability === "false") {
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>Sign in</Text>
+        <Text style={styles.header}>{t('signIn')}</Text>
   
         <Text style={styles.message}>
-        Looks like you already have an account using{" "}
-        <Text style={{ fontWeight: "bold" }}>{emailAddress}</Text> , please enter your password.
+        {t('alreadyhaveAccount')}{" "}
+        <Text style={{ fontWeight: "bold" }}>{emailAddress}</Text>  {t('pleaseEnterYoutPassword')}
       </Text>
 
         <View style={styles.inputWrapper}>
-          <Text style={styles.label}>Password *</Text>
-          <View style={styles.inputContainer}>
-            <TextInput style={styles.input} value={password} onChangeText={setPassword} placeholder="Password" secureTextEntry />
+          <Text style={styles.label}> {t('password')} *</Text>
+          <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+            <TextInput style={styles.input} value={password} onChangeText={setPassword} placeholder= {t('password')} secureTextEntry />
           </View>
         </View>
 
         <TouchableOpacity style={styles.loginButton} onPress={handleLoginAction}>
-          <Text style={styles.loginButtonText}>Login</Text>
+          <Text style={styles.loginButtonText}>{t('loginn')}</Text>
         </TouchableOpacity>
       </View>    
 
@@ -160,42 +166,42 @@ const CreateAccount = () => {
       contentContainerStyle={styles.scrollViewContent}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.header}>Create Your Account</Text>
+      <Text style={styles.header}>{t('createYourAccount')}</Text>
 
       <View style={styles.section}>
-        <Text style={styles.sectionHeader}>Personal Details</Text>
+        <Text style={styles.sectionHeader}>{t('personalDetails')}</Text>
 
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>First Name</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('firstName')}</Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="person-outline" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.inputWithIcon}
             value={firstName}
             onChangeText={setFirstName}
-            placeholder="First Name"
+            placeholder= {t('firstName')}
           />
         </View>
         </View>
 
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Last Name</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('lastnNme')}</Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="person-outline" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.inputWithIcon}
             value={lastName}
             onChangeText={setLastName}
-            placeholder="Last Name"
+            placeholder={t('lastnNme')}
           />
         </View>
         </View>
 
 
         <View style={styles.dropdownWrapper}>
-          <Text style={styles.label}>Gender</Text>
+          <Text style={styles.label}>{t('gender')}</Text>
           <TouchableOpacity onPress={toggleDropdown} style={styles.dropdownButton}>
-            <View style={styles.dropdownButtonContent}>
+            <View style={[styles.dropdownButtonContent,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                 <Text style={styles.dropdownButtonText}>{selectedGenderOption}</Text>
                 <Ionicons name="caret-down-outline" size={14} color="black" />
             </View>
@@ -217,34 +223,34 @@ const CreateAccount = () => {
         </View>
 
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Mobile Number</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('phoneNumber')}</Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="call-outline" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.inputWithIcon}
             value={mobileNumber}
             onChangeText={setMobileNumber}
-            placeholder="Mobile Number"
+            placeholder={t('phoneNumber')}
           />
         </View>
         </View>
 
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Email</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('email')} </Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="mail-outline" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.inputWithIcon}
             value={email}
             onChangeText={setEmailAddress}
-            placeholder="Email"
+            placeholder={t('email')} 
           />
         </View>
         </View>
 
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Username</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('userName')} </Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="people-outline" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.inputWithIcon}
@@ -253,7 +259,7 @@ const CreateAccount = () => {
               setUsername(text);
               setUsernameStatus(null);  // Reset status when typing
             }}
-            placeholder="Username"
+            placeholder={t('userName')}
             onEndEditing={checkUsernameAvailability}
           />
         </View>
@@ -265,14 +271,14 @@ const CreateAccount = () => {
       </View>
 
         <View style={styles.inputWrapper}>
-        <Text style={styles.label}>Password</Text>
-        <View style={styles.inputContainer}>
+        <Text style={styles.label}>{t('password')} </Text>
+        <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
           <Ionicons name="lock-closed-outline" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.inputWithIcon}
             value={password}
             onChangeText={setPassword}
-            placeholder="Password" secureTextEntry
+            placeholder={t('password')}  secureTextEntry
           />
         </View>
         </View>
@@ -281,7 +287,7 @@ const CreateAccount = () => {
 
       {/* Register Button */}
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
+        <Text style={styles.buttonText}>{t('register')}</Text>
       </TouchableOpacity>
     </ScrollView><Navbar activetab="" /></>
 

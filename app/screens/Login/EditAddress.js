@@ -8,6 +8,8 @@ import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 import {ipAddress,port,webAppPath} from "@env";
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const EditAddress = () => {
   const {loginIdentifier,loggedClientFullName} = useLocalSearchParams();
@@ -26,6 +28,10 @@ const EditAddress = () => {
   });
   const [marker, setMarker] = useState(region);
 
+   const { t, i18n } = useTranslation(); 
+    const lang = i18next.language;
+    const isRTL = lang === 'ar'; 
+
   useEffect(() => {
     const fetchAddressData = async () => {
       try {
@@ -41,11 +47,11 @@ const EditAddress = () => {
         } 
         else {
           console.error("Failed to fetch address data");
-          Alert.alert("Error", "Unable to fetch address data.");
+          Alert.alert("Error", t('unableToFetchAddressDataStat'));
         }
       } catch (error) {
         console.error("Error fetching address data:", error);
-        Alert.alert("Error", "Something went wrong while fetching address data.");
+        Alert.alert("Error", t('fetchingAddressDataErrorStat'));
       } finally {
         setLoading(false);
       }
@@ -56,7 +62,7 @@ const EditAddress = () => {
 
   useEffect(() => {
     const backAction = () => {
-      Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+      Alert.alert('Hold on!', t('goingBackStat'), [
         {
           text: 'Cancel',
           onPress: () => null,
@@ -108,7 +114,7 @@ const EditAddress = () => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Permission Denied", "Please allow location access to use this feature.");
+        Alert.alert("Permission Denied", t('allowLocationAccessToUseThisFeatureStat'));
         setLoading(false);
         return;
       }
@@ -155,7 +161,7 @@ const EditAddress = () => {
       setCurrentLongitude(longitude.toString());
     } catch (error) {
       console.error("Error fetching location:", error);
-      Alert.alert("Error", "Unable to fetch location.");
+      Alert.alert("Error", t('UnableToFetchLocationStat'));
     } finally {
       setLoading(false);
     }
@@ -163,7 +169,7 @@ const EditAddress = () => {
 
   const updateDeliveryAddress = async () => {
     if (!address) {
-      alert("Please fill out the address.");
+      alert(t('fillTheAddressStat'));
       return;
     }
     const response = await axios.post('http://'+ipAddress+':'+port+webAppPath+'/SaveSooqNetClientAccountDetails',{}, {
@@ -186,7 +192,7 @@ const EditAddress = () => {
           longitude: parseFloat(longitude),
         });
 
-      Alert.alert("Account Update", "Address updated successfully!");
+      Alert.alert("Account Update", t('addressUpdatedSuccessfullyStat'));
     } 
   };
 
@@ -196,34 +202,34 @@ const EditAddress = () => {
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0d6efd" />
-          <Text>Fetching location...</Text>
+          <Text>{t('fetchingLocation')}</Text>
         </View>
       ) : (
         <>
-          <Text style={styles.header}>Edit Address</Text>
+          <Text style={styles.header}>{t('editAddress')}</Text>
           <View style={styles.section}>
-            <Text style={styles.sectionHeader}>Delivery Location</Text>
+            <Text style={styles.sectionHeader}>{t('deliveryLocation')}</Text>
             <TouchableOpacity style={styles.setCoordinatesButton} onPress={setToCurrentLocation}>
-              <Text style={styles.buttonText}>Set Current Location</Text>
+              <Text style={styles.buttonText}>{t('setCurrentLocation')}</Text>
             </TouchableOpacity> 
             <Text></Text>
 
             <View style={styles.row}>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Longitude</Text>
+                <Text style={styles.label}>{t('longitude')}</Text>
                 <TextInput style={styles.input} value={longitude} onChangeText={setLongitude} keyboardType="numeric" />
               </View>
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>Latitude</Text>
+                <Text style={styles.label}>{t('latitude')}</Text>
                 <TextInput style={styles.input} value={latitude} onChangeText={setLatitude} keyboardType="numeric" />
               </View>
             </View>
 
             <View style={styles.inputWrapper}>
-              <Text style={styles.label}>Address</Text>
-              <View style={styles.inputContainer}>
+              <Text style={styles.label}>{t('address')}</Text>
+              <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                 <Ionicons name="location-outline" size={20} color="#555" style={styles.inputIcon} />
-                <TextInput style={[styles.inputWithIcon, { height: 80 }]} value={address} onChangeText={setAddress} placeholder="Address" multiline />
+                <TextInput style={[styles.inputWithIcon, { height: 80 }]} value={address} onChangeText={setAddress} placeholder={t('address')} multiline />
                 </View>
             </View>
 
@@ -244,7 +250,7 @@ const EditAddress = () => {
             </MapView>
           </View>
           <TouchableOpacity style={styles.updateAddressButton} onPress={updateDeliveryAddress}>
-            <Text style={styles.buttonText}>Update Address</Text>
+            <Text style={styles.buttonText}>{t('updateAddress')}</Text>
           </TouchableOpacity>
         </>
       )}

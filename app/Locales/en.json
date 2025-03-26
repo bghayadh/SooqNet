@@ -89,7 +89,77 @@
 
   "orderConfirmation":"Order Confirmation",
   "orderRecievedStat":"We've received your order and will begin processing shortly.",
-  "thanksStat":" Thanks for shopping with us!"
+  "thanksStat":" Thanks for shopping with us!",
+
+  "Login":"Login",
+  "emailUserName":"Email / Username",
+  "sighnUpHere":"Sign up here",
+  "arabic":"Arabic",
+  "english":"English",
+  "Email/userandPasswordStat":"Please enter both email/username and password.",
+
+  "createAccount":"Create Account",
+  "dataProtected":"Your data is protected.",
+  "registerEnjoyTailoredExperience":"Register now and end enjoy your tailored experience!",
+  "emailPhoneNb":"Email or Phone Number",
+  "continueWithEmail":"Continue with Email",
+  "continueWithGoogle":"Continue with Google",
+  "continueWithFacebook":"Continue with Facebook",
+  "enterEmailToContinue":"Enter an email to continue",
+  "unableToCheckEmailValidation":"Unable to check email validation.",
+
+  "createYourAccount":"Create Your Account",
+  "personalDetails":"Personal Details",
+  "gender":"Gender",
+  "selectGender":"Select Gender",
+  "male":"Male",
+  "female":"Female",
+  "userName":"Username",
+  "enterYourPassword":"Enter your password",
+  "pleaseFillAllRequiredFieldStat":"Please fill out all required fields.",
+  "somethingWentWrong":"Something went wrong. Please try again.",
+  "signIn":"Sign In",
+  "alreadyhaveAccount":"Looks like you already have an account using",
+  "pleaseEnterYoutPassword":", please enter your password.",
+
+  "welcome":"Welcome",
+  "accountDetails":"Account Details",
+  "myOrders":"My Orders",
+  "editAddress":"Edit Address",
+  "paymentMethods":"Payment Methods",
+  "changePassword":"Change Password",
+  "logout":"Logout",
+  "signedOutStat":"You have been signed out.",
+  "unableToSignOutStat":"Unable to sign out. Please try again.",
+
+  "myDetails":"My details",
+  "saveChanges":"Save Changes",
+  "accountBeenSuccessfullyUpdatedStat":"Your account have been successfully updated.",
+
+  "fetchingLocation":"Fetching location...",
+  "deliveryLocation":"Delivery Location",
+  "setCurrentLocation":"Set Current Location",
+  "address":"Address",
+  "updateAddress":"Update Address",
+  "unableToFetchAddressDataStat":"Unable to fetch address data.",
+  "fetchingAddressDataErrorStat":"Something went wrong while fetching address data.",
+  "goingBackStat":"Are you sure you want to go back?",
+  "allowLocationAccessToUseThisFeatureStat":"Please allow location access to use this feature.",
+  "UnableToFetchLocationStat":"Unable to fetch location.",
+  "fillTheAddressStat":"Please fill out the address.",
+  "addressUpdatedSuccessfullyStat":"Address updated successfully!",
+
+  "oldPassword":"Old Password",
+  "newPassword":"New Password",
+  "confirmPassword":"Confirm Password",
+  "newPasswordsDoNotMatchStat":"New passwords do not match",
+  "passwordChangedSuccessfullyStat":"Password changed successfully!",
+  "wantToGoBackAndDiscardStat":"Are you sure you want to go back and discard ?"
+  
+  
+  
+
+    
 
 
 }

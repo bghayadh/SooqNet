@@ -7,6 +7,8 @@ import {ipAddress,port,webAppPath} from "@env";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const ChangePassword = () => {
 
@@ -18,13 +20,17 @@ const ChangePassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
+  const { t, i18n } = useTranslation(); 
+  const lang = i18next.language;
+  const isRTL = lang === 'ar'; 
+
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword || !confirmPassword) {
-      alert('Please fill in all the fields');
+      alert(t('pleaseFillAllFields'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      alert('New passwords do not match');
+      alert(t('newPasswordsDoNotMatchStat'));
       return;
     }
     const response = await axios.post('http://'+ipAddress+':'+port+webAppPath+'/SooqNetChangeAccountPassword',{}, {
@@ -34,7 +40,7 @@ const ChangePassword = () => {
     });
    
     if (response.data.Status === "Success") {      
-      Alert.alert("Account Update", "Password changed successfully!");
+      Alert.alert("Account Update", t('passwordChangedSuccessfullyStat'));
       await AsyncStorage.setItem('loginDetails', JSON.stringify({
         loginIdentifier: "",  
         password: "",         
@@ -52,7 +58,7 @@ const ChangePassword = () => {
 
   useEffect(() => {
     const backAction = () => {
-      Alert.alert('Hold on!', 'Are you sure you want to go back and discard ?', [
+      Alert.alert('Hold on!', t('wantToGoBackAndDiscardStat'), [
         {
           text: 'Cancel',
           onPress: () => null,
@@ -76,24 +82,24 @@ const ChangePassword = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Change Password</Text>
+      <Text style={styles.title}>{t('changePassword')}</Text>
       <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder="Old Password" value={oldPassword} onChangeText={setOldPassword} />
+        <TextInput style={styles.input} placeholder={t('oldPassword')} value={oldPassword} onChangeText={setOldPassword} />
       </View>
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder="New Password" secureTextEntry={!showNewPassword} value={newPassword} onChangeText={setNewPassword}  />
+      <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+        <TextInput style={styles.input} placeholder={t('newPassword')} secureTextEntry={!showNewPassword} value={newPassword} onChangeText={setNewPassword}  />
         <TouchableOpacity onPress={() => setShowNewPassword(!showNewPassword)}>
           <Ionicons name={showNewPassword ? 'eye-off' : 'eye'} size={24} color="#777" />
         </TouchableOpacity>
       </View>
-      <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder="Confirm Password" secureTextEntry={!showConfirmPassword} value={confirmPassword} onChangeText={setConfirmPassword} />
+      <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+        <TextInput style={styles.input} placeholder={t('confirmPassword')} secureTextEntry={!showConfirmPassword} value={confirmPassword} onChangeText={setConfirmPassword} />
         <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
           <Ionicons name={showConfirmPassword ? 'eye-off' : 'eye'} size={24} color="#777" />
         </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
-        <Text style={styles.buttonText}>Change Password</Text>
+        <Text style={styles.buttonText}>{t('changePassword')}</Text>
       </TouchableOpacity>
       <Navbar activetab="" />
     </View>
