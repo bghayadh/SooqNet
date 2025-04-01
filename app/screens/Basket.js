@@ -126,10 +126,24 @@ const Basket = () => {
     }
   };
 
-  const handleCheckoutPress = () => {
+  const handleCheckoutPress = async () => {
     if (basketData.length > 0) {
-      // Proceed to checkout if there are items in the basket
+
+      const storedLoginDetails = await AsyncStorage.getItem('loginDetails');
+       
+      if (storedLoginDetails) {
+        const userData = JSON.parse(storedLoginDetails);
+        if (userData.isLoggedIn === "true") {
+         // console.log("login identifier "+userData.loginIdentifier)
+          router.push('/screens/Checkout/GuestPersonalInfo');
+        }
+        else{
+           // Proceed to checkout if there are items in the basket
       router.push('/screens/Checkout/CheckoutLogin');
+        }
+      }
+
+     
     } else {
       // Show an alert if the basket is empty
       alert('Your basket is empty. Add some items before proceeding to checkout.');

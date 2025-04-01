@@ -50,7 +50,7 @@
   "email":"Email",
   "password":"Password",
   "loginn":"Login",
-  "noAccountStat":"Don't have an account",
+  "noAccountStat":"Don't have an account?",
   "register":"Register",
   "coninueasGuest":"Continue as Guest",
   "PleaseEmailandPasswordStat":"Please fill in both email and password",

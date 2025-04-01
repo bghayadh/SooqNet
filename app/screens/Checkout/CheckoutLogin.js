@@ -3,6 +3,10 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { useRouter } from 'expo-router';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ipAddress, port, webAppPath } from '@env';
+
 
 const CheckoutLogin = () => {
   const [email, setEmail] = useState('');
@@ -13,20 +17,47 @@ const CheckoutLogin = () => {
   const lang = i18next.language;
   const isRTL = lang === 'ar'; 
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Error', t('PleaseEmailandPasswordStat'));
       return;
     }
-    Alert.alert('Login Successful');
+    try {
+      const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/cltLoginAuthentication', {
+        params: { loginIdentifier: email, password: password, }
+      });
+
+      if (response.data.Message === "Success") {
+       
+        await AsyncStorage.setItem('loginDetails', JSON.stringify({
+          loginIdentifier: email,
+          password:password,
+          clientName: response.data.clientName,
+          isLoggedIn:"true",
+        }));
+
+        router.push('/screens/Checkout/GuestPersonalInfo');
+      } 
+      else {
+        Alert.alert("Login Failed", response.data.Message || "Invalid credentials");
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    }
   };
 
   const handleRegister = () => {
-    Alert.alert('Redirect to Register');
+    router.push({ pathname: '/screens/Login/CreateAccount' })
   };
 
   const handleGuestLogin = () => {
+    try{
     router.push('/screens/Checkout/GuestPersonalInfo');
+  }
+  catch{
+    Alert.alert("Error", "Something went wrong. Please try again.");
+  }
   };
 
   return (

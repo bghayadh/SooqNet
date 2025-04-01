@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect  } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
+import { ipAddress, port, webAppPath } from '@env';
 import { useRouter } from 'expo-router';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
 
 const GuestPersonalInfo = () => {
   const [firstName, setFirstName] = useState('');
@@ -25,6 +29,10 @@ const GuestPersonalInfo = () => {
     longitudeDelta: 0.01,
   });
 
+  const [loading, setLoading] = useState(true);  // Loading state
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isEmailEditable, setIsEmailEditable] = useState(true);
+
 
   const { t, i18n } = useTranslation(); 
   
@@ -32,6 +40,48 @@ const GuestPersonalInfo = () => {
     const isRTL = lang === 'ar'; 
 
   const router = useRouter(); 
+
+  /*check if the user ia logged in then get personal info of the user from data base else load 
+  view with no data*/
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const storedLoginDetails = await AsyncStorage.getItem('loginDetails');
+      if (storedLoginDetails) {
+        const userData = JSON.parse(storedLoginDetails);
+        if (userData.isLoggedIn === "true") {
+          setIsLoggedIn(true);
+          // Make axios request to fetch data
+          try {
+            const response = await axios.get('http://' + ipAddress + ':' + port + webAppPath + '/GetSooqNetClientDetails', {
+           
+              params: { loginIdentifier: userData.loginIdentifier }, 
+            });
+            if (response?.data?.clientDetailsList && response.data.clientDetailsList.length > 0) {
+              const details = response.data.clientDetailsList[0]; 
+              setFirstName(details[1] || "");  
+              setLastName(details[2] || "");  
+            
+              setPhoneNumber(details[4] || "");  
+              setEmail(details[5] || "");
+              setLatitude (details[7] || "");
+            
+             setLongitude(details[6] || "");
+
+             setIsEmailEditable(false);  // Set to false to make it readonly
+              
+            }
+          } catch (error) {
+            console.error("Error fetching user data", error);
+            Alert.alert("Error", "Failed to load user data");
+          }
+        }
+      }
+      setLoading(false);  // Set loading to false once the data is fetched or if not logged in
+    };
+
+    checkLoginStatus();
+  }, []);
 
   const setToCurrentLocation = () => {
     const latitude = parseFloat(0.00);
@@ -100,6 +150,13 @@ const GuestPersonalInfo = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+       {loading ? (
+      <View style={styles.loadingContainer}>
+        <Text>{t('loadingText')}</Text> 
+      
+      </View>
+    ) : (
+      <>
       <Text style={styles.title}>{t('personalInfo')}</Text>
 
       <View style={styles.formWrapper}>
@@ -153,6 +210,7 @@ const GuestPersonalInfo = () => {
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
+              editable={isEmailEditable}
             />
           </View>
         </View>
@@ -247,6 +305,8 @@ const GuestPersonalInfo = () => {
       <TouchableOpacity style={styles.button} onPress={handleContinue}>
         <Text style={styles.buttonText}>{t('continue')}</Text>
       </TouchableOpacity>
+      </>
+    )}
     </ScrollView>
   );
 };
@@ -258,6 +318,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     padding: 20,
+  },
+  loadingContainer:{
+    flex: 1,
+    paddingTop: 0,
+
   },
   title: {
     fontSize: 20,

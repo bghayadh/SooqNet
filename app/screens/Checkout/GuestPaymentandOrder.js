@@ -17,6 +17,7 @@ const GuestPaymentandOrder = () => {
 
   const lang = i18next.language;
   const isRTL = lang === 'ar';
+  const [clientName, setClientName] = useState("Guest");
 
   const { formData } = useLocalSearchParams(); 
   const parsedFormData = formData ? JSON.parse(formData) : null;
@@ -108,13 +109,25 @@ const GuestPaymentandOrder = () => {
       setPaymentMethod(method);
     }
   };
+  useEffect(() => {
+    const fetchLoginDetails = async () => {
+      const storedLoginDetails = await AsyncStorage.getItem('loginDetails');
+      if (storedLoginDetails) {
+        const userData = JSON.parse(storedLoginDetails);
+        if (userData.isLoggedIn === "true") {
+          setClientName(userData.loginIdentifier); // Update the clientName dynamically
+        }
+      }
+    };
 
+    fetchLoginDetails();
+  }, []);
   const handlePlaceOrder = async () => {
     if (!paymentMethod) {
       Alert.alert('Payment Method Required', t('selectPaymetMethodAlert'));
     } else {
       try {
-        console.log("totalQty "+totalQty)
+        
         const response = await axios.post('http://' + ipAddress + ':' + port + webAppPath + '/placeOrder', {
           "dictParameter": basketData, 
           "paymentMethod": paymentMethod,
@@ -124,7 +137,7 @@ const GuestPaymentandOrder = () => {
           "email": parsedFormData.email,
           "long": parsedFormData.longitude,
           "lat": parsedFormData.latitude,
-          "clientName": "Guest",
+          "clientName": clientName,
           "netTotal": totalNetAmount,
           "totalQty": totalQty,
           "totalAmount": totalNetAmount,
@@ -136,7 +149,7 @@ const GuestPaymentandOrder = () => {
           Alert.alert('Error', t('placingorderErrorAlert'));
         }
 
-        console.log("Payment Method: " + paymentMethod);
+        
         console.log(response.data);  
       } catch (error) {
         console.error("Error placing order:", error.message);
