@@ -61,7 +61,7 @@
   "phoneNumber":"Phone Number",
   "city":"City",
   "building":"Building",
-  "street":"Street",
+  "country":"Country",
   "latitude":"Latitude",
   "longitude":"Longitude",
   "getCurrentLoc":"Get Current Location",
@@ -147,6 +147,9 @@
   "allowLocationAccessToUseThisFeatureStat":"Please allow location access to use this feature.",
   "UnableToFetchLocationStat":"Unable to fetch location.",
   "fillTheAddressStat":"Please fill out the address.",
+  "fillTheCountry":"Please fill out the Country.",
+  "fillTheCity":"Please fill out the City.",
+
   "addressUpdatedSuccessfullyStat":"Address updated successfully!",
 
   "oldPassword":"Old Password",

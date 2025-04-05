@@ -17,8 +17,8 @@ const GuestPersonalInfo = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
   const [city, setCity] = useState('');
-  const [street, setStreet] = useState('');
-  const [building, setBuilding] = useState('');
+  const [country, setCountry] = useState('');
+  const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
   const [isMapVisible, setIsMapVisible] = useState(false);
@@ -69,6 +69,12 @@ const GuestPersonalInfo = () => {
              setLongitude(details[6] || "");
 
              setIsEmailEditable(false);  // Set to false to make it readonly
+            // console.log("country "+details[6] )
+             setCountry(details[13] || "");
+             setCity(details[14] || "");
+             setAddress(details[8] || "");
+             setLongitude(details[6] || "");
+             setLatitude(details[7] || "");
               
             }
           } catch (error) {
@@ -98,7 +104,7 @@ const GuestPersonalInfo = () => {
   };
 
   const handleContinue = () => {
-    if (!firstName || !lastName || !phoneNumber || !email || !city || !street || !building || !latitude || !longitude) {
+    if (!firstName || !lastName || !phoneNumber || !email || !city || !country || !address || !latitude || !longitude) {
       Alert.alert('Error', t('pleaseFillAllFields'));
       return;
     }
@@ -134,8 +140,8 @@ const GuestPersonalInfo = () => {
       phoneNumber,
       email,
       city,
-      street,
-      building,
+      country,
+      address,
       latitude,
       longitude,
     };
@@ -216,6 +222,20 @@ const GuestPersonalInfo = () => {
         </View>
 
         <View style={styles.inputContainer}>
+          <Text style={styles.label}>{t('country')}</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="location-outline" size={20} color="#333" style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder={t('country')}
+              value={country}
+              onChangeText={setCountry}
+            />
+          </View>
+        </View>
+
+
+        <View style={styles.inputContainer}>
           <Text style={styles.label}>{t('city')}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="location-outline" size={20} color="#333" style={styles.icon} />
@@ -229,27 +249,14 @@ const GuestPersonalInfo = () => {
         </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>{t('street')}</Text>
-          <View style={styles.inputWrapper}>
-            <Ionicons name="location-outline" size={20} color="#333" style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder={t('street')}
-              value={street}
-              onChangeText={setStreet}
-            />
-          </View>
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>{t('building')}</Text>
+          <Text style={styles.label}>{t('address')}</Text>
           <View style={styles.inputWrapper}>
             <Ionicons name="business-outline" size={20} color="#333" style={styles.icon} />
             <TextInput
               style={styles.input}
-              placeholder={t('building')}
-              value={building}
-              onChangeText={setBuilding}
+              placeholder={t('address')}
+              value={address}
+              onChangeText={setAddress}
             />
           </View>
         </View>

@@ -58,7 +58,7 @@
 "phoneNumber": "رقم الهاتف",
 "city": "المدينة",
 "building": "المبنى",
-"street": "الشارع",
+"country": "دولة",
 "latitude": "خط العرض",
 "longitude": "خط الطول",
 "getCurrentLoc": "احصل على الموقع الحالي",
@@ -144,6 +144,8 @@
 "allowLocationAccessToUseThisFeatureStat": "يرجى السماح بالوصول إلى الموقع لاستخدام هذه الميزة.",
 "UnableToFetchLocationStat": "تعذر جلب الموقع.",
 "fillTheAddressStat": "يرجى ملء العنوان.",
+"fillTheCountry": "الرجاء ملء الدولة.",
+"fillTheCity": "الرجاء ملء المدينة.",
 "addressUpdatedSuccessfullyStat": "تم تحديث العنوان بنجاح!",
 
 "oldPassword": "كلمة المرور القديمة",

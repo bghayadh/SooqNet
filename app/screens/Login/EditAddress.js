@@ -14,6 +14,8 @@ import { useTranslation } from 'react-i18next';
 const EditAddress = () => {
   const {loginIdentifier,loggedClientFullName} = useLocalSearchParams();
   const [address, setAddress] = useState("");
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
   const [latitude, setLatitude] = useState("0");
   const [longitude, setLongitude] = useState("0");
   const router = useRouter();
@@ -44,6 +46,9 @@ const EditAddress = () => {
           await getCurrentLocation(details);
           
           setAddress(details[8] || "");
+          setCountry(details[13] || "");
+          setCity(details[14] || "");
+
         } 
         else {
           console.error("Failed to fetch address data");
@@ -110,6 +115,7 @@ const EditAddress = () => {
   
    // Function to get the current location
    const getCurrentLocation = async (details) => {
+    console.log("getCurrentLocation ")
     setLoading(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -172,9 +178,17 @@ const EditAddress = () => {
       alert(t('fillTheAddressStat'));
       return;
     }
+    if (!country) {
+      alert(t('fillTheCountry'));
+      return;
+    }
+    if (!city) {
+      alert(t('fillTheCity'));
+      return;
+    }
     const response = await axios.post('http://'+ipAddress+':'+port+webAppPath+'/SaveSooqNetClientAccountDetails',{}, {
       params: {
-        target:"UpdateAddress",loginIdentifier:loginIdentifier,address:address,longitude:longitude,latitude:latitude
+        target:"UpdateAddress",loginIdentifier:loginIdentifier,address:address,longitude:longitude,latitude:latitude,country:country,city:city
       }
     });
     if (response.data.Status === "Success") {      
@@ -230,6 +244,22 @@ const EditAddress = () => {
               <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
                 <Ionicons name="location-outline" size={20} color="#555" style={styles.inputIcon} />
                 <TextInput style={[styles.inputWithIcon, { height: 80 }]} value={address} onChangeText={setAddress} placeholder={t('address')} multiline />
+                </View>
+            </View>
+
+            <View style={styles.inputWrapper}>
+              <Text style={styles.label}>{t('country')}</Text>
+              <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Ionicons name="location-outline" size={20} color="#555" style={styles.inputIcon} />
+                <TextInput style={[styles.inputWithIcon, { height: 80 }]} value={country} onChangeText={setCountry} placeholder={t('country')} multiline />
+                </View>
+            </View>
+
+            <View style={styles.inputWrapper}>
+              <Text style={styles.label}>{t('city')}</Text>
+              <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Ionicons name="location-outline" size={20} color="#555" style={styles.inputIcon} />
+                <TextInput style={[styles.inputWithIcon, { height: 80 }]} value={city} onChangeText={setCity} placeholder={t('city')} multiline />
                 </View>
             </View>
 
