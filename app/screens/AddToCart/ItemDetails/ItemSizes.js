@@ -16,9 +16,16 @@ const onSizePress = (sizeID, sizeDimensionOne, sizeDimensionTwo, setSelectedSize
   //console.log(`onSizePress - SizeID: ${sizeID}, Dimension 1: ${sizeDimensionOne}, Dimension 2: ${sizeDimensionTwo}`);
 };
 
-const Size = ({ item, onPress, isSelected,isRTL }) => {
+const Size = ({ item, onPress, isSelected,isRTL,disabled }) => {
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.size]}>
+    <TouchableOpacity 
+    onPress={disabled ? null : onPress} // Prevent press if disabled
+    disabled={disabled}
+    style={[
+      styles.size,
+      disabled && styles.disabledSize, // Apply disabled styling
+    ]}
+    >
       <View style={[styles.sizeContainer, isSelected && styles.selectedSize,item.SIZE_DIMENSION_TWO && item.SIZE_DIMENSION_TWO !== '' ? { width: 90 } : { width: 60 }]}>
         {item.SIZE_DIMENSION_ONE || item.SIZE_DIMENSION_TWO ? (
           <Text style={[styles.sizeText , isSelected && styles.selectedSizeText]}>
@@ -34,9 +41,10 @@ const Size = ({ item, onPress, isSelected,isRTL }) => {
   );
 };
 
-const ItemSizes = ({ itemSizes,setSelectedItemSize ,isRTL}) => {
+const ItemSizes = ({ itemSizes,setSelectedItemSize ,isRTL,noSizeNoColor,noSize,noQuantityCheck}) => {
   const [selectedSize, setSelectedSize] = useState(null); // State to track selected size
   const { t, i18n } = useTranslation(); 
+  
 
   useEffect(() => {
     // Reset selected size when itemSizes changes(when color changes)
@@ -51,6 +59,7 @@ const ItemSizes = ({ itemSizes,setSelectedItemSize ,isRTL}) => {
       }}
       isSelected={selectedSize === item.ID} // Highlight if selected
       isRTL={isRTL}
+      disabled={item.ITEM_SIZE_QTY <= 0 && noQuantityCheck !=1}
     />
   );
 
@@ -112,6 +121,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
   },
+  disabledSize: {
+    opacity: 0.5,
+  },
+  
+  
   
 });
 

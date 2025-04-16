@@ -31,8 +31,9 @@ const Color = ({ item, onPress, isSelected,colorImagePath }) => {
   );
 };
 
-const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID ,colorImagePath,selectedColorName,setSelectedColorName,setSelectedItemSize,isRTL,selectedColorArabicName,setSelectedColorArabicName}) => {
+const ItemColors = ({ itemColors, selectedColorID, setSelectedColorID ,colorImagePath,selectedColorName,setSelectedColorName,setSelectedItemSize,isRTL,selectedColorArabicName,setSelectedColorArabicName,noSizeNoColor}) => {
 //console.log("item color "+itemColors)
+
 const { t, i18n } = useTranslation(); 
 
 

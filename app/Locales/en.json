@@ -43,6 +43,8 @@
   "show less":"Show Less",
   "Add to Cart": "Add to Cart",
   "addToCartAlert":"Please select a size before adding to the cart.",
+  "itemOutOfStock":"Product that you are trying to add is not available in the selected quantity.",
+  "itemOutOfStockcheckout":"is not available in the selected quantity.",
 
   "checkout":"Checkout",
 

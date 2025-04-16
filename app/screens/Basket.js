@@ -16,6 +16,8 @@ import Navbar from '../Navigations/Navbar';
 import { useRouter } from 'expo-router';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import { ipAddress, port, webAppPath } from '@env';
 
 const Basket = () => {
   const [basketData, setBasketData] = useState([]);
@@ -130,20 +132,55 @@ const Basket = () => {
     if (basketData.length > 0) {
 
       const storedLoginDetails = await AsyncStorage.getItem('loginDetails');
-       
-      if (storedLoginDetails) {
-        const userData = JSON.parse(storedLoginDetails);
-        if (userData.isLoggedIn === "true") {
-         // console.log("login identifier "+userData.loginIdentifier)
-          router.push('/screens/Checkout/GuestPersonalInfo');
+
+      try {
+        const response = await axios.post('http://' + ipAddress + ':' + port + webAppPath + '/GetAllItemAvailableQtySooqNet', {
+          dictParameter: basketData
+        });
+
+        const qtyItemList = response.data?.qtyItemList;
+
+        let Flag=""; 
+        for (let i = 0; i < basketData.length; i++) {
+          const basketItem = basketData[i];
+        
+          // Find the matching entry in qtyItemList by itemCode
+          const matchedRow = qtyItemList.find(row => row[1] === basketItem.itemCode);
+        
+          if (matchedRow) {
+        
+            if (parseInt(basketItem.quentity) > parseInt(matchedRow[0])) {
+              if (isRTL) {
+                alert(matchedRow[3] + t("itemOutOfStock"));
+              } else {
+                alert(matchedRow[2] + t("itemOutOfStock"));
+              }
+              Flag = "cantProceed";
+              break;
+            }
+          }
         }
-        else{
-           // Proceed to checkout if there are items in the basket
-      router.push('/screens/Checkout/CheckoutLogin');
+        
+          
+          if(Flag!="cantProceed"){
+          if (storedLoginDetails) {
+            const userData = JSON.parse(storedLoginDetails);
+            if (userData.isLoggedIn === "true") {
+            // console.log("login identifier "+userData.loginIdentifier)
+              router.push('/screens/Checkout/GuestPersonalInfo');
+            }
+            else{
+               router.push('/screens/Checkout/CheckoutLogin');
+            }
+          }
         }
+
+      } catch (error) {
+        console.error("Error fetching available quantity: ", error);
+        alert(t('qtyCheckError')); 
+        return;
       }
 
-     
     } else {
       // Show an alert if the basket is empty
       alert('Your basket is empty. Add some items before proceeding to checkout.');
@@ -170,7 +207,7 @@ const Basket = () => {
   
             <View style={[styles.colorSizeRow,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Text>{isRTL ? item.arabicColorName : item.colorName}</Text>
-              <Text>/</Text>
+              {item.itemSize ? <Text>/</Text> : null}
               <Text>{item.itemSize}</Text>
             </View>
   

@@ -10,13 +10,41 @@ import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
 
-const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName,t,arabicColorName) => {
+const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName,t,arabicColorName,noSize,noSizeNoColor,noQuantityCheck) => {
   // Validate itemSize to make sure it's not null or empty
-  if (!itemSize || itemSize === "") {
+  if ((!itemSize || itemSize === "") && noSize!=1 && noSizeNoColor!=1) {
     // Display an alert or message
     const msg =t('addToCartAlert');
     alert(msg);
     return; // Stop further execution
+  }
+ 
+  if(noSizeNoColor ==1){
+    colorID=""
+    colorName=""
+  }
+  //console.log("colorID "+colorID)
+  try {
+  
+    const response = await axios.get('http://' + ipAddress + ':' + port + webAppPath + '/GetItemAvailableQtySooqNet', {
+      
+      params: { itemCode:itemCode,
+        color:colorName,
+        size: itemSize },
+    });
+
+    const availableQty = response.data?.itemAvailableQty;
+   // console.log("availableQty "+availableQty)
+    // Check if item is available; this need to be updated
+    //  if quantity field added  to addToCart view so compare availableQty with typed quantity by user
+    if (availableQty <= 0 && noQuantityCheck!=1) {
+      alert(t('itemOutOfStock')); // Add this translation key to your i18n files
+      return;
+    }
+  } catch (error) {
+    console.error("Error fetching available quantity: ", error);
+   // alert(t('qtyCheckError')); // Optional: Add this message too
+    return;
   }
 
   // Generate unique ID for the item based on itemCode, colorID, and itemSize
@@ -95,6 +123,9 @@ const AddToCartView = () => {
   const [colorImageBasePath, setColorImageBasePath] = useState('');
   const [selectedItemSize, setSelectedItemSize] = useState('');
   const { t, i18n } = useTranslation(); 
+  const [noSizeNoColor, setNoSizeNoColor] = useState([]);
+  const [noSize, setNoSize] = useState([]);
+  const [noQuantityCheck, setNoQuantityCheck] = useState([]);
 
   const lang = i18next.language;
   const isRTL = lang === 'ar'; //
@@ -123,6 +154,9 @@ const AddToCartView = () => {
         setSelectedColorID(itemColorsList[0][2] || null); // Set the first color as the default selected color
         setSelectedColorName(itemColorsList[0][3] || null); 
         setSelectedColorArabicName(itemColorsList[0][4] || null)
+        setNoSizeNoColor(itemDescList[0][8]);
+        setNoSize(itemDescList[0][9]);
+        setNoQuantityCheck(itemDescList[0][10]);
 
         if (response?.data?.imageBasePathDetails) {
             const details = response.data.imageBasePathDetails;
@@ -206,7 +240,7 @@ const AddToCartView = () => {
 
         {!isFullScreen && (
           <View style={styles.addToCartButtonContainer}>
-            <TouchableOpacity style={styles.addToCartButton} onPress={() => {onAddCartPress(itemCode,itemData,selectedColorID,selectedColorName,selectedItemSize,itemImageBasePath,itemColorsImage[selectedColorID][0].IMAGE_NAME,t,selectedColorArabicName); }}>
+            <TouchableOpacity style={styles.addToCartButton} onPress={() => {onAddCartPress(itemCode,itemData,selectedColorID,selectedColorName,selectedItemSize,itemImageBasePath,itemColorsImage[selectedColorID][0].IMAGE_NAME,t,selectedColorArabicName,noSize,noSizeNoColor,noQuantityCheck); }}>
               <Text style={styles.addToCartText}>{t('Add to Cart')}</Text>
             </TouchableOpacity>
           </View>
