@@ -226,10 +226,7 @@ const Basket = () => {
           
           <View style={styles.quantityContainer}>
             <TouchableOpacity
-              style={[styles.quantityMinusButton,{
-                [isRTL ? 'borderLeftWidth' : 'borderRightWidth']: 1, 
-                borderColor: '#ddd',  
-              }]}
+              style={styles.quantityMinusButton}
               onPress={() => updateQuantity(item.ID, -1)}
             >
               <Text style={styles.quantityButtonText}>-</Text>
@@ -244,10 +241,7 @@ const Basket = () => {
             />
   
             <TouchableOpacity
-              style={[styles.quantityPlusButton, {
-                [isRTL ? 'borderRightWidth' : 'borderLeftWidth']: 1, 
-                borderColor: '#ddd',  
-              }]}
+              style={styles.quantityPlusButton}
               onPress={() => updateQuantity(item.ID, 1)}
             >
               <Text style={styles.quantityButtonText}>+</Text>
@@ -387,15 +381,15 @@ const styles = StyleSheet.create({
     padding: 5,
     backgroundColor: '#fff',
     borderRadius: 5,
-   // borderRightWidth: 1, 
-    //borderRightColor: '#ddd',
+    borderRightWidth: 1, 
+    borderRightColor: '#ddd',
   },
   quantityPlusButton: {
     padding: 5,
     backgroundColor: '#fff',
     borderRadius: 5,
-   // borderLeftWidth: 1, 
-    //borderLeftColor: '#ddd',
+    borderLeftWidth: 1, 
+    borderLeftColor: '#ddd',
   },
   quantityButtonText: {
     fontSize: 14,
