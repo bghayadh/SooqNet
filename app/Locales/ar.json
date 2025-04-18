@@ -155,6 +155,23 @@
 "confirmPassword": "تأكيد كلمة المرور",
 "newPasswordsDoNotMatchStat": "كلمات المرور الجديدة لا تتطابق",
 "passwordChangedSuccessfullyStat": "تم تغيير كلمة المرور بنجاح!",
-"wantToGoBackAndDiscardStat": "هل أنت متأكد أنك تريد العودة والتخلي عن التغييرات؟"
+"wantToGoBackAndDiscardStat": "هل أنت متأكد أنك تريد العودة والتخلي عن التغييرات؟",
+
+"nothingInOrderYetStat": "لم تقم بأي طلبات بعد! سيتم عرض جميع طلباتك هنا.",
+"deliveryStatus": "حالة التوصيل",
+"orderDate": "تاريخ الطلب",
+"To Be Delivered": "قيد التوصيل",
+"In The Way": "في الطريق",
+"Delivered": "تم التوصيل",
+
+"order": "طلب",
+"unitPrice": "سعر الوحدة",
+"netPrice": "السعر الصافي",
+"noImage": "لا توجد صورة",
+"noOrderDetailsFoundStat": "لم يتم العثور على تفاصيل الطلب.",
+"discount": "خصم",
+"delivery": "التوصيل"
+
+
 }
 

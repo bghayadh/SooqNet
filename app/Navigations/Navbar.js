@@ -86,7 +86,7 @@ const Navbar = ({ activetab }) => {
             color={activetab === 'myaccount' ? 'black' : '#aaa'}
           />
           <Text style={[styles.navItem, activetab === 'myaccount' && styles.activeText]}>
-            My Account
+            {t("myaccount")}
           </Text>
         </TouchableOpacity>
       ) : (

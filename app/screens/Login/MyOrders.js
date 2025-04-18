@@ -5,12 +5,18 @@ import axios from 'axios';
 import { ipAddress, port, webAppPath } from "@env";
 import { useRouter } from "expo-router";
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const MyOrders = () => {
   const { loginIdentifier } = useLocalSearchParams();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { t, i18n } = useTranslation(); 
+
+  const lang = i18next.language;
+  const isRTL = lang === 'ar'; 
 
   useEffect(() => {
     const GetClientDetails = async () => {
@@ -51,19 +57,19 @@ const MyOrders = () => {
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleOrderPress(item.id)}>
     <View style={styles.orderContainer}>
-        <View style={styles.orderHeader}>
+        <View style={[styles.orderHeader, isRTL && { flexDirection: 'row-reverse' }]}>
           <Text style={styles.orderId}>{item.id}</Text>
           <Text style={styles.orderTotal}>$ {item.total}</Text>
         </View>
-        <Text style={styles.orderName}>Delivery Status: {item.status}</Text>
-        <Text style={styles.orderDate}>Order Date: {item.date}</Text>
+        <Text style={styles.orderName}>{t("deliveryStatus")}: {t(item.status)}</Text>
+        <Text style={styles.orderDate}>{t("orderDate")}: {item.date}</Text>
       </View>
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>My Orders</Text>
+      <Text style={styles.title}> {t("myOrders")}</Text>
       {loading ? (
         <ActivityIndicator size="large" color="#007bff" style={styles.loader} />
       ) : orders.length > 0 ? (
@@ -74,7 +80,7 @@ const MyOrders = () => {
         />
       ) : (
         <Text style={styles.noOrdersText}>
-          You haven't placed any orders yet! All your orders will be listed here for you.
+           {t("nothingInOrderYetStat")}
         </Text>
       )}
     <Navbar activetab="" />

@@ -159,8 +159,23 @@
   "confirmPassword":"Confirm Password",
   "newPasswordsDoNotMatchStat":"New passwords do not match",
   "passwordChangedSuccessfullyStat":"Password changed successfully!",
-  "wantToGoBackAndDiscardStat":"Are you sure you want to go back and discard ?"
+  "wantToGoBackAndDiscardStat":"Are you sure you want to go back and discard ?",
+
+  "nothingInOrderYetStat":" You haven't placed any orders yet! All your orders will be listed here for you.",
+  "deliveryStatus":"Delivery Status",
+  "orderDate":"Order Date",
+  "To Be Delivered":"To Be Delivered",
+  "In The Way":"In The Way",
+  "Delivered":"Delivered",
+
   
+  "order":"Order",
+  "unitPrice":"Unit Price",
+  "netPrice":"Net Price",
+  "noImage":"No Image",
+  "noOrderDetailsFoundStat":"No order details found.",
+  "discount":"Discount",
+  "delivery":"delivery"
   
   
 

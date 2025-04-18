@@ -5,12 +5,18 @@ import { useLocalSearchParams } from 'expo-router';
 import {ipAddress,port,webAppPath} from "@env";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const OrderDetails = () => {
   //const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const {orderID} = useLocalSearchParams();
   const [orderDetails, setOrderDetails] = useState({ items: [], colorsImagesPath: '', relativePath: '' ,  OrderAllDetails: [], });
+  const { t, i18n } = useTranslation(); 
+
+  const lang = i18next.language;
+  const isRTL = lang === 'ar'; 
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
@@ -32,6 +38,7 @@ const OrderDetails = () => {
           name: item[7],
           hiddenCat: item[8],
           imageName: item[9],
+          arabicname: item[10],
         }));
         setOrderDetails({ items: fetchedItems, colorsImagesPath, relativePath , OrderAllDetails });
 
@@ -50,7 +57,8 @@ const OrderDetails = () => {
       orderDetails.relativePath === '1'
         ? 'http://' + ipAddress + ':' + port + webAppPath + orderDetails.colorsImagesPath
         : 'http://' + ipAddress + ':' + port + orderDetails.colorsImagesPath;
-        return basePath + '/' + imageName;
+        return basePath + imageName;
+        
   };
 
   const getItemCount = () => (orderDetails?.items?.length ?? 0);
@@ -58,57 +66,59 @@ const OrderDetails = () => {
   const getItem = (data, index) => data[index];
 
   const renderItem = ({ item }) => (
-    <View style={styles.itemContainer}>
+    <View style={[styles.itemContainer,isRTL && { flexDirection: 'row-reverse' }]}>
      {item.imageName ? (
       <Image source={{ uri: constructImagePath(item.imageName) }} style={styles.itemImage} />
     ) : (
       <View style={styles.noImageContainer}>
         <MaterialIcons name="image-not-supported" size={40} color="#aaa" />
-        <Text style={styles.noImageText}>No Image</Text>
+        <Text style={styles.noImageText}>{t("noImage")}</Text>
       </View>
     )}
       <View style={styles.itemDetails}>
-        <Text style={styles.itemName}>{item.name}</Text>
+        <Text style={styles.itemName}>{isRTL ?
+         (item.name !== 'delivery' ? item.arabicname : t("delivery")) :
+         (item.name !== 'delivery' ? item.name : t("delivery")) }</Text>
         <View style={styles.gridContainer}>
         
           {item.hiddenCat=="false" && (
           <>
-             <View style={styles.gridItem}>
-            <Text style={styles.label}>Size:</Text>
+          <View style={[styles.gridItem, isRTL && { flexDirection: 'row-reverse' }]}>
+            <Text style={styles.label}>{t("size")}:</Text>
             <Text style={styles.value}>{item.size}</Text>
           </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Color: </Text>
+          <View style={[styles.gridItem, isRTL && { flexDirection: 'row-reverse' }]}>
+            <Text style={styles.label}>{t("color")}: </Text>
             <Text style={styles.value}>{item.color}</Text>
           </View>
           </>
         )}
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Qty:</Text>
+          <View style={[styles.gridItem, isRTL && { flexDirection: 'row-reverse' }]}>
+            <Text style={styles.label}>{t("quantity")}</Text>
             <Text style={styles.value}>{item.qty}</Text>
           </View>
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Unit Price:</Text>
-            <Text style={styles.value}>$ {item.unitPrice}</Text>
+          <View style={[styles.gridItem, isRTL && { flexDirection: 'row-reverse' }]}>
+            <Text style={styles.label}>{t("unitPrice")}:</Text>
+            <Text style={styles.value}> {isRTL ? `${item.unitPrice} $` : `$${item.unitPrice}`}</Text>
           </View>
           {item.discount > 0 && (
-            <View style={styles.gridItem}>
-              <Text style={styles.label}>Discount:</Text>
-              <Text style={[styles.value, styles.discount]}>-$ {item.discount}</Text>
+             <View style={[styles.gridItem, isRTL && { flexDirection: 'row-reverse' }]}>
+              <Text style={styles.label}>{t("discount")}:</Text>
+              <Text style={[styles.value, styles.discount]}> {isRTL ? `- ${item.discount} $` : `$-${item.discount}`}</Text>
             </View>
           )}
            {item.hiddenCat=="false" && (
           <>
-            <View style={styles.gridItem}>
-            <Text style={styles.label}>Net Price:</Text>
-            <Text style={styles.value}>$ {item.netPrice}</Text>
+             <View style={[styles.gridItem, isRTL && { flexDirection: 'row-reverse' }]}>
+            <Text style={styles.label}>{t("netPrice")}:</Text>
+            <Text style={styles.value}>{isRTL ? `${item.netPrice} $` : `$${item.netPrice}`}</Text>
             </View>
           </>
         )}
           
-          <View style={styles.gridItem}>
-            <Text style={styles.label}>Total:</Text>
-            <Text style={styles.totalValue}>$ {item.totalPrice}</Text>
+          <View style={[styles.gridItem, isRTL && { flexDirection: 'row-reverse' }]}>
+            <Text style={styles.label}>{t("total")}</Text>
+            <Text style={styles.value}>{isRTL ? `${item.totalPrice} $` : `$${item.totalPrice}`}</Text>
           </View>
         </View>
       </View>
@@ -124,22 +134,22 @@ const OrderDetails = () => {
       {orderDetails ? (
         <>
       <View style={styles.orderInfo}>
-            <Text style={styles.sectionTitle}>Order Summary</Text>
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Order:</Text>
+            <Text style={styles.sectionTitle}>{t("orderSummary")}</Text>
+            <View style={[styles.infoRow , isRTL && { flexDirection: 'row-reverse' }]}>
+              <Text style={styles.label}>{t("order")}:</Text>
               <Text style={styles.value}>{orderDetails.OrderAllDetails[0][0]}</Text>
             </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Order Date:</Text>
+            <View style={[styles.infoRow, isRTL && { flexDirection: 'row-reverse' }]}>
+              <Text style={styles.label}>{t("orderDate")}:</Text>
               <Text style={styles.value}>{orderDetails.OrderAllDetails[0][2]}</Text>
             </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Delivery Status:</Text>
-              <Text style={styles.value}>{orderDetails.OrderAllDetails[0][1]} </Text>
+            <View style={[styles.infoRow, isRTL && { flexDirection: 'row-reverse' }]}>
+              <Text style={styles.label}>{t("deliveryStatus")}:</Text>
+              <Text style={styles.value}>{t(orderDetails.OrderAllDetails[0][1])} </Text>
             </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Total:</Text>
-              <Text style={styles.OrderTotalValue}>$ {orderDetails?.OrderAllDetails?.[0]?.[3] || '0.00'}</Text>
+            <View style={[styles.infoRow, isRTL && { flexDirection: 'row-reverse' }]}>
+              <Text style={styles.label}>{t("total")}</Text>
+              <Text style={styles.value}>$ {orderDetails?.OrderAllDetails?.[0]?.[3] || '0.00'} </Text>
             </View>
           </View>
 
@@ -153,7 +163,7 @@ const OrderDetails = () => {
           />
         </>
       ) : (
-        <Text style={styles.noOrders}>No order details found.</Text>
+        <Text style={styles.noOrders}>{t("noOrderDetailsFoundStat")}</Text>
       )}
     <Navbar activetab="" />
     </View>
@@ -201,7 +211,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   OrderTotalValue: {
-    fontSize:20,
+    fontSize:16,
     fontWeight: 'bold',
   },
   
