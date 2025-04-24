@@ -8,6 +8,7 @@
       "expo-router"
     ],
     "name": "SooqNet",
-    "slug": "SooqNet"
+    "slug": "SooqNet",
+    "newArchEnabled": true
   }
 }

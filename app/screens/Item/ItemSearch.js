@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#333',
-    height: 30,
+    height: 60,
     marginHorizontal:2,
   },
   iconContainer: {
