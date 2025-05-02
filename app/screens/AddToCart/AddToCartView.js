@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useRef } from 'react';
 import { View, Text, StyleSheet, Animated, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import ItemImages from './ItemImages';
@@ -23,7 +23,6 @@ const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, 
     colorID=""
     colorName=""
   }
-  //console.log("colorID "+colorID)
   try {
   
     const response = await axios.get('http://' + ipAddress + ':' + port + webAppPath + '/GetItemAvailableQtySooqNet', {
@@ -98,8 +97,6 @@ const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, 
     // Save the updated cartArray back to AsyncStorage
     await AsyncStorage.setItem('cartData', JSON.stringify(cartArray));
 
-    // Optional: Confirm that the cart data has been updated
-    //console.log("Updated cart: ", cartArray);
 
   } catch (error) {
     console.error("Error saving data: ", error);
@@ -126,11 +123,15 @@ const AddToCartView = () => {
   const [noSizeNoColor, setNoSizeNoColor] = useState([]);
   const [noSize, setNoSize] = useState([]);
   const [noQuantityCheck, setNoQuantityCheck] = useState([]);
+  const MemoizedItemImages = React.memo(ItemImages);
+const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent);
+
 
   const lang = i18next.language;
   const isRTL = lang === 'ar'; //
   
-  const scrollY = new Animated.Value(0); // Track scroll position
+
+  const scrollY = useRef(new Animated.Value(0)).current; // Track scroll position
   const screenHeight = Dimensions.get('window').height; // Get screen height to calculate dynamic sizes
 
   useEffect(() => {
@@ -207,47 +208,72 @@ const AddToCartView = () => {
   });
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.carouselContainer, { height: imageHeight }]}>
-        <ItemImages imageData={itemColorsImage[selectedColorID]} onFullScreenToggle={setIsFullScreen} itemImagePath={itemImageBasePath}  isRTL ={isRTL} />
-      </Animated.View>
+    <Animated.View style={[styles.carouselContainer, { height: imageHeight }]}>
+      <MemoizedItemImages
+        imageData={itemColorsImage[selectedColorID]}
+        onFullScreenToggle={setIsFullScreen}
+        itemImagePath={itemImageBasePath}
+        isRTL={isRTL}
+      />
+    </Animated.View>
 
+    
+    <View style={{ flex: 1, pointerEvents: 'box-none' }}>
       <ScrollView
-        contentContainerStyle={styles.detailsContainer}
-        scrollEventThrottle={1000}
+        contentContainerStyle={[styles.detailsContainer, { paddingBottom: 30 }]}
+        scrollEventThrottle={16}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
+        style={{ pointerEvents: 'auto' }} 
       >
-
         {!isFullScreen && (
           <ItemDetailsComponent
             itemData={itemData}
             itemColors={itemColors}
             itemSizes={itemSizes[selectedColorID]}
-            selectedColorID={selectedColorID} // Pass the selected color
-            setSelectedColorID={setSelectedColorID} 
+            selectedColorID={selectedColorID}
+            setSelectedColorID={setSelectedColorID}
             colorImagePath={colorImageBasePath}
-            selectedColorName={selectedColorName} // Pass the selected color
-            setSelectedColorName={setSelectedColorName} 
-            selectedColorArabicName={selectedColorArabicName}//pass selected color arabic name 
+            selectedColorName={selectedColorName}
+            setSelectedColorName={setSelectedColorName}
+            selectedColorArabicName={selectedColorArabicName}
             setSelectedColorArabicName={setSelectedColorArabicName}
             setSelectedItemSize={setSelectedItemSize}
-            isRTL ={isRTL}
-
+            isRTL={isRTL}
           />
         )}
 
         {!isFullScreen && (
-          <View style={styles.addToCartButtonContainer}>
-            <TouchableOpacity style={styles.addToCartButton} onPress={() => {onAddCartPress(itemCode,itemData,selectedColorID,selectedColorName,selectedItemSize,itemImageBasePath,itemColorsImage[selectedColorID][0].IMAGE_NAME,t,selectedColorArabicName,noSize,noSizeNoColor,noQuantityCheck); }}>
+          <View style={{ pointerEvents: 'auto' }}>
+            <TouchableOpacity
+              style={styles.addToCartButton}
+              onPress={() => {
+                onAddCartPress(
+                  itemCode,
+                  itemData,
+                  selectedColorID,
+                  selectedColorName,
+                  selectedItemSize,
+                  itemImageBasePath,
+                  itemColorsImage[selectedColorID][0].IMAGE_NAME,
+                  t,
+                  selectedColorArabicName,
+                  noSize,
+                  noSizeNoColor,
+                  noQuantityCheck
+                );
+              }}
+            >
               <Text style={styles.addToCartText}>{t('Add to Cart')}</Text>
             </TouchableOpacity>
           </View>
         )}
       </ScrollView>
-      <Navbar activetab="" />
     </View>
+    <Navbar activetab="" />
+  </View>
   );
 };
 

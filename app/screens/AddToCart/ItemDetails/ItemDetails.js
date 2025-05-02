@@ -53,7 +53,7 @@ const ItemDetails = ({ itemData ,isRTL}) => {
         <Text style={styles.descriptionText}>
           {expanded 
               ? ITEM_DESCRIPTION 
-              : (ITEM_DESCRIPTION && ITEM_DESCRIPTION !== "" ? ITEM_DESCRIPTION.slice(0, 100) + '...' : "")
+              : (ITEM_DESCRIPTION && ITEM_DESCRIPTION !== "" ? ITEM_DESCRIPTION.slice(0, 100)  : "")
             }
         </Text>
 
