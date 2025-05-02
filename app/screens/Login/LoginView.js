@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     },
     
     languageDropdown: {
-      height: 40,
+      minHeigh: 40,
       width: 150,
     }
     
