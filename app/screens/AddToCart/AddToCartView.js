@@ -209,7 +209,7 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent);
   return (
     <View style={styles.container}>
     <Animated.View style={[styles.carouselContainer, { height: imageHeight }]}>
-      <MemoizedItemImages
+      <ItemImages
         imageData={itemColorsImage[selectedColorID]}
         onFullScreenToggle={setIsFullScreen}
         itemImagePath={itemImageBasePath}

@@ -97,7 +97,7 @@ const Item = React.memo(({ item,isRTL, itemImagesPath, textColor }) => {
           });
         }}
       >
-        <Text numberOfLines={1} style={[styles.title, { color: textColor, marginLeft: 2 }]}>
+        <Text numberOfLines={1} style={[styles.title, { color: textColor, marginLeft: 2 },{ textAlign: isRTL ? 'right' : 'left' }]}>
           {isRTL ? item.arabicItemName:item.itemName}
         </Text>
 

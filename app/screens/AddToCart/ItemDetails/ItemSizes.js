@@ -65,7 +65,7 @@ const ItemSizes = ({ itemSizes,setSelectedItemSize ,isRTL,noSizeNoColor,noSize,n
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t('size')}:</Text>
+      <Text style={[styles.title,{ textAlign: isRTL ? 'right' : 'left' }]}>{t('size')}:</Text>
       <FlatList
         data={itemSizes} 
         renderItem={renderSize}

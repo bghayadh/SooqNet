@@ -203,7 +203,7 @@ const Basket = () => {
             style={styles.itemImage}
           />
           <View style={styles.itemDetails}>
-            <Text style={styles.itemName}>{isRTL ? item.arabicItemName : item.itemName}</Text>
+            <Text style={[styles.itemName,{ textAlign: isRTL ? 'right' : 'left' }]}>{isRTL ? item.arabicItemName : item.itemName}</Text>
   
             <View style={[styles.colorSizeRow,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
               <Text>{isRTL ? item.arabicColorName : item.colorName}</Text>
@@ -272,7 +272,7 @@ const Basket = () => {
 
       <View style={[styles.header,{flexDirection: isRTL ? 'row-reverse' : 'row'}]}>
           <Icon name="shopping-cart" size={24} color="#000" style={styles.icon} />
-          <Text style={styles.headerTitle}>{t('basket')}</Text>
+          <Text style={[styles.headerTitle,{ textAlign: isRTL ? 'right' : 'left' }]}>{t('basket')}</Text>
           <TouchableOpacity
             style={styles.checkoutButton}
             onPress={handleCheckoutPress}

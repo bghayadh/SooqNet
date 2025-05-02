@@ -59,7 +59,7 @@ const { t, i18n } = useTranslation();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t('color')}: {selectedColor ? isRTL ? selectedColor[4] : selectedColor[3] : ''}</Text>
+      <Text style={[styles.title,{ textAlign: isRTL ? 'right' : 'left' }]}>{t('color')}: {selectedColor ? isRTL ? selectedColor[4] : selectedColor[3] : ''}</Text>
       <FlatList
         data={itemColors}
         renderItem={renderColor}

@@ -31,7 +31,7 @@ const ItemDetails = ({ itemData ,isRTL}) => {
   return (
     <View style={styles.container}>
       
-      <Text style={[styles.itemName,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>{isRTL ? ARABIC_ITEM_NAME:ITEM_NAME}</Text>
+      <Text style={[styles.itemName,{ textAlign: isRTL ? 'right' : 'left' }]}>{isRTL ? ARABIC_ITEM_NAME:ITEM_NAME}</Text>
 
      
       <View style={[styles.priceContainer ,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
@@ -50,7 +50,7 @@ const ItemDetails = ({ itemData ,isRTL}) => {
       </View>
 
       <View style={styles.descriptionContainer}>
-        <Text style={styles.descriptionText}>
+        <Text style={[styles.descriptionText,{ textAlign: isRTL ? 'right' : 'left' }]}>
           {expanded 
               ? ITEM_DESCRIPTION 
               : (ITEM_DESCRIPTION && ITEM_DESCRIPTION !== "" ? ITEM_DESCRIPTION.slice(0, 100)  : "")
