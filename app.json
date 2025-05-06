@@ -7,8 +7,26 @@
     "plugins": [
       "expo-router"
     ],
+    "android": {
+      "package": "com.almensaah.sooqnet",
+      "versionCode": 1,
+      "permissions": [
+        "INTERNET"
+      ]
+    },
     "name": "SooqNet",
     "slug": "SooqNet",
-    "newArchEnabled": true
+    "sdkVersion": "52.0.0",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "newArchEnabled": true,
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c8a20e5e-e833-4aed-b73f-aaf8f7146649"
+      }
+    }
   }
 }

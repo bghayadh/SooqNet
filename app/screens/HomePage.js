@@ -61,7 +61,7 @@ const HomePage = () => {
           setData([]);
         }
       } catch (error) {
-        console.error("There was an error!", error.message);
+        console.error("There was an error while trying to get C1 categories in the home screen!", error.message);
         setData([]);
       } finally {
         setLoading(false);

@@ -169,9 +169,10 @@ const Basket = () => {
             // console.log("login identifier "+userData.loginIdentifier)
               router.push('/screens/Checkout/GuestPersonalInfo');
             }
-            else{
-               router.push('/screens/Checkout/CheckoutLogin');
-            }
+          }
+          else{
+            console.log("Not logged in or nothing stored in local storage")
+            router.push('/screens/Checkout/CheckoutLogin');
           }
         }
 
