@@ -123,8 +123,9 @@ const AddToCartView = () => {
   const [noSizeNoColor, setNoSizeNoColor] = useState([]);
   const [noSize, setNoSize] = useState([]);
   const [noQuantityCheck, setNoQuantityCheck] = useState([]);
+/*  
   const MemoizedItemImages = React.memo(ItemImages);
-const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent);
+const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
 
 
   const lang = i18next.language;
@@ -133,6 +134,7 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent);
 
   const scrollY = useRef(new Animated.Value(0)).current; // Track scroll position
   const screenHeight = Dimensions.get('window').height; // Get screen height to calculate dynamic sizes
+  const IMAGE_MAX_HEIGHT = screenHeight * 0.7;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -218,15 +220,15 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent);
     </Animated.View>
 
     
-    <View style={{ flex: 1, pointerEvents: 'box-none' }}>
+    <View style={{ flex: 1, pointerEvents: 'box-none'}}>
       <ScrollView
-        contentContainerStyle={[styles.detailsContainer, { paddingBottom: 30 }]}
+        contentContainerStyle={[styles.detailsContainer,  { paddingTop: IMAGE_MAX_HEIGHT}]}
         scrollEventThrottle={16}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
-        style={{ pointerEvents: 'auto' }} 
+        style={{ pointerEvents: 'auto'}} 
       >
         {!isFullScreen && (
           <ItemDetailsComponent
@@ -246,7 +248,7 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent);
         )}
 
         {!isFullScreen && (
-          <View style={{ pointerEvents: 'auto' }}>
+          <View style={{ pointerEvents: 'auto'}}>
             <TouchableOpacity
               style={styles.addToCartButton}
               onPress={() => {
@@ -283,10 +285,14 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   carouselContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
     width: '100%',
   },
   detailsContainer: {
-    paddingTop: 10,
+    paddingTop: 0,
   },
   addToCartButtonContainer: {
     marginBottom: 20, // No extra space at the bottom
@@ -297,8 +303,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 5,
+    marginTop: 20,
     marginHorizontal: 20, // Optional: Add horizontal margin for button spacing
-    marginBottom:35,
+    marginBottom:70,
   },
   addToCartText: {
     color: '#fff',

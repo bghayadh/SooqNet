@@ -26,7 +26,7 @@ const Size = ({ item, onPress, isSelected,isRTL,disabled }) => {
       disabled && styles.disabledSize, // Apply disabled styling
     ]}
     >
-      <View style={[styles.sizeContainer, isSelected && styles.selectedSize,item.SIZE_DIMENSION_TWO && item.SIZE_DIMENSION_TWO !== '' ? { width: 90 } : { width: 60 }]}>
+      <View style={[styles.sizeContainer, isSelected && styles.selectedSize, item.SIZE_DIMENSION_TWO && item.SIZE_DIMENSION_TWO !== '' ? { width: 90 } : { width: 60 }]}>
         {item.SIZE_DIMENSION_ONE || item.SIZE_DIMENSION_TWO ? (
           <Text style={[styles.sizeText , isSelected && styles.selectedSizeText]}>
             {item.SIZE_DIMENSION_ONE}
@@ -64,7 +64,7 @@ const ItemSizes = ({ itemSizes,setSelectedItemSize ,isRTL,noSizeNoColor,noSize,n
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {marginBottom: 10, left: 20}]}>
       <Text style={[styles.title,{ textAlign: isRTL ? 'right' : 'left' }]}>{t('size')}:</Text>
       <FlatList
         data={itemSizes} 
@@ -106,9 +106,7 @@ const styles = StyleSheet.create({
   selectedSize: {
     borderWidth: 1, // Thicker border for selected size
     borderColor: '#000', // Black color for selected size's border
-    backgroundColor: '#000',
-    
-    
+    backgroundColor: '#000',    
   },
   sizeText: {
     fontSize: 14,
@@ -123,10 +121,7 @@ const styles = StyleSheet.create({
   },
   disabledSize: {
     opacity: 0.5,
-  },
-  
-  
-  
+  },  
 });
 
 export default ItemSizes;

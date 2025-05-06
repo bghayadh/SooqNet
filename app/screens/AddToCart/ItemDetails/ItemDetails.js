@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 5,  
+    marginBottom: 5,
   },
   priceContainer: {
     flexDirection: 'row',
@@ -121,8 +121,5 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 });
-
-
-
 
 export default ItemDetails;

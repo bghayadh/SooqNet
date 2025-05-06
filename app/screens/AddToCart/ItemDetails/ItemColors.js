@@ -76,6 +76,7 @@ const { t, i18n } = useTranslation();
 const styles = StyleSheet.create({
   title: {
     fontSize: 16,
+    marginLeft: 20,
     marginRight:5
   },
   selectedColorText: {
@@ -95,6 +96,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',            
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 20
   },
   selectedImageContainer: {
     borderWidth: 1,                
