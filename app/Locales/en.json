@@ -44,6 +44,7 @@
   "Add to Cart": "Add to Cart",
   "addToCartAlert":"Please select a size before adding to the cart.",
   "itemOutOfStock":"Product that you are trying to add is not available in the selected quantity.",
+  "itemAddedToBasked":"Selected color and size of the item added to the basket.",
   "itemOutOfStockcheckout":"is not available in the selected quantity.",
 
   "checkout":"Checkout",
