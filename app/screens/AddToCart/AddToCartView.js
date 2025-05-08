@@ -9,6 +9,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+
+
 
 const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName,t,arabicColorName,noSize,noSizeNoColor,noQuantityCheck) => {
   // Validate itemSize to make sure it's not null or empty
@@ -123,6 +127,7 @@ const AddToCartView = () => {
   const [noSizeNoColor, setNoSizeNoColor] = useState([]);
   const [noSize, setNoSize] = useState([]);
   const [noQuantityCheck, setNoQuantityCheck] = useState([]);
+  const [isScrolling, setIsScrolling] = useState(false);
 /*  
   const MemoizedItemImages = React.memo(ItemImages);
 const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
@@ -208,28 +213,43 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
     outputRange: [screenHeight * 0.7, 0], // Shrink from 70% to 0 height
     extrapolate: 'clamp',
   });
+
+  const handleScrollBegin = () => {
+    setIsScrolling(true);  // Set scrolling state to true when scroll starts
+  };
+
+  const handleScrollEnd = () => {
+    setIsScrolling(false);  // Set scrolling state to false when scroll ends
+  };
+
   return (
-    <View style={styles.container}>
-    <Animated.View style={[styles.carouselContainer, { height: imageHeight }]}>
+
+  <View style={styles.container}>
+   <Animated.View style={[styles.carouselContainer, { height: imageHeight } , 
+     {zIndex: isScrolling ? 0 : 1, pointerEvents: isScrolling ? 'none' : 'auto'}]}          
+     >
       <ItemImages
         imageData={itemColorsImage[selectedColorID]}
         onFullScreenToggle={setIsFullScreen}
         itemImagePath={itemImageBasePath}
+        imageHeight={imageHeight}
         isRTL={isRTL}
       />
     </Animated.View>
-
     
     <View style={{ flex: 1, pointerEvents: 'box-none'}}>
       <ScrollView
-        contentContainerStyle={[styles.detailsContainer,  { paddingTop: IMAGE_MAX_HEIGHT}]}
+        contentContainerStyle={[styles.detailsContainer, { paddingTop: IMAGE_MAX_HEIGHT}]}
         scrollEventThrottle={16}
         onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
+          [{ nativeEvent: { contentOffset: { y: scrollY } }}],
+          { useNativeDriver: false}
+        )}          
+        onScrollBeginDrag={handleScrollBegin}  // Start scrolling event
+        onScrollEndDrag={handleScrollEnd}      // End scrolling event
         style={{ pointerEvents: 'auto'}} 
       >
+
         {!isFullScreen && (
           <ItemDetailsComponent
             itemData={itemData}
@@ -276,6 +296,7 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
     </View>
     <Navbar activetab="" />
   </View>
+  
   );
 };
 

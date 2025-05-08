@@ -5,7 +5,7 @@ import Carousel from 'react-native-reanimated-carousel';
 
 const { width, height } = Dimensions.get('window'); 
 
-const ItemImages = ({ imageData, onFullScreenToggle,itemImagePath }) => {
+const ItemImages = ({ imageData, onFullScreenToggle,itemImagePath, imageHeight }) => {
   const [currentIndex, setCurrentIndex] = useState(0); 
   const [isFullScreen, setIsFullScreen] = useState(false); 
   const [clickedIndex, setClickedIndex] = useState(null); 
@@ -44,7 +44,7 @@ const ItemImages = ({ imageData, onFullScreenToggle,itemImagePath }) => {
         }}
         activeOpacity={1}  // Disables the default opacity effect when pressed
       >
-        <View style={[styles.imageContainer, isFullScreen && styles.fullScreenImageContainer]}>
+        <View style={[styles.imageContainer, isFullScreen && styles.fullScreenImageContainer, {pointerEvents: 'auto'}]}>
           {imageUrl ? (
             <Image
               source={{ uri: imageUrl }} // Use the full image URL
@@ -69,13 +69,15 @@ const ItemImages = ({ imageData, onFullScreenToggle,itemImagePath }) => {
       <Carousel
         loop
         width={isFullScreen ? width : width}  // Full width for full-screen mode
-        height={isFullScreen ? height : height * 0.70}  // Full height for full-screen mode or 65% of height for normal mode
+        height={isFullScreen ? height : imageHeight}  // Full height for full-screen mode or 65% of height for normal mode
+//        height={imageHeight}
         autoPlay={false}
         data={imageData}
         initialIndex={clickedIndex || currentIndex}  // Ensure carousel starts at the clicked image
         onSnapToItem={(index) => setCurrentIndex(index)} // Update current index on swipe
         renderItem={({ item, index }) => renderImage(item, index)}  // Render images from imageData
-        scrollEnabled={true}  // Enable swipe functionality even in full-screen mode
+//        swipeEnabled={false}
+//        scrollEnabled={true}  // Enable swipe functionality even in full-screen mode
       />
     </View>
   );

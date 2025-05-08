@@ -316,7 +316,7 @@ function ItemView() {
   }
 };
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, {backgroundColor: 'white'}]}>
              <TouchableWithoutFeedback
           onPress={() => {
             if (searchText === '') {
