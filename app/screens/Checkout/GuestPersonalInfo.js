@@ -1,5 +1,5 @@
 import React, { useState,useEffect  } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, ActivityIndicator, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
@@ -32,14 +32,13 @@ const GuestPersonalInfo = () => {
   const [loading, setLoading] = useState(true);  // Loading state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isEmailEditable, setIsEmailEditable] = useState(true);
+  const [isWaiting, setIsWaiting] = useState(false);
 
-
-  const { t, i18n } = useTranslation(); 
-  
-    const lang = i18next.language;
-    const isRTL = lang === 'ar'; 
-
-  const router = useRouter(); 
+  const { t, i18n } = useTranslation();   
+  const lang = i18next.language;
+  const isRTL = lang === 'ar';
+  const router = useRouter();
+  locationPerm = 0;
 
   /*check if the user ia logged in then get personal info of the user from data base else load 
   view with no data*/
@@ -89,12 +88,48 @@ const GuestPersonalInfo = () => {
     checkLoginStatus();
   }, []);
 
-  const setToCurrentLocation = () => {
-    const latitude = parseFloat(0.00);
-    const longitude = parseFloat(0.00);
+  const setToCurrentLocation = async() => {
+    setIsWaiting(true);
+    try {
+      if (locationPerm == 0) {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permission Denied", t('allowLocationAccessToUseThisFeatureStat'));
+          setIsWaiting(false);
+          return;
+        }
+      }
+      locationPerm = 1;
 
-    setLatitude(latitude.toFixed(7).toString());
-    setLongitude(longitude.toFixed(7).toString());
+      const location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+
+/*      setLatitude(latitude.toString());
+      setLongitude(longitude.toString()); */
+
+      setLatitude(latitude.toFixed(7).toString());
+      setLongitude(longitude.toFixed(7).toString());  
+
+      setRegion({
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+
+      setMarker({
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+      });      
+    }
+    catch {
+      console.error("Error fetching location:", error);
+      Alert.alert("Error", t('UnableToFetchLocationStat'));
+      setIsWaiting(false);
+    }
+    finally {
+      setIsWaiting(false);
+    }
   };
 
   const handleMapSelect = (e) => {
@@ -259,6 +294,9 @@ const GuestPersonalInfo = () => {
               onChangeText={setAddress}
             />
           </View>
+          {isWaiting && (          
+            <ActivityIndicator size="large" color="#007bff" />
+          )}
         </View>
 
         <View style={styles.inputContainer}>
