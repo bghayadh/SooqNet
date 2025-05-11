@@ -100,6 +100,7 @@ const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, 
 
     // Save the updated cartArray back to AsyncStorage
     await AsyncStorage.setItem('cartData', JSON.stringify(cartArray));
+    alert(t('itemAddedToBasked'));
 
 
   } catch (error) {

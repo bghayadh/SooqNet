@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { BackHandler } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import i18next from 'i18next';
@@ -16,6 +18,28 @@ const CheckoutLogin = () => {
 
   const lang = i18next.language;
   const isRTL = lang === 'ar'; 
+
+  /* This code to handle the pressing for android hardware back button properly, actually we needed this code
+  certainly because of the Arabic language, because the back button is not working fine in arabic language.
+
+  The reason for using useCallback is to avoid executing the code when re-rending any component in the screen.
+  */
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        // Go back if possible
+        if (router.canGoBack()) {
+          router.back();
+          return true; // We handled it
+        }
+        return false; // Let OS handle (e.g., exit app)
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [])
+  );  
 
   const handleLogin = async () => {
     if (!email || !password) {

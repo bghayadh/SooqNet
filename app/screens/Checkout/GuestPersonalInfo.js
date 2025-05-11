@@ -1,4 +1,6 @@
 import React, { useState,useEffect  } from 'react';
+import { BackHandler } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, TextInput, ActivityIndicator, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -39,6 +41,29 @@ const GuestPersonalInfo = () => {
   const isRTL = lang === 'ar';
   const router = useRouter();
   locationPerm = 0;
+
+
+  /* This code to handle the pressing for android hardware back button properly, actually we needed this code
+  certainly because of the Arabic language, because the back button is not working fine in arabic language.
+
+  The reason for using useCallback is to avoid executing the code when re-rending any component in the screen.
+  */
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        // Go back if possible
+        if (router.canGoBack()) {
+          router.back();
+          return true; // We handled it
+        }
+        return false; // Let OS handle (e.g., exit app)
+      };
+
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }, [])
+  );
 
   /*check if the user ia logged in then get personal info of the user from data base else load 
   view with no data*/

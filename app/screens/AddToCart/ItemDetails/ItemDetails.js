@@ -69,7 +69,7 @@ const ItemDetails = ({ itemData ,isRTL}) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10, 
+    padding: 0,
     margin:10,
     backgroundColor: '#fff',
   },
@@ -81,7 +81,8 @@ const styles = StyleSheet.create({
   priceContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5,  
+    //marginBottom: 5,
+    margin: 5,
   },
   oldPrice: {
     fontSize: 16,

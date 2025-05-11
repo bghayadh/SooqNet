@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
     marginLeft: 20,
-    marginRight:5
+    marginRight:20
   },
   selectedColorText: {
     fontSize: 16,

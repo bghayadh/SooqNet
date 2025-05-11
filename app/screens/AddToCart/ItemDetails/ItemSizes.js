@@ -73,7 +73,7 @@ const ItemSizes = ({ itemSizes,setSelectedItemSize ,isRTL,noSizeNoColor,noSize,n
         horizontal
         inverted={isRTL}
         showsHorizontalScrollIndicator={false}
-        
+        style={{marginRight: 20}}
       />
     </View>
   );
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
-    marginRight:5,
+    marginRight:30,
   },
   size: {
     padding: 2,
