@@ -38,14 +38,12 @@ function ItemView() {
 
     const [itemImagesPath, setItemImagesPath] = useState("");
     const [catImagesPath, setCatImagesPath] = useState("");
-   
 
     useEffect(() => {//Set the value of previous cat before searching each time the searchKey change
       if (searchText === '' && savedFullCatCode.current) {
         setFullCatCode(savedFullCatCode.current);
       }
   }, [searchText]);
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -103,8 +101,7 @@ function ItemView() {
       setSelectedPriceRange([0,500]);
         const codes = fullCatCode.split('-');
         const titles = fullCatTitles.split('-');
-        const arabictitles = fullArabicCatTitles.split('-');
-        
+        const arabictitles = fullArabicCatTitles.split('-');        
 
         if (lastCatLevel && codes.length > 0) {
             // Replace the last category if lastCatLevel is true
@@ -216,7 +213,6 @@ function ItemView() {
         const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
         return () => backHandler.remove(); // Clean up the event listener
     }, [fullCatCode,searchKey,source]);
-
 
 
     const handleSizeChange = (sizes) => {
