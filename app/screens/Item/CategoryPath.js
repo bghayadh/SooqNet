@@ -6,7 +6,7 @@ const CategoryPath = ({ fullCatCode, fullCatTitle, fullArabicCatTitle, categorie
   // Split the fullCatCode into parts
   const catParts = fullCatCode.split('-');
   const catTitleParts = fullCatTitle.split('-');
-  const arabicCatTitleParts = fullArabicCatTitle.split('-');
+  const arabicCatTitleParts = fullArabicCatTitle?.split('-') || [];
 
   const lang = i18next.language;
   const isRTL = lang === 'ar'; // Check if the language is Arabic

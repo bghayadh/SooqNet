@@ -8,14 +8,25 @@
       "expo-router"
     ],
     "android": {
-      "package": "com.almensaah.sooqnet",
+      "package": "com.almensaah.sooqonline",
       "versionCode": 1,
       "permissions": [
         "INTERNET"
-      ]
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBJXAds-Gt4I39hRFHhYHMEg3XcBqihYoo"
+        }
+      }
     },
-    "name": "SooqNet",
-    "slug": "SooqNet",
+    "name": "SooqOnline",
+    "slug": "SooqOnline",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "sdkVersion": "52.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -25,8 +36,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "c8a20e5e-e833-4aed-b73f-aaf8f7146649"
+        "projectId": "e60e1d0b-d3ec-41d7-8ae3-fbee85ecc797"
       }
-    }
+    },
+    "owner": "bghayad"
   }
 }

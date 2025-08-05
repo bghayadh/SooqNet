@@ -6,7 +6,7 @@ import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import {ipAddress,port,webAppPath} from "@env";
+import {ipAddress,port,webAppPath,url} from "@env";
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,7 @@ const EditAddress = () => {
   useEffect(() => {
     const fetchAddressData = async () => {
       try {
-        const response = await axios.get('http://' + ipAddress + ':' + port + webAppPath + '/GetSooqNetClientDetails', {
+        const response = await axios.get(url + '/GetSooqNetClientDetails', {
           params: { loginIdentifier: loginIdentifier }
         });
   
@@ -186,7 +186,7 @@ const EditAddress = () => {
       alert(t('fillTheCity'));
       return;
     }
-    const response = await axios.post('http://'+ipAddress+':'+port+webAppPath+'/SaveSooqNetClientAccountDetails',{}, {
+    const response = await axios.post(url+'/SaveSooqNetClientAccountDetails',{}, {
       params: {
         target:"UpdateAddress",loginIdentifier:loginIdentifier,address:address,longitude:longitude,latitude:latitude,country:country,city:city
       }

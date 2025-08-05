@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet,BackHandler,Alert }
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import {ipAddress,port,webAppPath} from "@env";
+import {ipAddress,port,webAppPath,url} from "@env";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 import Navbar from '../../Navigations/Navbar';
@@ -33,7 +33,7 @@ const ChangePassword = () => {
       alert(t('newPasswordsDoNotMatchStat'));
       return;
     }
-    const response = await axios.post('http://'+ipAddress+':'+port+webAppPath+'/SooqNetChangeAccountPassword',{}, {
+    const response = await axios.post(url+'/SooqNetChangeAccountPassword',{}, {
       params: {
         loginIdentifier:loginIdentifier,oldPassword:oldPassword,newPassword:newPassword
       }

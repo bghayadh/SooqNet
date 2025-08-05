@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView,Alert,B
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import {ipAddress,port,webAppPath} from "@env";
+import {ipAddress,port,webAppPath,url} from "@env";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
@@ -28,7 +28,7 @@ const EditAccountDetails = () => {
   useEffect(() => {
     const GetClientDetails = async () => {
       try {
-        const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/GetSooqNetClientDetails', {
+        const response = await axios.get(url+'/GetSooqNetClientDetails', {
           params: { loginIdentifier: loginIdentifier}
         });
 
@@ -61,7 +61,7 @@ const EditAccountDetails = () => {
     else{
       try {
 
-        const response = await axios.post('http://'+ipAddress+':'+port+webAppPath+'/SaveSooqNetClientAccountDetails',{}, {
+        const response = await axios.post(url+'/SaveSooqNetClientAccountDetails',{}, {
           params: {
             target:"UpdateClient",firstName:firstName, lastName:lastName,gender:selectedGenderOption,mobileNumber:mobileNumber,email:email,username:username
           }

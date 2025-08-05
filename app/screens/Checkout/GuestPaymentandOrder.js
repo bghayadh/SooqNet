@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
-import {ipAddress,port,webAppPath} from "@env";
+import {ipAddress,port,webAppPath,url} from "@env";
 import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router'; 
 import { useRouter } from 'expo-router';
@@ -128,7 +128,7 @@ const GuestPaymentandOrder = () => {
     } else {
       try {
         
-        const response = await axios.post('http://' + ipAddress + ':' + port + webAppPath + '/placeOrder', {
+        const response = await axios.post(url + '/placeOrder', {
           "dictParameter": basketData, 
           "paymentMethod": paymentMethod,
           "customerName": parsedFormData.firstName +' '+ parsedFormData.lastName,

@@ -5,7 +5,7 @@ import { View, Text, TextInput, ActivityIndicator, TouchableOpacity, StyleSheet,
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
-import { ipAddress, port, webAppPath } from '@env';
+import { ipAddress, port, webAppPath,url } from '@env';
 import { useRouter } from 'expo-router';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -77,7 +77,7 @@ const GuestPersonalInfo = () => {
           setIsLoggedIn(true);
           // Make axios request to fetch data
           try {
-            const response = await axios.get('http://' + ipAddress + ':' + port + webAppPath + '/GetSooqNetClientDetails', {
+            const response = await axios.get(url + '/GetSooqNetClientDetails', {
            
               params: { loginIdentifier: userData.loginIdentifier }, 
             });

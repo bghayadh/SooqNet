@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator,TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import { ipAddress, port, webAppPath } from "@env";
+import { ipAddress, port, webAppPath, url } from "@env";
 import { useRouter } from "expo-router";
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
@@ -21,7 +21,7 @@ const MyOrders = () => {
   useEffect(() => {
     const GetClientDetails = async () => {
       try {
-        const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/GetSooqNetClientOrdersList', {
+        const response = await axios.get(url+'/GetSooqNetClientOrdersList', {
           params: { loginIdentifier: loginIdentifier }
         });
 

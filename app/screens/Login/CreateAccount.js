@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView,
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import axios from "axios";
-import { ipAddress, port, webAppPath } from "@env";
+import { ipAddress, port, webAppPath, url } from "@env";
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ const handleContinueAction = async () => {
     } 
     else {
       try {
-        const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/CheckEmailAvailability', {
+        const response = await axios.get(url+'/CheckEmailAvailability', {
           params: { email }
         });
         if (response.data.isAvailable === "false") { // An account is already created using this email

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, VirtualizedList, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
-import {ipAddress,port,webAppPath} from "@env";
+import {ipAddress,port,webAppPath,url} from "@env";
 import { MaterialIcons } from '@expo/vector-icons'; 
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
@@ -21,7 +21,7 @@ const OrderDetails = () => {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-         const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/GetSooqNetClientOrderDetails', {
+         const response = await axios.get(url+'/GetSooqNetClientOrderDetails', {
           params: { orderID: orderID },
         });
         const { OrderItemsDetails, colorsImagesPath, relativePath, OrderAllDetails } = response.data;
@@ -55,8 +55,8 @@ const OrderDetails = () => {
   const constructImagePath = (imageName) => {
     const basePath =
       orderDetails.relativePath === '1'
-        ? 'http://' + ipAddress + ':' + port + webAppPath + orderDetails.colorsImagesPath
-        : 'http://' + ipAddress + ':' + port + orderDetails.colorsImagesPath;
+        ? url + orderDetails.colorsImagesPath
+        : 'https://' + ipAddress + ':' + port + orderDetails.colorsImagesPath;
         return basePath + imageName;
         
   };

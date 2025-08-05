@@ -4,7 +4,7 @@ import axios from 'axios';
 import ItemImages from './ItemImages';
 import ItemDetailsComponent from './ItemDetailsComponent';
 import { useLocalSearchParams } from 'expo-router';
-import { ipAddress, port, webAppPath } from '@env';
+import { ipAddress, port, webAppPath, url } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
@@ -29,7 +29,7 @@ const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, 
   }
   try {
   
-    const response = await axios.get('http://' + ipAddress + ':' + port + webAppPath + '/GetItemAvailableQtySooqNet', {
+    const response = await axios.get(url + '/GetItemAvailableQtySooqNet', {
       
       params: { itemCode:itemCode,
         color:colorName,
@@ -113,6 +113,7 @@ const AddToCartView = () => {
   const { itemCode } = useLocalSearchParams();
 
   const [itemData, setItemData] = useState([]);
+  const [itemImage, setItemImage] = useState([]);
   const [itemColors, setItemColors] = useState([]);
   const [itemSizes, setItemSizes] = useState([]);
   const [itemColorsImage, setItemColorsImage] = useState([]);
@@ -150,22 +151,31 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
 
       try {
        // console.log("ipAddress "+ipAddress)
-        const response = await axios.get('http://' + ipAddress + ':' + port + webAppPath + '/GetItemDetails', {
+        const response = await axios.get(url + '/GetItemDetails', {
           params: { itemCode: itemCode },
         });
 
-        const { itemDescList, itemColorsList, itemSizeTypeList, itemColorImages } = response?.data || {};
-
+        const { itemDescList, itemImageList, itemColorsList, itemSizeTypeList, itemColorImages } = response?.data || {};
+        console.log("itemDescList is: ", itemDescList);
         setItemData(itemDescList || []);
+        console.log("itemDescList[0][8] is: ", itemDescList[0][8]);
+        console.log("itemImageList is: ", itemImageList);
+        setItemImage(itemImageList || []);
+        console.log("item")
+        console.log("itemImage is ", itemImage);
+        console.log("itemColorsList is: ", itemColorsList);
         setItemColors(itemColorsList || []);
+        console.log("itemSizeTypeList is: ", itemSizeTypeList);
         setItemSizes(itemSizeTypeList || []);
+        console.log("itemColorImages is: ", itemColorImages);
         setItemColorsImage(itemColorImages || []);
-        setSelectedColorID(itemColorsList[0][2] || null); // Set the first color as the default selected color
-        setSelectedColorName(itemColorsList[0][3] || null); 
-        setSelectedColorArabicName(itemColorsList[0][4] || null)
-        setNoSizeNoColor(itemDescList[0][8]);
-        setNoSize(itemDescList[0][9]);
-        setNoQuantityCheck(itemDescList[0][10]);
+        console.log("itemColorsList[0][2] is: ", itemColorsList[0]?.[2] ?? null);        
+        setSelectedColorID(itemColorsList[0]?.[2] ?? null); // Set the first color as the default selected color
+        setSelectedColorName(itemColorsList[0]?.[3] ?? null); 
+        setSelectedColorArabicName(itemColorsList[0]?.[4] ?? null)
+        setNoSizeNoColor(itemDescList[0]?.[8] ?? null);
+        setNoSize(itemDescList[0]?.[9] ?? null);
+        setNoQuantityCheck(itemDescList[0]?.[10] ?? null);
 
         if (response?.data?.imageBasePathDetails) {
             const details = response.data.imageBasePathDetails;
@@ -173,22 +183,23 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
             
             const itemImagePath =
             relPath === '1'
-            ? 'http://' + ipAddress + ':' + port + webAppPath + itemImagesPath
-            : 'http://' + ipAddress + ':' + port + itemImagesPath;
-
+            ? url + itemImagesPath
+            : 'https://' + ipAddress + ':' + port + itemImagesPath;
+            console.log("itemImagePath is ", itemImagePath)
             setItemImageBasePath(itemImagePath); 
 
             const colorImagePath =
             relPath === '1'
-            ? 'http://' + ipAddress + ':' + port + webAppPath + colorImagesPath
-            : 'http://' + ipAddress + ':' + port + colorImagesPath;
-
+            ? url + colorImagesPath
+            : 'https://' + ipAddress + ':' + port + colorImagesPath;
+            console.log("colorImagePath is ", colorImagePath);
             setColorImageBasePath(colorImagePath);
         } 
       
       } catch (error) {
         console.error('Error fetching data:', error.message);
         setItemData([]);
+        setItemImage([]);
         setItemColors([]);
         setItemSizes([]);
         setItemColorsImage([]);
@@ -228,14 +239,18 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
   <View style={styles.container}>
    <Animated.View style={[styles.carouselContainer, { height: imageHeight } , 
      {zIndex: isScrolling ? 0 : 1, pointerEvents: isScrolling ? 'none' : 'auto'}]}          
-     >
-      <ItemImages
-        imageData={itemColorsImage[selectedColorID]}
-        onFullScreenToggle={setIsFullScreen}
-        itemImagePath={itemImageBasePath}
-        imageHeight={imageHeight}
-        isRTL={isRTL}
-      />
+     >      
+    <ItemImages
+      imageData={
+        itemData[0][8] === "0" && itemColorsImage.length > 0
+          ? (Array.isArray(itemColorsImage[selectedColorID]) ? itemColorsImage[selectedColorID] : [])
+          : (Array.isArray(itemImage) ? itemImage : [])
+      }
+      onFullScreenToggle={setIsFullScreen}
+      itemImagePath={itemImageBasePath}
+      imageHeight={imageHeight}
+      isRTL={isRTL}
+    />
     </Animated.View>
     
     <View style={{ flex: 1, pointerEvents: 'box-none'}}>

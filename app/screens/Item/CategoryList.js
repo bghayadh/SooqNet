@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import i18next from 'i18next';
-
- 
  
 const Category = ({ item,isRTL, onPress, isSelected ,catImagesPath}) => {
     const backgroundColor = isSelected ? '#d3d3d3' : 'white'; // Highlight color for selected category
     const textColor = isSelected ? 'black' : 'black'; // Text color
+    
 
     return (
         <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
@@ -24,7 +23,7 @@ const Category = ({ item,isRTL, onPress, isSelected ,catImagesPath}) => {
 
 const CategoryList = ({ data, onCategoryPress, lastCatLevel, selectedId, catImagesPath }) => {
     const lang = i18next.language;
-    const isRTL = lang === 'ar'; 
+    const isRTL = lang === 'ar';
 
     const renderCategory = ({ item }) => (
         <Category

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
-//import {ipAddress,port,webAppPath} from "@env";
+//import {ipAddress,port,webAppPath,url} from "@env";
 
 
 // Handler when color is pressed to set the selected color

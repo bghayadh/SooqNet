@@ -17,7 +17,7 @@ import { useRouter } from 'expo-router';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { ipAddress, port, webAppPath } from '@env';
+import { ipAddress, port, webAppPath, url } from '@env';
 
 const Basket = () => {
   const [basketData, setBasketData] = useState([]);
@@ -134,7 +134,7 @@ const Basket = () => {
       const storedLoginDetails = await AsyncStorage.getItem('loginDetails');
 
       try {
-        const response = await axios.post('http://' + ipAddress + ':' + port + webAppPath + '/GetAllItemAvailableQtySooqNet', {
+        const response = await axios.post(url + '/GetAllItemAvailableQtySooqNet', {
           dictParameter: basketData
         });
 

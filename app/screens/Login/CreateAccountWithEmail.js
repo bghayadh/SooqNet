@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import {ipAddress,port,webAppPath} from "@env";
+import {ipAddress,port,webAppPath,url} from "@env";
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
@@ -36,7 +36,7 @@ const CreateAccount = () => {
     else{
       try {
 
-        const response = await axios.post('http://'+ipAddress+':'+port+webAppPath+'/SaveSooqNetClientAccountDetails',{}, {
+        const response = await axios.post(url+'/SaveSooqNetClientAccountDetails',{}, {
           params: {
             target:"NewClient",firstName:firstName, lastName:lastName,gender:selectedGenderOption,mobileNumber:mobileNumber,email:email,username:username,password:password
           }
@@ -72,7 +72,7 @@ const CreateAccount = () => {
     else {
       try {
 
-        const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/cltLoginAuthentication', {
+        const response = await axios.get(url+'/cltLoginAuthentication', {
           params: { loginIdentifier: emailAddress, password: password, }
         });
 
@@ -110,7 +110,7 @@ const CreateAccount = () => {
     }
   
     try {
-      const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/CheckUsernameAvailability', {
+      const response = await axios.get(url+'/CheckUsernameAvailability', {
         params: { username: username.trim() }
       });
   

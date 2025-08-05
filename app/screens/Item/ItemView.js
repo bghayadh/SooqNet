@@ -9,8 +9,9 @@ import ItemSearch from './ItemSearch';
 import { useNavigation } from '@react-navigation/native';
 import ItemFilter from './ItemFilter';
 import CategoryPath from './CategoryPath';
-import {ipAddress,port,webAppPath} from "@env";
+import {ipAddress,port,webAppPath,url} from "@env";
 import Navbar from '../../Navigations/Navbar';
+import i18next from 'i18next';
 
 function ItemView() {
     const { catCode,catTitle,arabicCatTitle, source: initialSource, searchKey, savedFullCatCode: routeSavedFullCatCode,routeOrigin } = useLocalSearchParams();
@@ -38,6 +39,8 @@ function ItemView() {
 
     const [itemImagesPath, setItemImagesPath] = useState("");
     const [catImagesPath, setCatImagesPath] = useState("");
+    const lang = i18next.language;
+    const isRTL = lang === 'ar'; // Check if the language is Arabic
 
     useEffect(() => {//Set the value of previous cat before searching each time the searchKey change
       if (searchText === '' && savedFullCatCode.current) {
@@ -52,7 +55,7 @@ function ItemView() {
             try {
                 setLoading(true);
                 console.log("ipAddress "+ipAddress)
-                const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/SooqNetGetCatItem', {
+                const response = await axios.get(url+'/SooqNetGetCatItem', {
                   params: { catID: fullCatCode, source, searchKey },
                 });
 
@@ -64,13 +67,13 @@ function ItemView() {
                 setLastCatLevel(response?.data?.lastCatLevel || false);
              
                 const itemImageBasePath = response?.data?.relativePath === "1"
-                ? 'http://'+ipAddress+':'+port+webAppPath+response?.data?.itemImagesPath
-                : 'http://'+ipAddress+':'+port+response?.data?.itemImagesPath;
+                ? url+response?.data?.itemImagesPath
+                : 'https://'+ipAddress+':'+port+response?.data?.itemImagesPath;
                 setItemImagesPath(itemImageBasePath);
 
                 const catImageBasePath = response?.data?.relativePath === "1"
-                ? 'http://'+ipAddress+':'+port+webAppPath+response?.data?.catImagesPath
-                : 'http://'+ipAddress+':'+port+response?.data?.catImagesPath;
+                ? url+response?.data?.catImagesPath
+                : 'https://'+ipAddress+':'+port+response?.data?.catImagesPath;
                 setCatImagesPath(catImageBasePath);
 
                 const sortedSizeOptions = sortSizes(response?.data?.sizeOptions || []);// Sort sizeOptions from smallest to largest
@@ -99,9 +102,9 @@ function ItemView() {
       setSelectedSizes([]);
       setSelectedColors([]);
       setSelectedPriceRange([0,500]);
-        const codes = fullCatCode.split('-');
-        const titles = fullCatTitles.split('-');
-        const arabictitles = fullArabicCatTitles.split('-');        
+      const codes = fullCatCode.split('-');
+      const titles = fullCatTitles.split('-');
+      const arabictitles = fullArabicCatTitles?.split('-') || [];      
 
         if (lastCatLevel && codes.length > 0) {
             // Replace the last category if lastCatLevel is true
@@ -118,16 +121,13 @@ function ItemView() {
           } else {
               // Replace the last category with the new category
               titles[titles.length - 1] = newCatTitle;
-              arabictitles[arabictitles.length - 1] = newArabicCatTitle;
-
-              
+              arabictitles.length > 0 && (arabictitles[arabictitles.length - 1] = newArabicCatTitle);              
           }
         } else {
             // Combine with dash if not empty
             codes.push(newCatCode);
             titles.push(newCatTitle);
-            arabictitles.push(newArabicCatTitle)
-
+            arabictitles.push(newArabicCatTitle);
         }
 
         const combinedCatCode = codes.join('-'); // Join back into a single string
@@ -147,6 +147,7 @@ function ItemView() {
 
     // BackHandler to manage back button behavior
     useEffect(() => {
+      console.log("BackHandler");
       const backAction = async () => {
         setSelectedSort(null);
         setSelectedSizes([]);
@@ -170,12 +171,15 @@ function ItemView() {
             }
             else {
               if (source==='search' ) {
+                console.log("Backhandler, the source is search");
                 try {
                   setLoading(true);
                   // Make an Axios request to refetch search results based on the searchKey
-                  const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/GetCategory1BySearchKey', {
+                  const response = await axios.get(url+'/GetCategory1BySearchKey', {
                       params: { searchKey },
                   });
+
+                  console.log("axios sent for GetCatehory1BySearchKey");
   
                   // Process and set the search results, similar to handleSearch in ItemSearch
                   const cat1TitlesList = response.data.cat1TitlesList || [];
@@ -257,7 +261,7 @@ function ItemView() {
       setIsDropdownOpen(false); // Close the overlay when fetching items
 
       try {
-        const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/GetSooqNetFilteredItems', {
+        const response = await axios.get(url+'/GetSooqNetFilteredItems', {
           params: {   
             sort: sortOption,
             catID: fullCatCode,
@@ -270,13 +274,13 @@ function ItemView() {
       });      
       setItemData(response?.data?.category1List || []);
       const itemImageBasePath = response?.data?.relativePath === "1"
-      ? 'http://'+ipAddress+':'+port+webAppPath+response?.data?.itemImagesPath
-      : 'http://'+ipAddress+':'+port+response?.data?.itemImagesPath;
+      ? url+response?.data?.itemImagesPath
+      : 'https://'+ipAddress+':'+port+response?.data?.itemImagesPath;
       setItemImagesPath(itemImageBasePath);
 
       const catImageBasePath = response?.data?.relativePath === "1"
-      ? 'http://'+ipAddress+':'+port+webAppPath+response?.data?.catImagesPath
-      : 'http://'+ipAddress+':'+port+response?.data?.catImagesPath;
+      ? url+response?.data?.catImagesPath
+      : 'https://'+ipAddress+':'+port+response?.data?.catImagesPath;
       setCatImagesPath(catImageBasePath);
 
     } catch (error) {
@@ -370,6 +374,7 @@ function ItemView() {
                     params: {
                       catCode: result.categoryCode,
                       catTitle:result.title,
+                      arabicCatTitle: result.ArabicTitle,
                       source: 'search',
                       searchKey: searchText,
                       savedFullCatCode: savedFullCatCode.current,
@@ -378,7 +383,8 @@ function ItemView() {
                   });
                 }}
               >
-                  <Text style={styles.resultText}>{result.title}</Text>
+                  <Text style={styles.resultText}>
+                    {isRTL ? result.ArabicTitle : result.title}</Text>
                   <Text style={styles.resultCount}>{result.count}</Text>
                 </TouchableOpacity>
               ))}

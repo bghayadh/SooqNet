@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, TextInput, Button, Alert  } from "react-native";
 import axios from "axios";
-import { ipAddress, port, webAppPath } from "@env";
+import { ipAddress, port, webAppPath, url } from "@env";
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
@@ -50,7 +50,7 @@ const LoginScreen = () => {
       return;
     }
     try {
-      const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/cltLoginAuthentication', {
+      const response = await axios.get(url+'/cltLoginAuthentication', {
         params: { loginIdentifier: loginIdentifier, password: password, }
       });
 

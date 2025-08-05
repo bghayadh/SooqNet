@@ -135,7 +135,6 @@ const Item = React.memo(({ item,isRTL, itemImagesPath, textColor }) => {
 // ItemList Component
 const ItemList = ({ data, itemImagesPath }) => {
   const [selectedId, setSelectedId] = useState(null);
-
   const lang = i18next.language;
   const isRTL = lang === 'ar';
 

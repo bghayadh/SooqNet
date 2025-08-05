@@ -3,12 +3,13 @@ import {FlatList,SafeAreaView,StatusBar,StyleSheet,Text,BackHandler, Dimensions,
 import axios from 'axios';
 import {useRouter} from 'expo-router';
 import ItemSearch from './Item/ItemSearch';
-import {ipAddress,port,webAppPath} from "@env";
+import {ipAddress,port,webAppPath,url} from "@env";
 import Navbar from '../Navigations/Navbar';
 import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
 import i18next from 'i18next';
 
 const Category = ({ category,imageBasePath, onPress }) => (
+ 
 
   <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor:'white' }]}>
       <View style={styles.imageContainer} >
@@ -41,7 +42,7 @@ const HomePage = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/getCat1DetailsAndPaths'); 
+        const response = await axios.get(url+'/getCat1DetailsAndPaths');
         
         if (response?.data?.imageBasePathDetails) {
           const details = response.data.imageBasePathDetails;
@@ -49,8 +50,8 @@ const HomePage = () => {
          
           const basePath =
           relPath === '1'
-            ? 'http://' + ipAddress + ':' + port + webAppPath + categoriesImagesPath
-            : 'http://' + ipAddress + ':' + port + categoriesImagesPath;
+            ? url + categoriesImagesPath
+            : 'https://' + ipAddress + ':' + port + categoriesImagesPath;
         
           setImageBasePath(basePath); 
         } 
@@ -62,6 +63,8 @@ const HomePage = () => {
         }
       } catch (error) {
         console.error("There was an error while trying to get C1 categories in the home screen!", error.message);
+        console.log('AXIOS ERROR:', error.message);
+        console.log('RESPONSE:', error?.response?.data || 'No response');
         setData([]);
       } finally {
         setLoading(false);
@@ -165,6 +168,7 @@ const HomePage = () => {
                    params: {
                      catCode: result.categoryCode,
                      catTitle:result.title,
+                     arabicCatTitle: result.ArabicTitle,
                      source: 'search',
                      searchKey: searchText,
                      routeOrigin:'home',
@@ -172,7 +176,7 @@ const HomePage = () => {
                  });
                }}
              >
-                <Text style={styles.resultText}>{result.title}</Text>
+                <Text style={styles.resultText}>{i18next.language === 'en' ? result.title : result.ArabicTitle}</Text>
                 <Text style={styles.resultCount}>{result.count}</Text>
               </TouchableOpacity>
             ))}

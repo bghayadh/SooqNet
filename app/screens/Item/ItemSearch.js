@@ -2,15 +2,15 @@ import React, { useEffect,useRef ,} from 'react';
 import {View,TextInput,TouchableOpacity,StyleSheet,Keyboard,I18nManager } from 'react-native';
 import axios from 'axios';
 import {Ionicons} from '@expo/vector-icons';
-import {ipAddress,port,webAppPath} from "@env";
+import {ipAddress,port,webAppPath,url} from "@env";
 import i18next from 'i18next';
 
 const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults }) => {
 
   const inputRef = useRef(null); // Create the ref
- 
   const lang = i18next.language;
-  const isRTL = lang === 'ar'; 
+  const isRTL = lang === 'ar';
+  const tArabic = i18next.getFixedT('ar'); // fixed translator for Arabic
  
   // when pressing the search button on the keyboard,this function is called
   const handleSubmitEditing = async () => {
@@ -39,7 +39,7 @@ const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults
     if (searchKey) {
       setShowFlatList(false);// Hide other flatList (cond. flatList)
       
-      const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/GetCategory1BySearchKey', {
+      const response = await axios.get(url+'/GetCategory1BySearchKey', {
         params: { searchKey }
       });
 
@@ -49,12 +49,12 @@ const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults
         const cat1ItemsList = response.data.cat1ItemsList;
           
         return [
-          { title: 'All', count: cat1ItemsList.length, categoryCode: 'AllCatOptions', searchText },
+          { title: 'All', count: cat1ItemsList.length, categoryCode: 'AllCatOptions', searchText, ArabicTitle: tArabic('all')},
           ...cat1TitlesList.map((element) => {
             const cat1Code = element[0];
             const count = cat1ItemsList.reduce((acc, itemCatCode) => 
               itemCatCode[0] === cat1Code ? acc + 1 : acc, 0);
-            return { title: element[1], count, categoryCode: cat1Code, searchText };
+            return { title: element[1], count, categoryCode: cat1Code, searchText, ArabicTitle: element[2] };
           }),
         ];
       }

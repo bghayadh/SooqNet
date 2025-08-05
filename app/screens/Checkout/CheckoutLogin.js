@@ -7,7 +7,7 @@ import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ipAddress, port, webAppPath } from '@env';
+import { ipAddress, port, webAppPath, url } from '@env';
 
 
 const CheckoutLogin = () => {
@@ -47,7 +47,7 @@ const CheckoutLogin = () => {
       return;
     }
     try {
-      const response = await axios.get('http://'+ipAddress+':'+port+webAppPath+'/cltLoginAuthentication', {
+      const response = await axios.get(url+'/cltLoginAuthentication', {
         params: { loginIdentifier: email, password: password, }
       });
 
