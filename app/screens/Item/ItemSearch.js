@@ -77,7 +77,7 @@ useEffect(() => {
 }, [searchText]);
 
   return (
-    <View style={styles.searchBarContainer}>            
+    <View style={styles.searchBarContainer}>
       <TextInput
         style={[styles.searchInput,{ textAlign: isRTL ? 'right' : 'left' }]}
         placeholder={i18next.t('searchPlaceholder')}
@@ -89,10 +89,10 @@ useEffect(() => {
       />
       <TouchableOpacity onPress={handleSubmitEditing} 
       style={[styles.iconContainer,
-      { position: 'absolute',
-      [isRTL ? 'left' : 'right']: 0, // Align left for Arabic, right for English
-    }]}>
-        <Ionicons name="search" size={20} color="#fff" style={styles.searchIcon} />
+       {position: 'absolute'},
+       isRTL ? styles.iconArabic : styles.iconEnglish // Align left for Arabic, right for English
+      ]}>
+        <Ionicons name="search" size={20} color="#fff"/>
       </TouchableOpacity>
     </View>
   );
@@ -121,8 +121,13 @@ const styles = StyleSheet.create({
     width: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: -10,
   },
+  iconArabic: {
+    start: 0
+  },
+  iconEnglish: {
+    end: 0
+  }
 });
 
 export default ItemSearch;

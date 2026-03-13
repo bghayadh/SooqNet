@@ -9,15 +9,20 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
+import Dialog from "react-native-dialog";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 
 
 
-const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName,t,arabicColorName,noSize,noSizeNoColor,noQuantityCheck) => {
+const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, imagePath, imageName,t,arabicColorName,noSize,noSizeNoColor,noQuantityCheck, setDialogVisible, setMsg) => {
   // Validate itemSize to make sure it's not null or empty
+  console.log("Welcome to onAddCartPress");
+  console.log("itemSize is ", itemSize + " noSize is " ,noSize + " noSizeNoColor is " , noSizeNoColor);
+  console.log("colorID is ", colorID);
   if ((!itemSize || itemSize === "") && noSize!=1 && noSizeNoColor!=1) {
     // Display an alert or message
+    console.log("Inside the if statement itemSize is ", itemSize + " noSize is " ,noSize + " noSizeNoColor is " , noSizeNoColor);
     const msg =t('addToCartAlert');
     alert(msg);
     return; // Stop further execution
@@ -100,9 +105,23 @@ const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, 
 
     // Save the updated cartArray back to AsyncStorage
     await AsyncStorage.setItem('cartData', JSON.stringify(cartArray));
-    alert(t('itemAddedToBasked'));
-
-
+    console.log("noSizeNoColor is ", noSizeNoColor);
+    if (noSizeNoColor == 1) {
+      setMsg("itemAddedToBasketNoColorNoSize");
+      setDialogVisible(true);
+      //alert(t('itemAddedToBasketNoColorNoSize'));
+    }
+    else if (noSize == 1) {
+      setMsg("itemAddedToBasketNoSize");
+      setDialogVisible(true);
+      //alert(t('itemAddedToBasketNoSize'));
+    }
+    else {
+      console.log("Successfully Added.");
+      setMsg("itemAddedToBasket");
+      setDialogVisible(true);
+      //alert(t('itemAddedToBasket'));
+    }
   } catch (error) {
     console.error("Error saving data: ", error);
   }
@@ -111,7 +130,6 @@ const onAddCartPress = async (itemCode, itemData, colorID, colorName, itemSize, 
 
 const AddToCartView = () => {
   const { itemCode } = useLocalSearchParams();
-
   const [itemData, setItemData] = useState([]);
   const [itemImage, setItemImage] = useState([]);
   const [itemColors, setItemColors] = useState([]);
@@ -130,6 +148,9 @@ const AddToCartView = () => {
   const [noSize, setNoSize] = useState([]);
   const [noQuantityCheck, setNoQuantityCheck] = useState([]);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [dialogVisible, setDialogVisible] = useState(false);
+  const [msg, setMsg] = useState("");
+  
 /*  
   const MemoizedItemImages = React.memo(ItemImages);
 const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
@@ -160,6 +181,7 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
         setItemData(itemDescList || []);
         console.log("itemDescList[0][8] is: ", itemDescList[0][8]);
         console.log("itemImageList is: ", itemImageList);
+        console.log("itemImageList length is: ", itemImageList.length);
         setItemImage(itemImageList || []);
         console.log("item")
         console.log("itemImage is ", itemImage);
@@ -288,6 +310,7 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
             <TouchableOpacity
               style={styles.addToCartButton}
               onPress={() => {
+                const imageName = itemColorsImage?.[selectedColorID]?.[0]?.IMAGE_NAME || (Array.isArray(itemImage) ? itemImage?.[0]?.IMAGE_NAME : null);
                 onAddCartPress(
                   itemCode,
                   itemData,
@@ -295,12 +318,15 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
                   selectedColorName,
                   selectedItemSize,
                   itemImageBasePath,
-                  itemColorsImage[selectedColorID][0].IMAGE_NAME,
+                  imageName,
+                  //itemColorsImage[selectedColorID][0].IMAGE_NAME,
                   t,
                   selectedColorArabicName,
                   noSize,
                   noSizeNoColor,
-                  noQuantityCheck
+                  noQuantityCheck,
+                  setDialogVisible,
+                  setMsg
                 );
               }}
             >
@@ -309,6 +335,11 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
           </View>
         )}
       </ScrollView>
+      <Dialog.Container visible={dialogVisible}>
+      <Dialog.Title>"Success"</Dialog.Title>    
+      <Dialog.Description>{t(msg)}</Dialog.Description>                            
+      <Dialog.Button label="OK" onPress={() => setDialogVisible(false)} />
+      </Dialog.Container>      
     </View>
     <Navbar activetab="" />
   </View>

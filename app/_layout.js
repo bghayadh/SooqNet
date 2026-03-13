@@ -5,6 +5,7 @@ export default function Layout() {
     <Stack 
       screenOptions={{
         headerShown: false,  // This hides the header
+        animation: "slide_from_right", // Shein-like animation on both platforms
       }}
     />
   );

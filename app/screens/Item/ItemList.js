@@ -6,12 +6,13 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
+//  Image,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Animated,
   Dimensions,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import i18next from 'i18next';
 
@@ -38,11 +39,12 @@ const Item = React.memo(({ item,isRTL, itemImagesPath, textColor }) => {
             params: { itemCode },
           });
         }}
-      >
+      >        
         <Image
           source={{ uri: itemImagesPath + item.name }}
           style={styles.image}
-          resizeMode="contain"
+          contentFit="contain" // instead of resizeMode
+          cachePolicy="disk"   // disk caching
         />
       </TouchableWithoutFeedback>
     </View>

@@ -39,6 +39,12 @@
         "projectId": "e60e1d0b-d3ec-41d7-8ae3-fbee85ecc797"
       }
     },
-    "owner": "bghayad"
+    "owner": "bghayad",
+    "ios": {
+      "bundleIdentifier": "com.almensaah.sooqonline",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    }
   }
 }
