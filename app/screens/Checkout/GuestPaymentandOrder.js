@@ -59,7 +59,8 @@ const GuestPaymentandOrder = () => {
     });
 
     const shippingFee = 5; // Fixed shipping fee
-    const totalNetAmount = totalAfterDiscount + shippingFee;
+    //const totalNetAmount = totalAfterDiscount + shippingFee;
+    const totalNetAmount = totalAfterDiscount;
 
     return {
       totalBeforeDiscount,
@@ -141,6 +142,7 @@ const GuestPaymentandOrder = () => {
           "lat": parsedFormData.latitude,
           "clientName": clientName,
           "netTotal": totalNetAmount,
+          "shippingFee": shippingFee,
           "totalQty": totalQty,
           "totalAmount": totalNetAmount,
         });

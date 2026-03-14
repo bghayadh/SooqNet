@@ -174,8 +174,9 @@ const GuestPersonalInfo = () => {
       Alert.alert('Error',  t('pleaseEnterValidEmailAddress'));
       return;
     }
-
-    const phoneRegex = /^[0-9]{8}$/;
+    
+    const phoneRegex = /^\+?[0-9]{8,15}$/;
+    //const phoneRegex = /^[0-9]{8}$/;
     if (!phoneRegex.test(phoneNumber)) {
       Alert.alert('Error',  t('pleaseEnterValidPhoneNumber'));
       return;
