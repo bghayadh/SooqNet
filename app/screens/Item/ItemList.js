@@ -1,32 +1,35 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback } from "react";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import {
   FlatList,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
   View,
-//  Image,
+  //  Image,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Animated,
   Dimensions,
-} from 'react-native';
-import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
-import i18next from 'i18next';
+} from "react-native";
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import i18next from "i18next";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 // Item Component
-const Item = React.memo(({ item,isRTL, itemImagesPath, textColor }) => {
-  const validImages = item.imageData.filter(img => img.name !== null);
+const Item = React.memo(({ item, isRTL, itemImagesPath, textColor }) => {
+  const validImages = item.imageData.filter((img) => img.name !== null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
 
-  const itemCode = item.itemCode || 'unknown';
+  const itemCode = item.itemCode || "unknown";
 
   const renderImage = ({ item }) => (
     <View style={styles.slide}>
@@ -35,16 +38,16 @@ const Item = React.memo(({ item,isRTL, itemImagesPath, textColor }) => {
         onPress={() => {
           // Navigate to AddToCart screen when image is clicked
           router.push({
-            pathname: '/screens/AddToCart/AddToCartView',
+            pathname: "/screens/AddToCart/AddToCartView",
             params: { itemCode },
           });
         }}
-      >        
+      >
         <Image
           source={{ uri: itemImagesPath + item.name }}
           style={styles.image}
           contentFit="contain" // instead of resizeMode
-          cachePolicy="disk"   // disk caching
+          cachePolicy="disk" // disk caching
         />
       </TouchableWithoutFeedback>
     </View>
@@ -73,18 +76,21 @@ const Item = React.memo(({ item,isRTL, itemImagesPath, textColor }) => {
             keyExtractor={(item, index) => `item.name-${index}`}
             onMomentumScrollEnd={(event) => {
               const index = Math.floor(
-                event.nativeEvent.contentOffset.x / event.nativeEvent.layoutMeasurement.width
+                event.nativeEvent.contentOffset.x /
+                  event.nativeEvent.layoutMeasurement.width,
               );
               setCurrentIndex(index);
             }}
             snapToAlignment="center"
             decelerationRate={0.4}
-            snapToInterval={screenWidth / 2 - 4}  // Adjust this based on your image width (50% of screen width)
+            snapToInterval={screenWidth / 2 - 4} // Adjust this based on your image width (50% of screen width)
             showsHorizontalScrollIndicator={false}
           />
         ) : (
           <View style={styles.noImageContainer}>
-            <Text style={[styles.noImageText, { color: textColor }]}>No image found</Text>
+            <Text style={[styles.noImageText, { color: textColor }]}>
+              No image found
+            </Text>
           </View>
         )}
       </View>
@@ -94,38 +100,61 @@ const Item = React.memo(({ item,isRTL, itemImagesPath, textColor }) => {
         onPress={() => {
           // Navigate to AddToCart screen when description is clicked
           router.push({
-            pathname: '/screens/AddToCart/AddToCartView',
+            pathname: "/screens/AddToCart/AddToCartView",
             params: { itemCode },
           });
         }}
       >
-        <Text numberOfLines={1} style={[styles.title, { color: textColor, marginLeft: 2 },{ textAlign: isRTL ? 'right' : 'left' }]}>
-          {isRTL ? item.arabicItemName:item.itemName}
+        <Text
+          numberOfLines={1}
+          style={[
+            styles.title,
+            { color: textColor, marginLeft: 2 },
+            { textAlign: isRTL ? "right" : "left" },
+          ]}
+        >
+          {isRTL ? item.arabicItemName : item.itemName}
         </Text>
 
-        <View style={[styles.priceContainer, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
-
+        <View
+          style={[
+            styles.priceContainer,
+            { flexDirection: isRTL ? "row-reverse" : "row" },
+          ]}
+        >
           {discount ? (
             <>
               <Text
-                style={[styles.title, { color: textColor, textDecorationLine: 'line-through', marginLeft: 2 }]}
+                style={[
+                  styles.title,
+                  {
+                    color: textColor,
+                    textDecorationLine: "line-through",
+                    marginLeft: 2,
+                  },
+                ]}
               >
-                {oldPrice ? `$${oldPrice.toFixed(2)}` : 'N/A'}
+                {oldPrice ? `$${oldPrice.toFixed(2)}` : "N/A"}
               </Text>
 
               <View style={styles.discountContainer}>
-                <Text style={[styles.title, { color: textColor, marginHorizontal: 2 }]}>
+                <Text
+                  style={[
+                    styles.title,
+                    { color: textColor, marginHorizontal: 2 },
+                  ]}
+                >
                   {`- ${discount}%`}
                 </Text>
               </View>
 
               <Text style={[styles.title, { color: textColor, marginLeft: 5 }]}>
-                {newPrice ? `$${newPrice.toFixed(2)}` : 'N/A'}
+                {newPrice ? `$${newPrice.toFixed(2)}` : "N/A"}
               </Text>
             </>
           ) : (
             <Text style={[styles.title, { color: textColor, marginLeft: 2 }]}>
-              {oldPrice ? `$${oldPrice.toFixed(2)}` : 'N/A'}
+              {oldPrice ? `$${oldPrice.toFixed(2)}` : "N/A"}
             </Text>
           )}
         </View>
@@ -136,29 +165,36 @@ const Item = React.memo(({ item,isRTL, itemImagesPath, textColor }) => {
 
 // ItemList Component
 const ItemList = ({ data, itemImagesPath }) => {
+  const insets = useSafeAreaInsets();
   const [selectedId, setSelectedId] = useState(null);
   const lang = i18next.language;
-  const isRTL = lang === 'ar';
+  const isRTL = lang === "ar";
 
   // Adjust the data to prevent the last item from overflowing into both columns
-  const adjustedData = data.length % 2 === 0 ? data : [...data, { itemCode: 'empty', imageData: [] }];
+  const adjustedData =
+    data.length % 2 === 0
+      ? data
+      : [...data, { itemCode: "empty", imageData: [] }];
 
-  const getColor = (item) => (item === selectedId ? 'white' : 'black');
+  const getColor = (item) => (item === selectedId ? "white" : "black");
 
-  const renderItem = useCallback(({ item }) => {
-    if (item.itemCode === 'empty') {
-      return <View style={styles.emptyItem} />;
-    }
+  const renderItem = useCallback(
+    ({ item }) => {
+      if (item.itemCode === "empty") {
+        return <View style={styles.emptyItem} />;
+      }
 
-    return (
-      <Item
-        item={item}
-        isRTL={isRTL}
-        itemImagesPath={itemImagesPath}
-        textColor={getColor(item.itemCode)}
-      />
-    );
-  }, [selectedId]);
+      return (
+        <Item
+          item={item}
+          isRTL={isRTL}
+          itemImagesPath={itemImagesPath}
+          textColor={getColor(item.itemCode)}
+        />
+      );
+    },
+    [selectedId],
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -170,11 +206,14 @@ const ItemList = ({ data, itemImagesPath }) => {
         numColumns={2}
         initialNumToRender={10}
         windowSize={5}
-        contentContainerStyle={styles.flatListContent}
+        contentContainerStyle={[
+          styles.flatListContent,
+          { paddingBottom: 72 + insets.bottom },
+        ]}
         columnWrapperStyle={{
           //justifyContent: 'space-between',
-         // paddingHorizontal: 16,
-          flexDirection: isRTL? 'row-reverse' : 'row', // Handle RTL layout
+          // paddingHorizontal: 16,
+          flexDirection: isRTL ? "row-reverse" : "row", // Handle RTL layout
         }}
       />
     </SafeAreaView>
@@ -198,42 +237,42 @@ const styles = StyleSheet.create({
   },
   swiperContainer: {
     height: 290,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   slide: {
     width: screenWidth / 2 - 4,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 2,
   },
   image: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   noImageContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'lightgray',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "lightgray",
     height: 290,
   },
   noImageText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   priceContainer: {
     //flexDirection: isRTL?'row-reverse' :'row',
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 5,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
   discountContainer: {
-    borderColor: 'red',
+    borderColor: "red",
     borderWidth: 1,
     padding: 3,
     borderRadius: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginLeft: 5,
   },
   textContainer: {
@@ -246,7 +285,7 @@ const styles = StyleSheet.create({
   emptyItem: {
     flex: 1,
     height: 290,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
 });
 

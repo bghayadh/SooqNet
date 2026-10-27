@@ -1,12 +1,13 @@
 import React, { useState,useEffect  } from 'react';
 import { BackHandler } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, TextInput, ActivityIndicator, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TextInput, ActivityIndicator, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
 import { ipAddress, port, webAppPath,url } from '@env';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -40,7 +41,7 @@ const GuestPersonalInfo = () => {
   const lang = i18next.language;
   const isRTL = lang === 'ar';
   const router = useRouter();
-  locationPerm = 0;
+  const insets = useSafeAreaInsets();
 
 
   /* This code to handle the pressing for android hardware back button properly, actually we needed this code
@@ -59,9 +60,9 @@ const GuestPersonalInfo = () => {
         return false; // Let OS handle (e.g., exit app)
       };
 
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      const backHandlerSubscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+      return () => backHandlerSubscription.remove();
     }, [])
   );
 
@@ -94,8 +95,8 @@ const GuestPersonalInfo = () => {
 
              setIsEmailEditable(false);  // Set to false to make it readonly
             // console.log("country "+details[6] )
-             setCountry(details[13] || "");
-             setCity(details[14] || "");
+             setCountry(details[12] || "");
+             setCity(details[13] || "");
              setAddress(details[8] || "");
              setLongitude(details[6] || "");
              setLatitude(details[7] || "");
@@ -116,15 +117,11 @@ const GuestPersonalInfo = () => {
   const setToCurrentLocation = async() => {
     setIsWaiting(true);
     try {
-      if (locationPerm == 0) {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("Permission Denied", t('allowLocationAccessToUseThisFeatureStat'));
-          setIsWaiting(false);
-          return;
-        }
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Denied", t('allowLocationAccessToUseThisFeatureStat'));
+        return;
       }
-      locationPerm = 1;
 
       const location = await Location.getCurrentPositionAsync({});
       const { latitude, longitude } = location.coords;
@@ -142,12 +139,8 @@ const GuestPersonalInfo = () => {
         longitudeDelta: 0.01,
       });
 
-      setMarker({
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
-      });      
     }
-    catch {
+    catch (error) {
       console.error("Error fetching location:", error);
       Alert.alert("Error", t('UnableToFetchLocationStat'));
       setIsWaiting(false);
@@ -216,7 +209,11 @@ const GuestPersonalInfo = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <KeyboardAwareScrollView
+      bottomOffset={60}
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={[styles.container, { paddingBottom: 28 + insets.bottom }]}
+    >
        {loading ? (
       <View style={styles.loadingContainer}>
         <Text>{t('loadingText')}</Text> 
@@ -378,7 +375,7 @@ const GuestPersonalInfo = () => {
       </TouchableOpacity>
       </>
     )}
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

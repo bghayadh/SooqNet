@@ -9,8 +9,13 @@ import { useRouter } from "expo-router";
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useKeyboardVisible } from '../../Components/KeyboardScreen';
 
 const ChangePassword = () => {
+  const insets = useSafeAreaInsets();
+  const keyboardVisible = useKeyboardVisible();
 
   const {loginIdentifier,loggedClientFullName} = useLocalSearchParams();
   const [oldPassword, setOldPassword] = useState('');
@@ -33,26 +38,28 @@ const ChangePassword = () => {
       alert(t('newPasswordsDoNotMatchStat'));
       return;
     }
-    const response = await axios.post(url+'/SooqNetChangeAccountPassword',{}, {
-      params: {
-        loginIdentifier:loginIdentifier,oldPassword:oldPassword,newPassword:newPassword
-      }
-    });
+    try {
+      const response = await axios.post(url+'/SooqNetChangeAccountPassword', new URLSearchParams({
+        loginIdentifier, oldPassword, newPassword,
+      }));
    
-    if (response.data.Status === "Success") {      
-      Alert.alert("Account Update", t('passwordChangedSuccessfullyStat'));
-      await AsyncStorage.setItem('loginDetails', JSON.stringify({
-        loginIdentifier: "",  
-        password: "",         
-        clientName: "",       
-        isLoggedIn: "false"    
-      }));      
-      router.push({
-        pathname: '/screens/Login/LoginView',
-      });
-    } 
-    else{
-      Alert.alert("Password Update Failed", response.data.message);
+      if (response.data.Status === "Success") {      
+        Alert.alert("Account Update", t('passwordChangedSuccessfullyStat'));
+        await AsyncStorage.setItem('loginDetails', JSON.stringify({
+          loginIdentifier: "",  
+          clientName: "",       
+          isLoggedIn: "false"    
+        }));      
+        router.push({
+          pathname: '/screens/Login/LoginView',
+        });
+      } 
+      else{
+        Alert.alert("Password Update Failed", response.data.message || response.data.Message || t('somethingWentWrong'));
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      Alert.alert("Error", t('somethingWentWrong'));
     }
   };
 
@@ -81,10 +88,22 @@ const ChangePassword = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.screen}>
+    <KeyboardAwareScrollView
+      style={{ flex: 1 }}
+      contentContainerStyle={[
+        styles.container,
+        {
+          flexGrow: keyboardVisible ? 0 : 1,
+          paddingBottom: keyboardVisible ? 24 : 72 + insets.bottom,
+        },
+      ]}
+      keyboardShouldPersistTaps="handled"
+      bottomOffset={60}
+    >
       <Text style={styles.title}>{t('changePassword')}</Text>
       <View style={styles.inputContainer}>
-        <TextInput style={styles.input} placeholder={t('oldPassword')} value={oldPassword} onChangeText={setOldPassword} />
+        <TextInput style={styles.input} placeholder={t('oldPassword')} secureTextEntry value={oldPassword} onChangeText={setOldPassword} />
       </View>
       <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <TextInput style={styles.input} placeholder={t('newPassword')} secureTextEntry={!showNewPassword} value={newPassword} onChangeText={setNewPassword}  />
@@ -101,16 +120,19 @@ const ChangePassword = () => {
       <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
         <Text style={styles.buttonText}>{t('changePassword')}</Text>
       </TouchableOpacity>
-      <Navbar activetab="" />
+    </KeyboardAwareScrollView>
+    {!keyboardVisible && <Navbar activetab="" />}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#fff',
+  },
+  container: {
+    padding: 20,
     justifyContent: 'center',
   },
   title: {

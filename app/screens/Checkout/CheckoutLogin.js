@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { BackHandler } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ipAddress, port, webAppPath, url } from '@env';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 
 const CheckoutLogin = () => {
@@ -35,9 +35,9 @@ const CheckoutLogin = () => {
         return false; // Let OS handle (e.g., exit app)
       };
 
-      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      const backHandlerSubscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
-      return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+      return () => backHandlerSubscription.remove();
     }, [])
   );  
 
@@ -47,15 +47,12 @@ const CheckoutLogin = () => {
       return;
     }
     try {
-      const response = await axios.get(url+'/cltLoginAuthentication', {
-        params: { loginIdentifier: email, password: password, }
-      });
+      const response = await axios.post(url+'/cltLoginAuthentication', new URLSearchParams({ loginIdentifier: email, password }));
 
       if (response.data.Message === "Success") {
        
         await AsyncStorage.setItem('loginDetails', JSON.stringify({
           loginIdentifier: email,
-          password:password,
           clientName: response.data.clientName,
           isLoggedIn:"true",
         }));
@@ -85,7 +82,12 @@ const CheckoutLogin = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+      bottomOffset={60}
+    >
       <Text style={styles.title}>{t('signInStat')}</Text>
 
       <TextInput
@@ -111,22 +113,25 @@ const CheckoutLogin = () => {
       <View style={[styles.registerContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <Text style={styles.registerText}>{t('noAccountStat')}</Text>
         <TouchableOpacity onPress={handleRegister}>
-          <Text style={styles.registerLink}>{t('register')}</Text>
+          <Text style={[styles.registerLink, { marginLeft: isRTL ? 0 : 8, marginRight: isRTL ? 8 : 0 }]}>{t('register')}</Text>
         </TouchableOpacity>
       </View>
 
       <TouchableOpacity style={styles.guestButton} onPress={handleGuestLogin}>
         <Text style={styles.guestButtonText}>{t('coninueasGuest')}</Text>
       </TouchableOpacity>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scroll: {
     flex: 1,
-    alignItems: 'center',
     backgroundColor: '#f7f7f7',
+  },
+  container: {
+    flexGrow: 1,
+    alignItems: 'center',
     padding: 20,
   },
   title: {

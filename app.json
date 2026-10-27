@@ -5,7 +5,8 @@
       "bundler": "metro"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-video"
     ],
     "android": {
       "package": "com.almensaah.sooqonline",
@@ -17,17 +18,20 @@
         "googleMaps": {
           "apiKey": "AIzaSyBJXAds-Gt4I39hRFHhYHMEg3XcBqihYoo"
         }
+      },
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
       }
     },
     "name": "SooqOnline",
     "slug": "SooqOnline",
     "icon": "./assets/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splash-logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "sdkVersion": "52.0.0",
     "version": "1.0.0",
     "orientation": "portrait",
     "newArchEnabled": true,

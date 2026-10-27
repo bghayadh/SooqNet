@@ -1,434 +1,544 @@
-import React, { useState, useEffect,useRef } from 'react';
-import { View, SafeAreaView, StyleSheet, Text, BackHandler,Keyboard,TouchableWithoutFeedback,TouchableOpacity } from 'react-native';
-import ItemList from './ItemList';
-import CategoryList from './CategoryList';
-import axios from 'axios';
-import { useLocalSearchParams } from 'expo-router';
-import { useRouter } from 'expo-router';
-import ItemSearch from './ItemSearch';
-import { useNavigation } from '@react-navigation/native';
-import ItemFilter from './ItemFilter';
-import CategoryPath from './CategoryPath';
-import {ipAddress,port,webAppPath,url} from "@env";
-import Navbar from '../../Navigations/Navbar';
-import i18next from 'i18next';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
+import {
+  View,
+  StyleSheet,
+  Text,
+  BackHandler,
+  Keyboard,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import ItemList from "./ItemList";
+import CategoryList from "./CategoryList";
+import axios from "axios";
+import { useLocalSearchParams } from "expo-router";
+import { useRouter } from "expo-router";
+import ItemSearch from "./ItemSearch";
+import ItemFilter from "./ItemFilter";
+import CategoryPath from "./CategoryPath";
+import { ipAddress, port, webAppPath, url } from "@env";
+import Navbar from "../../Navigations/Navbar";
+import i18next from "i18next";
+import KeyboardScreen, {
+  useKeyboardVisible,
+} from "../../Components/KeyboardScreen";
 
 function ItemView() {
-    const { catCode,catTitle,arabicCatTitle, source: initialSource, searchKey, savedFullCatCode: routeSavedFullCatCode,routeOrigin } = useLocalSearchParams();
-    const [source, setSource] = useState(initialSource || 'category'); // Use 'category' as a default if no initial value 
-    const [itemData, setItemData] = useState([]);
-    const [catData, setCatData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [fullCatCode, setFullCatCode] = useState(catCode || ""); // Initialize with catCode
-    const [lastCatLevel, setLastCatLevel] = useState(false); 
-    const [showFlatList, setShowFlatList] = useState(true);
-    const [searchResults, setSearchResults] = useState([]); 
-    const [searchText, setSearchText] = useState(searchKey);
-    const savedFullCatCode = useRef(source === 'search' && routeSavedFullCatCode ? routeSavedFullCatCode : fullCatCode);// Conditionally initialize savedFullCatCode with routeSavedFullCatCode if source is "search"
-    const router = useRouter();
-    const navigation = useNavigation();
-    const [selectedSort, setSelectedSort] = useState(null); 
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [sizeOptions, setSizeOptions] = useState([]); 
-    const [selectedSizes, setSelectedSizes] = useState([]);
-    const [colorsOptions, setColorsOptions] = useState([]); 
-    const [selectedColors, setSelectedColors] = useState([]);
-    const [selectedPriceRange, setSelectedPriceRange] = useState([0,500]);
-    const [fullCatTitles, setFullCatTitles] = useState(catTitle);
-    const [fullArabicCatTitles, setFullArabicCatTitles] = useState(arabicCatTitle);
+  const keyboardVisible = useKeyboardVisible();
+  const insets = useSafeAreaInsets();
+  const {
+    catCode,
+    catTitle,
+    arabicCatTitle,
+    source: initialSource,
+    searchKey,
+    savedFullCatCode: routeSavedFullCatCode,
+    routeOrigin,
+  } = useLocalSearchParams();
+  const [source, setSource] = useState(initialSource || "category"); // Use 'category' as a default if no initial value
+  const [itemData, setItemData] = useState([]);
+  const [catData, setCatData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [fullCatCode, setFullCatCode] = useState(catCode || ""); // Initialize with catCode
+  const [lastCatLevel, setLastCatLevel] = useState(false);
+  const [showFlatList, setShowFlatList] = useState(true);
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchText, setSearchText] = useState(searchKey);
+  const savedFullCatCode = useRef(
+    source === "search" && routeSavedFullCatCode
+      ? routeSavedFullCatCode
+      : fullCatCode,
+  ); // Conditionally initialize savedFullCatCode with routeSavedFullCatCode if source is "search"
+  const router = useRouter();
+  const [selectedSort, setSelectedSort] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [sizeOptions, setSizeOptions] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [colorsOptions, setColorsOptions] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedPriceRange, setSelectedPriceRange] = useState([0, 0]);
+  const [maxPrice, setMaxPrice] = useState(0);
+  const priceRangeCustomized = useRef(false);
+  const [fullCatTitles, setFullCatTitles] = useState(catTitle);
+  const [fullArabicCatTitles, setFullArabicCatTitles] =
+    useState(arabicCatTitle);
 
-    const [itemImagesPath, setItemImagesPath] = useState("");
-    const [catImagesPath, setCatImagesPath] = useState("");
-    const lang = i18next.language;
-    const isRTL = lang === 'ar'; // Check if the language is Arabic
+  const [itemImagesPath, setItemImagesPath] = useState("");
+  const [catImagesPath, setCatImagesPath] = useState("");
+  const lang = i18next.language;
+  const isRTL = lang === "ar"; // Check if the language is Arabic
 
-    useEffect(() => {//Set the value of previous cat before searching each time the searchKey change
-      if (searchText === '' && savedFullCatCode.current) {
-        setFullCatCode(savedFullCatCode.current);
-      }
+  useEffect(() => {
+    //Set the value of previous cat before searching each time the searchKey change
+    if (searchText === "" && savedFullCatCode.current) {
+      setFullCatCode(savedFullCatCode.current);
+    }
   }, [searchText]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (!fullCatCode) return; // Prevent fetch if no category code
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!fullCatCode) return; // Prevent fetch if no category code
 
-            try {
-                setLoading(true);
-                console.log("ipAddress "+ipAddress)
-                const response = await axios.get(url+'/SooqNetGetCatItem', {
-                  params: { catID: fullCatCode, source, searchKey },
-                });
+      try {
+        setLoading(true);
+        priceRangeCustomized.current = false;
+        setMaxPrice(0);
+        setSelectedPriceRange([0, 0]);
+        console.log("ipAddress " + ipAddress);
+        const response = await axios.get(url + "/SooqNetGetCatItem", {
+          params: { catID: fullCatCode, source, searchKey },
+        });
 
-                // Handle item data
-                setItemData(response?.data?.category1List || []);
-                // Handle category data
-                setCatData(response?.data?.subCategory1List || []);
-                // Set lastCatLevel from server response
-                setLastCatLevel(response?.data?.lastCatLevel || false);
-             
-                const itemImageBasePath = response?.data?.relativePath === "1"
-                ? url+response?.data?.itemImagesPath
-                : 'https://'+ipAddress+':'+port+response?.data?.itemImagesPath;
-                setItemImagesPath(itemImageBasePath);
+        // Handle item data
+        setItemData(response?.data?.category1List || []);
+        const fetchedMaxPrice = Math.max(
+          0,
+          Math.ceil(Number(response?.data?.maxPrice) || 0),
+        );
+        setMaxPrice(fetchedMaxPrice);
+        setSelectedPriceRange([0, fetchedMaxPrice]);
+        // Handle category data
+        setCatData(response?.data?.subCategory1List || []);
+        // Set lastCatLevel from server response
+        setLastCatLevel(response?.data?.lastCatLevel || false);
 
-                const catImageBasePath = response?.data?.relativePath === "1"
-                ? url+response?.data?.catImagesPath
-                : 'https://'+ipAddress+':'+port+response?.data?.catImagesPath;
-                setCatImagesPath(catImageBasePath);
+        const itemImageBasePath =
+          response?.data?.relativePath === "1"
+            ? url + response?.data?.itemImagesPath
+            : "https://" +
+              ipAddress +
+              ":" +
+              port +
+              response?.data?.itemImagesPath;
+        setItemImagesPath(itemImageBasePath);
 
-                const sortedSizeOptions = sortSizes(response?.data?.sizeOptions || []);// Sort sizeOptions from smallest to largest
-                setSizeOptions(sortedSizeOptions);            
-                setColorsOptions(response?.data?.colorsOptions);
+        const catImageBasePath =
+          response?.data?.relativePath === "1"
+            ? url + response?.data?.catImagesPath
+            : "https://" +
+              ipAddress +
+              ":" +
+              port +
+              response?.data?.catImagesPath;
+        setCatImagesPath(catImageBasePath);
 
-            } catch (error) {
-                console.error("Error fetching data:", error.message);
-                setItemData([]);
-                setCatData([]); 
-                setItemImagesPath("");
-                setCatImagesPath("");
-                setSizeOptions([]);
-                setColorsOptions([]);
-            } finally {
-                setLoading(false);
-            }
-        };
+        const sortedSizeOptions = sortSizes(response?.data?.sizeOptions || []); // Sort sizeOptions from smallest to largest
+        setSizeOptions(sortedSizeOptions);
+        setColorsOptions(response?.data?.colorsOptions);
+      } catch (error) {
+        console.error("Error fetching data:", error.message);
+        setItemData([]);
+        setCatData([]);
+        setItemImagesPath("");
+        setCatImagesPath("");
+        setSizeOptions([]);
+        setColorsOptions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        fetchData();
-    }, [fullCatCode, source, searchKey]); 
+    fetchData();
+  }, [fullCatCode, source, searchKey]);
 
-    // Function to handle category selection
-    const handleCategoryPress = (newCatCode,newCatTitle,newArabicCatTitle) => {
+  // Function to handle category selection
+  const handleCategoryPress = (newCatCode, newCatTitle, newArabicCatTitle) => {
+    setSelectedSort(null);
+    setSelectedSizes([]);
+    setSelectedColors([]);
+    priceRangeCustomized.current = false;
+    setSelectedPriceRange([0, 0]);
+    const codes = fullCatCode.split("-");
+    const titles = fullCatTitles.split("-");
+    const arabictitles = fullArabicCatTitles?.split("-") || [];
+
+    if (lastCatLevel && codes.length > 0) {
+      // Replace the last category if lastCatLevel is true
+      if (codes[codes.length - 1] === newCatCode) {
+        // If the new category is the same as the last one, do nothing
+        return;
+      } else {
+        // Replace the last category with the new category
+        codes[codes.length - 1] = newCatCode;
+      }
+      if (titles[titles.length - 1] === newCatTitle) {
+        // If the new category is the same as the last one, do nothing
+        return;
+      } else {
+        // Replace the last category with the new category
+        titles[titles.length - 1] = newCatTitle;
+        arabictitles.length > 0 &&
+          (arabictitles[arabictitles.length - 1] = newArabicCatTitle);
+      }
+    } else {
+      // Combine with dash if not empty
+      codes.push(newCatCode);
+      titles.push(newCatTitle);
+      arabictitles.push(newArabicCatTitle);
+    }
+
+    const combinedCatCode = codes.join("-"); // Join back into a single string
+    const combinedCatTitle = titles.join("-"); // Join back into a single string
+    const combinedArabicCatTitle = arabictitles.join("-"); // Join back into a single string
+
+    setFullCatCode(combinedCatCode); // This will trigger the useEffect to fetch data
+    setFullCatTitles(combinedCatTitle);
+    setFullArabicCatTitles(combinedArabicCatTitle);
+  };
+
+  const handlePathPress = (newCatCode, newCatTitle, newArabicCatTitle) => {
+    priceRangeCustomized.current = false;
+    setSelectedPriceRange([0, 0]);
+    setFullCatCode(newCatCode); // This updates the fullCatCode, triggering a re-fetch of data
+    setFullCatTitles(newCatTitle);
+    setFullArabicCatTitles(newArabicCatTitle);
+  };
+
+  // BackHandler to manage back button behavior
+  useEffect(() => {
+    console.log("BackHandler");
+    const backAction = async () => {
       setSelectedSort(null);
       setSelectedSizes([]);
       setSelectedColors([]);
-      setSelectedPriceRange([0,500]);
-      const codes = fullCatCode.split('-');
-      const titles = fullCatTitles.split('-');
-      const arabictitles = fullArabicCatTitles?.split('-') || [];      
+      priceRangeCustomized.current = false;
+      setSelectedPriceRange([0, 0]);
 
-        if (lastCatLevel && codes.length > 0) {
-            // Replace the last category if lastCatLevel is true
-            if (codes[codes.length - 1] === newCatCode) {
-                // If the new category is the same as the last one, do nothing
-                return;
-            } else {
-                // Replace the last category with the new category
-                codes[codes.length - 1] = newCatCode;
-            }
-            if (titles[titles.length - 1] === newCatTitle) {
-              // If the new category is the same as the last one, do nothing
-              return;
-          } else {
-              // Replace the last category with the new category
-              titles[titles.length - 1] = newCatTitle;
-              arabictitles.length > 0 && (arabictitles[arabictitles.length - 1] = newArabicCatTitle);              
+      const codes = fullCatCode.split("-");
+      const titles = fullCatTitles.split("-");
+      const arabictitles = fullArabicCatTitles.split("-");
+
+      if (codes.length > 1) {
+        const updatedCatTitle = titles.slice(0, -1).join("-"); // Remove the last category Title
+        setFullCatTitles(updatedCatTitle);
+
+        const updatedArabicCatTitle = arabictitles.slice(0, -1).join("-"); // Remove the last category Title
+        setFullArabicCatTitles(updatedArabicCatTitle);
+
+        const updatedCatCode = codes.slice(0, -1).join("-"); // Remove the last category code
+        setFullCatCode(updatedCatCode);
+        return true;
+      } else {
+        if (source === "search") {
+          console.log("Backhandler, the source is search");
+          try {
+            setLoading(true);
+            // Make an Axios request to refetch search results based on the searchKey
+            const response = await axios.get(url + "/GetCategory1BySearchKey", {
+              params: { searchKey },
+            });
+
+            console.log("axios sent for GetCatehory1BySearchKey");
+
+            // Process and set the search results, similar to handleSearch in ItemSearch
+            const cat1TitlesList = response.data.cat1TitlesList || [];
+            const cat1ItemsList = response.data.cat1ItemsList || [];
+
+            const results = [
+              {
+                title: "All",
+                count: cat1ItemsList.length,
+                categoryCode: "AllCatOptions",
+                searchText: searchKey,
+              },
+              ...cat1TitlesList.map((element) => {
+                const cat1Code = element[0];
+                const count = cat1ItemsList.reduce(
+                  (acc, itemCatCode) =>
+                    itemCatCode[0] === cat1Code ? acc + 1 : acc,
+                  0,
+                );
+                return {
+                  title: element[1],
+                  count,
+                  categoryCode: cat1Code,
+                  searchText: searchKey,
+                };
+              }),
+            ];
+
+            setSearchResults(results);
+            setShowFlatList(false);
+            setLoading(false);
+            return true; // Indicate we handled the back action
+          } catch (error) {
+            console.error("Error fetching search results:", error);
+            setLoading(false);
+            return false; // Let the back action continue if there's an error
           }
         } else {
-            // Combine with dash if not empty
-            codes.push(newCatCode);
-            titles.push(newCatTitle);
-            arabictitles.push(newArabicCatTitle);
+          //navigation.navigate('screens/HomePage'); // Navigate to HomePage screen
+          router.back();
         }
-
-        const combinedCatCode = codes.join('-'); // Join back into a single string
-        const combinedCatTitle = titles.join('-'); // Join back into a single string
-        const combinedArabicCatTitle = arabictitles.join('-'); // Join back into a single string
-
-        setFullCatCode(combinedCatCode); // This will trigger the useEffect to fetch data
-        setFullCatTitles(combinedCatTitle);
-        setFullArabicCatTitles(combinedArabicCatTitle)
+      }
+      // return false;
     };
 
-    const handlePathPress = (newCatCode,newCatTitle,newArabicCatTitle) => {
-      setFullCatCode(newCatCode);  // This updates the fullCatCode, triggering a re-fetch of data
-      setFullCatTitles(newCatTitle);
-      setFullArabicCatTitles(newArabicCatTitle);
-    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction,
+    );
+    return () => backHandler.remove(); // Clean up the event listener
+  }, [fullCatCode, searchKey, source]);
 
-    // BackHandler to manage back button behavior
-    useEffect(() => {
-      console.log("BackHandler");
-      const backAction = async () => {
-        setSelectedSort(null);
-        setSelectedSizes([]);
-        setSelectedColors([]);
-        setSelectedPriceRange([0,500]);
-
-        const codes = fullCatCode.split('-');
-        const titles = fullCatTitles.split('-');
-        const arabictitles = fullArabicCatTitles.split('-');
-
-            if (codes.length > 1) {
-                const updatedCatTitle = titles.slice(0, -1).join('-'); // Remove the last category Title
-                setFullCatTitles(updatedCatTitle);
-
-                const updatedArabicCatTitle = arabictitles.slice(0, -1).join('-'); // Remove the last category Title
-                setFullArabicCatTitles(updatedArabicCatTitle);
-
-                const updatedCatCode = codes.slice(0, -1).join('-'); // Remove the last category code
-                setFullCatCode(updatedCatCode);
-                return true; 
-            }
-            else {
-              if (source==='search' ) {
-                console.log("Backhandler, the source is search");
-                try {
-                  setLoading(true);
-                  // Make an Axios request to refetch search results based on the searchKey
-                  const response = await axios.get(url+'/GetCategory1BySearchKey', {
-                      params: { searchKey },
-                  });
-
-                  console.log("axios sent for GetCatehory1BySearchKey");
-  
-                  // Process and set the search results, similar to handleSearch in ItemSearch
-                  const cat1TitlesList = response.data.cat1TitlesList || [];
-                  const cat1ItemsList = response.data.cat1ItemsList || [];
-                  
-                  const results = [
-                      { title: 'All', count: cat1ItemsList.length, categoryCode: 'AllCatOptions', searchText: searchKey },
-                      ...cat1TitlesList.map((element) => {
-                          const cat1Code = element[0];
-                          const count = cat1ItemsList.reduce((acc, itemCatCode) => 
-                              itemCatCode[0] === cat1Code ? acc + 1 : acc, 0);
-                          return { title: element[1], count, categoryCode: cat1Code, searchText: searchKey };
-                      }),
-                  ];
-  
-                  setSearchResults(results);
-                  setShowFlatList(false); 
-                  setLoading(false);
-                  return true; // Indicate we handled the back action
-  
-              } catch (error) {
-                  console.error("Error fetching search results:", error);
-                  setLoading(false);
-                  return false; // Let the back action continue if there's an error
-              }
-            }
-            else {
-              //navigation.navigate('screens/HomePage'); // Navigate to HomePage screen
-              router.back();
-            }            
-            }
-           // return false; 
-        };
-
-        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
-        return () => backHandler.remove(); // Clean up the event listener
-    }, [fullCatCode,searchKey,source]);
-
-
-    const handleSizeChange = (sizes) => {
-      setSelectedSizes(sizes);  
-      fetchItems(selectedSort,sizes,selectedColors,selectedPriceRange);
-    };
-
-    const handleRangeChange =(priceRange)  => {
-      setSelectedPriceRange(priceRange);  
-      fetchItems(selectedSort,selectedSizes,selectedColors,priceRange);
-    };
-
-    // Sorting function for sizeOptions
-    const sortSizes = (sizes) => {
-        
-      // Separate numeric and alphabetic sizes
-      const numericSizes = sizes.filter((size) => /^\d/.test(size));
-      const alphabeticSizes = sizes.filter((size) => /^[a-zA-Z]/.test(size));
-
-      if(numericSizes.length>0){
-        numericSizes.sort((a, b) => {
-            const [aMain, aSub] = a.split("/").map(Number);
-            const [bMain, bSub] = b.split("/").map(Number);
-            return aMain - bMain || (aSub || 0) - (bSub || 0);
-        });
-    }
-      // Define custom order for alphabetic sizes
-      const sizeOrder = ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"];
-      alphabeticSizes.sort((a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
- 
-     return [...alphabeticSizes, ...numericSizes];
-      
-    };
-
-    const handleColorChange = (updatedColors) => {    
-      setSelectedColors(updatedColors);
-     fetchItems(selectedSort, selectedSizes, updatedColors,selectedPriceRange);
-  
+  const handleSizeChange = (sizes) => {
+    setSelectedSizes(sizes);
+    fetchItems(selectedSort, sizes, selectedColors, selectedPriceRange);
   };
-    const fetchItems = async (sortOption,sizes = [],colors =[],price=[]) => {
-      setLoading(true);
-      setIsDropdownOpen(false); // Close the overlay when fetching items
 
-      try {
-        const response = await axios.get(url+'/GetSooqNetFilteredItems', {
-          params: {   
-            sort: sortOption,
-            catID: fullCatCode,
-            sizes: sizes.join(','),
-            colors: colors.join(','),
-            price:price.join(','),
-            source:source,
-            searchKey:searchKey,
-           },
-      });      
+  const handleRangeChange = (priceRange) => {
+    priceRangeCustomized.current = true;
+    setSelectedPriceRange(priceRange);
+    fetchItems(selectedSort, selectedSizes, selectedColors, priceRange);
+  };
+
+  // Sorting function for sizeOptions
+  const sortSizes = (sizes) => {
+    // Separate numeric and alphabetic sizes
+    const numericSizes = sizes.filter((size) => /^\d/.test(size));
+    const alphabeticSizes = sizes.filter((size) => /^[a-zA-Z]/.test(size));
+
+    if (numericSizes.length > 0) {
+      numericSizes.sort((a, b) => {
+        const [aMain, aSub] = a.split("/").map(Number);
+        const [bMain, bSub] = b.split("/").map(Number);
+        return aMain - bMain || (aSub || 0) - (bSub || 0);
+      });
+    }
+    // Define custom order for alphabetic sizes
+    const sizeOrder = ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"];
+    alphabeticSizes.sort((a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b));
+
+    return [...alphabeticSizes, ...numericSizes];
+  };
+
+  const handleColorChange = (updatedColors) => {
+    setSelectedColors(updatedColors);
+    fetchItems(selectedSort, selectedSizes, updatedColors, selectedPriceRange);
+  };
+  const fetchItems = async (
+    sortOption,
+    sizes = [],
+    colors = [],
+    price = [],
+  ) => {
+    setLoading(true);
+    setIsDropdownOpen(false); // Close the overlay when fetching items
+
+    try {
+      const response = await axios.get(url + "/GetSooqNetFilteredItems", {
+        params: {
+          sort: sortOption,
+          catID: fullCatCode,
+          sizes: sizes.join(","),
+          colors: colors.join(","),
+          price: price.join(","),
+          source: source,
+          searchKey: searchKey,
+        },
+      });
       setItemData(response?.data?.category1List || []);
-      const itemImageBasePath = response?.data?.relativePath === "1"
-      ? url+response?.data?.itemImagesPath
-      : 'https://'+ipAddress+':'+port+response?.data?.itemImagesPath;
+      const fetchedMaxPrice = Math.max(
+        0,
+        Math.ceil(Number(response?.data?.maxPrice) || 0),
+      );
+      setMaxPrice(fetchedMaxPrice);
+      if (!priceRangeCustomized.current) {
+        setSelectedPriceRange([0, fetchedMaxPrice]);
+      } else {
+        setSelectedPriceRange((currentRange) => [
+          Math.min(currentRange[0], fetchedMaxPrice),
+          Math.min(currentRange[1], fetchedMaxPrice),
+        ]);
+      }
+      const itemImageBasePath =
+        response?.data?.relativePath === "1"
+          ? url + response?.data?.itemImagesPath
+          : "https://" +
+            ipAddress +
+            ":" +
+            port +
+            response?.data?.itemImagesPath;
       setItemImagesPath(itemImageBasePath);
 
-      const catImageBasePath = response?.data?.relativePath === "1"
-      ? url+response?.data?.catImagesPath
-      : 'https://'+ipAddress+':'+port+response?.data?.catImagesPath;
+      const catImageBasePath =
+        response?.data?.relativePath === "1"
+          ? url + response?.data?.catImagesPath
+          : "https://" + ipAddress + ":" + port + response?.data?.catImagesPath;
       setCatImagesPath(catImageBasePath);
-
     } catch (error) {
-          console.error("Error fetching items:", error);
-      } finally {
-          setLoading(false);
-      }
+      console.error("Error fetching items:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSortChange = (sortOption) => {
     setSelectedSort(sortOption);
-    fetchItems(sortOption,selectedSizes,selectedColors,selectedPriceRange);
+    fetchItems(sortOption, selectedSizes, selectedColors, selectedPriceRange);
   };
 
- //Update the list of displayed items and toggles the visibility of main flatList before the search
- const handleSearchResults = (results, showCategories, sourceType) => {
-  setShowFlatList(showCategories);
-  setSearchResults(results);
+  //Update the list of displayed items and toggles the visibility of main flatList before the search
+  const handleSearchResults = (results, showCategories, sourceType) => {
+    setShowFlatList(showCategories);
+    setSearchResults(results);
 
-  if (sourceType === 'category') {
-      setSource('category');
+    if (sourceType === "category") {
+      setSource("category");
       setSearchText(() => {
-          return '';
+        return "";
       });
-      setFullCatCode(savedFullCatCode.current); 
+      setFullCatCode(savedFullCatCode.current);
 
-      if(routeOrigin ==='home') {
-        navigation.navigate('screens/HomePage'); // Navigate to HomePage screen
+      if (routeOrigin === "home") {
+        router.navigate("/"); // Return to the home route
       }
-    }
-  else  {
+    } else {
       savedFullCatCode.current = fullCatCode; // Save `fullCatCode` before search
-  }
-};
-    return (
-        <SafeAreaView style={[styles.container, {backgroundColor: 'white'}]}>
-             <TouchableWithoutFeedback
-          onPress={() => {
-            if (searchText === '') {
-              Keyboard.dismiss();
-              setShowFlatList(true);
-            }
-          }}
-          accessible={false} // Prevent accessibility conflicts
-        >
-          <View>
-            <ItemSearch searchText={searchText} setSearchText={setSearchText} setShowFlatList={setShowFlatList} onSearchResults={handleSearchResults}
-            />
-          </View>
-        </TouchableWithoutFeedback>
+    }
+  };
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: "white" }]}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          if (searchText === "") {
+            Keyboard.dismiss();
+            setShowFlatList(true);
+          }
+        }}
+        accessible={false} // Prevent accessibility conflicts
+      >
+        <View>
+          <ItemSearch
+            searchText={searchText}
+            setSearchText={setSearchText}
+            setShowFlatList={setShowFlatList}
+            onSearchResults={handleSearchResults}
+          />
+        </View>
+      </TouchableWithoutFeedback>
+      <KeyboardScreen>
         {loading ? (
           <Text>Loading...</Text>
+        ) : showFlatList ? (
+          <View style={styles.listContainer}>
+            {isDropdownOpen && (
+              <TouchableWithoutFeedback>
+                <View style={styles.overlay} />
+              </TouchableWithoutFeedback>
+            )}
+            <CategoryList
+              data={catData}
+              catImagesPath={catImagesPath}
+              onCategoryPress={handleCategoryPress}
+              lastCatLevel={lastCatLevel}
+              selectedId={fullCatCode.split("-").pop()}
+            />
+
+            <CategoryPath
+              fullCatCode={fullCatCode}
+              fullCatTitle={fullCatTitles}
+              fullArabicCatTitle={fullArabicCatTitles}
+              categories={catData}
+              onCategoryPress={handlePathPress}
+            />
+            <Text></Text>
+            <View>
+              <ItemFilter
+                onSortChange={handleSortChange}
+                selectedSort={selectedSort}
+                onDropdownToggle={setIsDropdownOpen}
+                sizeOptions={sizeOptions}
+                selectedSizes={selectedSizes}
+                onSizeChange={handleSizeChange}
+                colorsOptions={colorsOptions}
+                selectedColors={selectedColors}
+                onColorChange={handleColorChange}
+                onRangeChange={handleRangeChange}
+                selectedPriceRange={selectedPriceRange}
+                maxPrice={maxPrice}
+              />
+            </View>
+            <ItemList data={itemData} itemImagesPath={itemImagesPath} />
+          </View>
         ) : (
-          showFlatList ? (
-                <View style={styles.listContainer}>
-
-                {isDropdownOpen && (
-                    <TouchableWithoutFeedback >
-                        <View style={styles.overlay} />
-                    </TouchableWithoutFeedback>
-                  )
-                }
-                    <CategoryList 
-                        data={catData} 
-                        catImagesPath={catImagesPath}
-                        onCategoryPress={handleCategoryPress} 
-                        lastCatLevel={lastCatLevel} 
-                        selectedId={fullCatCode.split('-').pop()} 
-                    />
-
-                    <CategoryPath fullCatCode={fullCatCode}  fullCatTitle={fullCatTitles} fullArabicCatTitle={fullArabicCatTitles} categories={catData} onCategoryPress={handlePathPress} />
-                    <Text></Text>
-                    <View>
-                      <ItemFilter
-                        onSortChange={handleSortChange} selectedSort={selectedSort} onDropdownToggle={setIsDropdownOpen}
-                        sizeOptions={sizeOptions} selectedSizes={selectedSizes}  onSizeChange={handleSizeChange}   colorsOptions={colorsOptions} selectedColors={selectedColors} onColorChange={handleColorChange} 
-                         onRangeChange={handleRangeChange} selectedPriceRange={selectedPriceRange}    
-                      />
-                    </View>
-                    <ItemList data={itemData} itemImagesPath={itemImagesPath} />
-                </View>
-           ) : (
-            <View style={styles.resultsContainer}>
-              {searchResults.map((result, index) => (
-                <TouchableOpacity
+          <ScrollView
+            style={styles.resultsContainer}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={{
+              paddingBottom: keyboardVisible ? 16 : 72 + insets.bottom,
+            }}
+          >
+            {searchResults.map((result, index) => (
+              <TouchableOpacity
                 key={index}
                 style={styles.resultItem}
                 onPress={() => {
                   router.push({
-                    pathname: '/screens/Item/ItemView',
+                    pathname: "/screens/Item/ItemView",
                     params: {
                       catCode: result.categoryCode,
-                      catTitle:result.title,
+                      catTitle: result.title,
                       arabicCatTitle: result.ArabicTitle,
-                      source: 'search',
+                      source: "search",
                       searchKey: searchText,
                       savedFullCatCode: savedFullCatCode.current,
-                      routeOrigin:'itemView'
+                      routeOrigin: "itemView",
                     },
                   });
                 }}
               >
-                  <Text style={styles.resultText}>
-                    {isRTL ? result.ArabicTitle : result.title}</Text>
-                  <Text style={styles.resultCount}>{result.count}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )
+                <Text style={styles.resultText}>
+                  {isRTL ? result.ArabicTitle : result.title}
+                </Text>
+                <Text style={styles.resultCount}>{result.count}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         )}
-         <Navbar activetab="" />
-        </SafeAreaView>
-    );
+      </KeyboardScreen>
+      {!keyboardVisible && <Navbar activetab="" />}
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    listContainer: {
-        flex: 1,
-        padding: 10,
-    },
-    resultsContainer: {
-        marginTop: 50,
-        paddingHorizontal: 20,
-    },
-    resultItem: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e0e0e0',
-    },
-    resultText: {
-        fontSize: 16,
-        color: 'black',
-    },
-    resultCount: {
-        fontSize: 16,
-        color: 'gray',
-    },
-    overlay: {
-      ...StyleSheet.absoluteFillObject, // Covers entire screen
-      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent black
-      zIndex: 100, // Below `ItemFilter` but above other content
+  container: {
+    flex: 1,
   },
-      
+  listContainer: {
+    flex: 1,
+    padding: 10,
+  },
+  resultsContainer: {
+    marginTop: 50,
+    paddingHorizontal: 20,
+  },
+  resultItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+  resultText: {
+    fontSize: 16,
+    color: "black",
+  },
+  resultCount: {
+    fontSize: 16,
+    color: "gray",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject, // Covers entire screen
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black
+    zIndex: 100, // Below `ItemFilter` but above other content
+  },
 });
 
 export default ItemView;

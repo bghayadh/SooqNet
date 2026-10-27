@@ -7,8 +7,10 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const OrderDetails = () => {
+  const insets = useSafeAreaInsets();
   //const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const {orderID} = useLocalSearchParams();
@@ -155,6 +157,7 @@ const OrderDetails = () => {
 
           <VirtualizedList
             data={orderDetails.items}
+            contentContainerStyle={{ paddingBottom: 72 + insets.bottom }}
             initialNumToRender={4}
             renderItem={renderItem}
             keyExtractor={(item) => item.id.toString()}

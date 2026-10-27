@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';  // Importing useTranslation hook
 
-const ItemDetails = ({ itemData ,isRTL}) => {
+const ItemDetails = ({ itemData ,isRTL, wholesaleTiers = []}) => {
   
   const { t, i18n } = useTranslation(); 
 
@@ -48,6 +48,29 @@ const ItemDetails = ({ itemData ,isRTL}) => {
           <Text style={styles.newPrice}>${oldPrice.toFixed(2)}</Text>
         )}
       </View>
+
+      {wholesaleTiers.length > 0 && (
+        <View style={styles.wholesaleContainer}>
+          <Text style={[styles.wholesaleTitle, { textAlign: isRTL ? 'right' : 'left' }]}>
+            {isRTL ? 'أسعار الجملة' : 'Wholesale pricing'}
+          </Text>
+          {wholesaleTiers.map((tier) => {
+            const wholesalePrice = newPrice * (1 - Number(tier.discountPercent) / 100);
+            const quantityRange = tier.maxQuantity == null
+              ? `${tier.minQuantity}+`
+              : `${tier.minQuantity}–${tier.maxQuantity}`;
+            return (
+              <View key={`${tier.minQuantity}-${tier.maxQuantity ?? 'plus'}`} style={[styles.wholesaleRow, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
+                <Text style={styles.wholesaleQuantity}>
+                  {isRTL ? `${quantityRange} قطعة` : `${quantityRange} units`}
+                </Text>
+                <Text style={styles.wholesalePrice}>${wholesalePrice.toFixed(2)} / {isRTL ? 'قطعة' : 'unit'}</Text>
+                <Text style={styles.wholesaleDiscount}>-{tier.discountPercent}%</Text>
+              </View>
+            );
+          })}
+        </View>
+      )}
 
       <View style={styles.descriptionContainer}>
         <Text style={[styles.descriptionText,{ textAlign: isRTL ? 'right' : 'left' }]}>
@@ -108,6 +131,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
+  wholesaleContainer: { marginTop: 10, padding: 10, backgroundColor: '#f7f8fa', borderRadius: 8 },
+  wholesaleTitle: { fontSize: 16, fontWeight: '700', marginBottom: 6, color: '#222' },
+  wholesaleRow: { alignItems: 'center', justifyContent: 'space-between', paddingVertical: 6, borderTopWidth: 1, borderTopColor: '#e4e7eb' },
+  wholesaleQuantity: { flex: 1, color: '#555' },
+  wholesalePrice: { fontWeight: '700', color: '#222' },
+  wholesaleDiscount: { color: '#15803d', marginHorizontal: 8 },
   descriptionContainer: {
     marginTop: 10,
   },

@@ -18,10 +18,10 @@ const ConfirmCheckout = () => {
       return true; 
     };
 
-    BackHandler.addEventListener('hardwareBackPress', backAction);
+    const backHandlerSubscription = BackHandler.addEventListener('hardwareBackPress', backAction);
 
     return () => {
-      BackHandler.removeEventListener('hardwareBackPress', backAction);
+      backHandlerSubscription.remove();
     };
   }, [router]);
 

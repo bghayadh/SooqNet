@@ -1,5 +1,5 @@
 import React, { useState} from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
@@ -9,8 +9,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useKeyboardVisible } from '../../Components/KeyboardScreen';
 
 const CreateAccount = () => {
+  const insets = useSafeAreaInsets();
+  const keyboardVisible = useKeyboardVisible();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
@@ -29,23 +34,20 @@ const CreateAccount = () => {
 
    
   const handleRegister = async () => {
-    if (!firstName || !lastName || !password || !email || !username || !mobileNumber) {
+    if (!firstName || !lastName || !password || !emailAddress || !username || !mobileNumber) {
       alert(t('pleaseFillAllRequiredFieldStat'));
       return;
     }
     else{
       try {
 
-        const response = await axios.post(url+'/SaveSooqNetClientAccountDetails',{}, {
-          params: {
-            target:"NewClient",firstName:firstName, lastName:lastName,gender:selectedGenderOption,mobileNumber:mobileNumber,email:email,username:username,password:password
-          }
-        });
+        const response = await axios.post(url+'/SaveSooqNetClientAccountDetails', new URLSearchParams({
+          target:"NewClient",firstName,lastName,gender:selectedGenderOption,mobileNumber,email:emailAddress,username,password
+        }));
 
         if (response.data.Status === "Success") {
           await AsyncStorage.setItem('loginDetails', JSON.stringify({
-            loginIdentifier: email,
-            password:password,
+            loginIdentifier: emailAddress,
             clientName: firstName+' '+lastName,
             isLoggedIn:"true",
           }));
@@ -54,10 +56,12 @@ const CreateAccount = () => {
             pathname: '/screens/Login/MyAccount',
             params: {
               loggedClientFullName:firstName+' '+lastName,
-              loginIdentifier:email,
+              loginIdentifier:emailAddress,
             },
           });
-        } 
+        } else {
+          Alert.alert("Registration Failed", response.data.Message || response.data.message || t('somethingWentWrong'));
+        }
       } catch (error) {
         console.error("Error checking user status:", error);
         Alert.alert(t('unableToCheckEmailValidation'));
@@ -72,15 +76,12 @@ const CreateAccount = () => {
     else {
       try {
 
-        const response = await axios.get(url+'/cltLoginAuthentication', {
-          params: { loginIdentifier: emailAddress, password: password, }
-        });
+        const response = await axios.post(url+'/cltLoginAuthentication', new URLSearchParams({ loginIdentifier: emailAddress, password }));
 
         if (response.data.Message === "Success") {
        
           await AsyncStorage.setItem('loginDetails', JSON.stringify({
             loginIdentifier: emailAddress,
-            password:password,
             clientName: response.data.clientName,
             isLoggedIn:"true",
           }));
@@ -136,7 +137,11 @@ const CreateAccount = () => {
 
   if (EmailAvailability === "false") {
     return (
-      <View style={styles.container}>
+      <KeyboardAwareScrollView
+        style={styles.container}
+        keyboardShouldPersistTaps="handled"
+        bottomOffset={60}
+      >
         <Text style={styles.header}>{t('signIn')}</Text>
   
         <Text style={styles.message}>
@@ -154,17 +159,18 @@ const CreateAccount = () => {
         <TouchableOpacity style={styles.loginButton} onPress={handleLoginAction}>
           <Text style={styles.loginButtonText}>{t('loginn')}</Text>
         </TouchableOpacity>
-      </View>    
+      </KeyboardAwareScrollView>
 
     );
   
   }
 
   return (
-    <><ScrollView
+    <><KeyboardAwareScrollView
       style={styles.container}
-      contentContainerStyle={styles.scrollViewContent}
+      contentContainerStyle={[styles.scrollViewContent, { paddingBottom: keyboardVisible ? 24 : 72 + insets.bottom }]}
       keyboardShouldPersistTaps="handled"
+      bottomOffset={60}
     >
       <Text style={styles.header}>{t('createYourAccount')}</Text>
 
@@ -241,9 +247,12 @@ const CreateAccount = () => {
           <Ionicons name="mail-outline" size={20} color="#555" style={styles.inputIcon} />
           <TextInput
             style={styles.inputWithIcon}
-            value={email}
+            value={emailAddress}
             onChangeText={setEmailAddress}
             placeholder={t('email')} 
+            editable={EmailAvailability !== "false"}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
         </View>
         </View>
@@ -289,7 +298,7 @@ const CreateAccount = () => {
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>{t('register')}</Text>
       </TouchableOpacity>
-    </ScrollView><Navbar activetab="" /></>
+    </KeyboardAwareScrollView>{!keyboardVisible && <Navbar activetab="" />}</>
 
   );
 };

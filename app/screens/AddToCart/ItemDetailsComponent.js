@@ -4,7 +4,7 @@ import ItemDetails from './ItemDetails/ItemDetails';
 import ItemColors from './ItemDetails/ItemColors';
 import ItemSizes from './ItemDetails/ItemSizes';
 
-const ItemDetailsComponent = ({ itemData, itemColors, itemSizes, selectedColorID, setSelectedColorID ,colorImagePath,selectedColorName,setSelectedColorName,setSelectedItemSize,isRTL,selectedColorArabicName,setSelectedColorArabicName}) => {
+const ItemDetailsComponent = ({ itemData, itemColors, itemSizes, selectedColorID, setSelectedColorID ,colorImagePath,selectedColorName,setSelectedColorName,setSelectedItemSize,isRTL,selectedColorArabicName,setSelectedColorArabicName, wholesaleTiers}) => {
   const [noSizeNoColor, setNoSizeNoColor] = useState([]);
   const [noSize, setNoSize] = useState([]);
   const [noQuantityCheck, setNoQuantityCheck] = useState([]);
@@ -19,7 +19,7 @@ const ItemDetailsComponent = ({ itemData, itemColors, itemSizes, selectedColorID
 
   return (
     <View style={styles.container}>
-      <ItemDetails itemData={itemData} isRTL={isRTL} />
+      <ItemDetails itemData={itemData} isRTL={isRTL} wholesaleTiers={wholesaleTiers} />
       {noSizeNoColor != 1 && (
         <ItemColors 
           itemColors={itemColors} 

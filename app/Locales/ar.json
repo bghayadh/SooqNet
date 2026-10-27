@@ -2,6 +2,7 @@
 "homeTitle": "الصفحة الرئيسية",
 "searchPlaceholder": "بحث",
 "loadingText": "جاري التحميل...",
+"productVideo": "فيديو المنتج",
 "all": "الكل",
 
 "language":"اللغة",
@@ -48,6 +49,7 @@
   "itemOutOfStockcheckout":"غير متوفر بالكمية المطلوبة.",
 
   "checkout": "الدفع",
+  "qtyCheckError": "تعذر التحقق من توفر الكمية. يرجى المحاولة مرة أخرى.",
 
   "signInStat": "تسجيل الدخول إلى حسابك",
   "email": "البريد الإلكتروني",
@@ -81,6 +83,10 @@
 "creditCard": "بطاقة ائتمان",
 "orderItem": "محتويات الطلب",
 "quantity": "الكمية:",
+"itemTotal": "إجمالي الصنف",
+"basketTotal": "إجمالي السلة",
+"increaseQuantity": "زيادة الكمية",
+"decreaseQuantity": "تقليل الكمية",
 "orderSummary": "ملخص الطلب",
 "total": "المجموع:",
 "totalDiscount": "إجمالي الخصم:",
@@ -97,8 +103,8 @@
 "Login": "تسجيل الدخول",
 "emailUserName": "البريد الإلكتروني / اسم المستخدم",
 "sighnUpHere": "سجل هنا",
-"arabic": "العربية",
-"english": "الإنجليزية",
+"arabic": "عربي",
+"english": "إنجليزي",
 "Email/userandPasswordStat": "يرجى إدخال البريد الإلكتروني/اسم المستخدم وكلمة المرور.",
 
 "createAccount": "إنشاء حساب",

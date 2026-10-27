@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';  
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18next from 'i18next';
@@ -8,6 +9,7 @@ import { useTranslation } from 'react-i18next';  // Importing useTranslation hoo
 
 const Navbar = ({ activetab }) => { 
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loggedClientFullName, setLoggedClientFullName] = useState("");
   const [loginIdentifier, setLoginIdentifier] = useState("");
@@ -36,7 +38,7 @@ const Navbar = ({ activetab }) => {
   }, []);
 
   return (
-<View style={[styles.navbar, { flexDirection: isRTL ? 'row-reverse' : 'row' }]}>      
+<View style={[styles.navbar, { flexDirection: isRTL ? 'row-reverse' : 'row', bottom: insets.bottom }]}>
   {/* Home Button */}
       <TouchableOpacity 
         style={[styles.navItemContainer]} 
@@ -124,6 +126,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 2,
     borderColor: '#ddd',
     elevation: 10,  
+    zIndex: 10,
   },
   navItemContainer: {
     alignItems: 'center',

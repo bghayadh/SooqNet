@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, ScrollView,Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import axios from "axios";
@@ -7,8 +7,13 @@ import { ipAddress, port, webAppPath, url } from "@env";
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useKeyboardVisible } from '../../Components/KeyboardScreen';
 
 const CreateAccount = () => {
+  const insets = useSafeAreaInsets();
+  const keyboardVisible = useKeyboardVisible();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const { t, i18n } = useTranslation(); 
@@ -57,7 +62,12 @@ const handleContinueAction = async () => {
   };
 
   return (
-    <><ScrollView style={styles.container}>    
+    <><KeyboardAwareScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: keyboardVisible ? 24 : 72 + insets.bottom }}
+      keyboardShouldPersistTaps="handled"
+      bottomOffset={60}
+    >
       <Text style={styles.title}>{t('createAccount')}</Text>      
       <View style={styles.privacyContainer}>
         <Ionicons name="lock-closed-outline" size={18} color="green" />
@@ -94,7 +104,7 @@ const handleContinueAction = async () => {
           <Text style={styles.socialButtonText}>{t('continueWithFacebook')}</Text>
         </View>
       </TouchableOpacity>  
-      </ScrollView><Navbar activetab="" /></>
+      </KeyboardAwareScrollView>{!keyboardVisible && <Navbar activetab="" />}</>
 
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState,useEffect  } from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView,BackHandler,Alert,ActivityIndicator } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, BackHandler,Alert,ActivityIndicator } from "react-native";
 import MapView, { Marker } from "react-native-maps"; 
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
@@ -10,8 +10,13 @@ import {ipAddress,port,webAppPath,url} from "@env";
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useKeyboardVisible } from '../../Components/KeyboardScreen';
 
 const EditAddress = () => {
+  const insets = useSafeAreaInsets();
+  const keyboardVisible = useKeyboardVisible();
   const {loginIdentifier,loggedClientFullName} = useLocalSearchParams();
   const [address, setAddress] = useState("");
   const [country, setCountry] = useState("");
@@ -46,8 +51,8 @@ const EditAddress = () => {
           await getCurrentLocation(details);
           
           setAddress(details[8] || "");
-          setCountry(details[13] || "");
-          setCity(details[14] || "");
+          setCountry(details[12] || "");
+          setCity(details[13] || "");
 
         } 
         else {
@@ -212,7 +217,12 @@ const EditAddress = () => {
 
   return (
     <>
-    <ScrollView style={styles.container}   contentContainerStyle={{ flexGrow: 1, paddingBottom: 80 }} keyboardShouldPersistTaps="handled">
+    <KeyboardAwareScrollView
+      style={styles.container}
+      contentContainerStyle={{ flexGrow: 1, paddingBottom: keyboardVisible ? 24 : 80 + insets.bottom }}
+      keyboardShouldPersistTaps="handled"
+      bottomOffset={60}
+    >
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#0d6efd" />
@@ -284,7 +294,7 @@ const EditAddress = () => {
           </TouchableOpacity>
         </>
       )}
-      </ScrollView><Navbar activetab="" /></>
+      </KeyboardAwareScrollView>{!keyboardVisible && <Navbar activetab="" />}</>
   );
 };
 

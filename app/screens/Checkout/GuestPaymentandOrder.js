@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import {ipAddress,port,webAppPath,url} from "@env";
 import axios from 'axios';
@@ -9,6 +10,7 @@ import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 const GuestPaymentandOrder = () => {
+  const insets = useSafeAreaInsets();
   const [basketData, setBasketData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState(null); 
@@ -40,6 +42,13 @@ const GuestPaymentandOrder = () => {
   }, []);
 
   // Calculate total before discount, total discount, and final amount after discount + shipping fee
+  const getWholesaleDiscount = (item) => {
+    const tier = (item.wholesaleTiers || []).find(({ minQuantity, maxQuantity }) =>
+      item.quentity >= minQuantity && (maxQuantity == null || item.quentity <= maxQuantity)
+    );
+    return Number(tier?.discountPercent || 0);
+  };
+
   const calculateTotals = () => {
     let totalBeforeDiscount = 0;
     let totalDiscount = 0;
@@ -47,12 +56,12 @@ const GuestPaymentandOrder = () => {
     let totalQty=0;
 
     basketData.forEach(item => {
-      const discountPrice = item.discount
-        ? item.rate - (item.rate * item.discount) / 100
-        : item.rate;
+      const retailDiscount = Number(item.discount || 0);
+      const wholesaleDiscount = getWholesaleDiscount(item);
+      const discountPrice = item.rate * (1 - retailDiscount / 100) * (1 - wholesaleDiscount / 100);
 
       totalBeforeDiscount += item.rate * item.quentity;
-      totalDiscount += (item.rate * item.discount * item.quentity) / 100;
+      totalDiscount += (item.rate - discountPrice) * item.quentity;
       totalAfterDiscount += discountPrice * item.quentity;
       totalQty +=item.quentity;
 
@@ -83,9 +92,10 @@ const GuestPaymentandOrder = () => {
 
   const renderItem = ({ item }) => {
     const imagePath = item.imagePath + item.imageName;
-    const discountPrice = item.discount
-      ? item.rate - (item.rate * item.discount) / 100
-      : item.rate;
+    const retailDiscount = Number(item.discount || 0);
+    const wholesaleDiscount = getWholesaleDiscount(item);
+    const discountPrice = item.rate * (1 - retailDiscount / 100) * (1 - wholesaleDiscount / 100);
+    const effectiveDiscount = 100 * (1 - (1 - retailDiscount / 100) * (1 - wholesaleDiscount / 100));
 
     return (
       <View style={styles.itemRow}>
@@ -93,8 +103,8 @@ const GuestPaymentandOrder = () => {
         <View style={styles.itemInfo}>
           <View style={styles.priceRow}>
             <Text style={styles.itemPrice}>${discountPrice.toFixed(2)}</Text>
-            {item.discount && (
-              <Text style={styles.itemDiscount}> ({item.discount}% off)</Text>
+            {effectiveDiscount > 0 && (
+              <Text style={styles.itemDiscount}> ({effectiveDiscount.toFixed(1)}% off)</Text>
             )}
           </View>
           <Text style={styles.itemQuantity}>{t('quantity')} {item.quentity}</Text>
@@ -130,7 +140,14 @@ const GuestPaymentandOrder = () => {
       try {
         
         const response = await axios.post(url + '/placeOrder', {
-          "dictParameter": basketData, 
+          "dictParameter": basketData.map((item) => {
+            const retailDiscount = Number(item.discount || 0);
+            const wholesaleDiscount = getWholesaleDiscount(item);
+            return {
+              ...item,
+              discount: 100 * (1 - (1 - retailDiscount / 100) * (1 - wholesaleDiscount / 100)),
+            };
+          }),
           "paymentMethod": paymentMethod,
           "customerName": parsedFormData.firstName +' '+ parsedFormData.lastName,
           "address": parsedFormData.address,
@@ -169,7 +186,7 @@ const GuestPaymentandOrder = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 28 + insets.bottom }}>
       <View style={styles.paymentMethodContainer}>
         <Text style={styles.paymentMethodTitle}>{t('selectPaymentMethod')}</Text>
 
@@ -258,12 +275,13 @@ const GuestPaymentandOrder = () => {
       <TouchableOpacity style={styles.placeOrderButton} onPress={handlePlaceOrder}>
         <Text style={styles.placeOrderText}>{t('placeOrder')}</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
     backgroundColor: '#fff',
   },

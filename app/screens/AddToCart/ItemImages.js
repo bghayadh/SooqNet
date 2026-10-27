@@ -22,10 +22,10 @@ const ItemImages = ({ imageData, onFullScreenToggle,itemImagePath, imageHeight }
 
   // Add back button event listener on mount and clean up on unmount
   useEffect(() => {
-    BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    const backHandlerSubscription = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
 
     return () => {
-      BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+      backHandlerSubscription.remove();
     };
   }, [isFullScreen]);
 

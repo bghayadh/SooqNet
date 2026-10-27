@@ -2,6 +2,7 @@
 "homeTitle": "Home",
 "searchPlaceholder": "Search",
 "loadingText": "Loading...",
+"productVideo": "Product video",
 
 "all": "All",
 
@@ -51,6 +52,7 @@
   "itemOutOfStockcheckout":"is not available in the selected quantity.",
 
   "checkout":"Checkout",
+  "qtyCheckError":"Unable to verify item availability. Please try again.",
 
   "signInStat":"Sign In To Your Account",
   "email":"Email",
@@ -84,6 +86,10 @@
   "creditCard":"Credit Card",
   "orderItem":"Order Item",
   "quantity":"Quantity:",
+  "itemTotal":"Item total",
+  "basketTotal":"Basket total",
+  "increaseQuantity":"Increase quantity",
+  "decreaseQuantity":"Decrease quantity",
   "orderSummary":"Order Summary",
   "total":"Total:",
   "totalDiscount":"Total Discount:",

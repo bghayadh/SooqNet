@@ -7,8 +7,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const MyAccount = () => {
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const {loggedClientFullName,loginIdentifier } = useLocalSearchParams();
   const [loggedUser, setLoggedUser] = useState(loggedClientFullName || "");
@@ -21,7 +23,6 @@ const MyAccount = () => {
 
       await AsyncStorage.setItem('loginDetails', JSON.stringify({
         loginIdentifier: "",  
-        password: "",         
         clientName: "",       
         isLoggedIn: "false"    
       }));      
@@ -39,7 +40,7 @@ const MyAccount = () => {
 
    
     return (
-        <><ScrollView style={styles.loggedInContainer}>
+        <><ScrollView style={styles.loggedInContainer} contentContainerStyle={{ paddingBottom: 72 + insets.bottom }}>
         <View style={styles.greetingView}><Text style={styles.greeting}>{t('welcome')} {loggedUser.split(" ")[0]},</Text>
         </View>
         <View style={styles.avatarContainer}>

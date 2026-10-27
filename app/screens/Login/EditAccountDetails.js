@@ -1,5 +1,5 @@
 import React, { useState,useEffect} from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView,Alert,BackHandler } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert,BackHandler } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
@@ -8,8 +8,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useKeyboardVisible } from '../../Components/KeyboardScreen';
 
 const EditAccountDetails = () => {
+  const insets = useSafeAreaInsets();
+  const keyboardVisible = useKeyboardVisible();
   const {loginIdentifier} = useLocalSearchParams();
 
   const [firstName, setFirstName] = useState("");
@@ -44,7 +49,6 @@ const EditAccountDetails = () => {
         }
       } catch (error) {
         console.error("There was an error!", error.message);
-        setData([]);
       } finally {
       }
     };
@@ -74,7 +78,6 @@ const EditAccountDetails = () => {
 
             await AsyncStorage.setItem('loginDetails', JSON.stringify({//Update the asyncStorage with the updatedName
               loginIdentifier: userData.loginIdentifier,
-              password:userData.password,
               clientName:firstName+' '+lastName,
               isLoggedIn:"true",
             }));
@@ -99,10 +102,11 @@ const EditAccountDetails = () => {
   };
 
   return (
-    <><ScrollView
+    <><KeyboardAwareScrollView
       style={styles.container}
-      contentContainerStyle={styles.scrollViewContent}
+      contentContainerStyle={[styles.scrollViewContent, { paddingBottom: keyboardVisible ? 24 : 72 + insets.bottom }]}
       keyboardShouldPersistTaps="handled"
+      bottomOffset={60}
     >
       <Text style={styles.header}>{t('myDetails')}</Text>
 
@@ -207,7 +211,7 @@ const EditAccountDetails = () => {
       </TouchableOpacity>
       </View>
 
-      </ScrollView><Navbar activetab="" /></>
+      </KeyboardAwareScrollView>{!keyboardVisible && <Navbar activetab="" />}</>
     
   );
 };
