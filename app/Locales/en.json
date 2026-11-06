@@ -167,6 +167,7 @@
   "oldPassword":"Old Password",
   "newPassword":"New Password",
   "confirmPassword":"Confirm Password",
+  "passwordRule":"Password must be at least 8 characters and at most 72 bytes.",
   "newPasswordsDoNotMatchStat":"New passwords do not match",
   "passwordChangedSuccessfullyStat":"Password changed successfully!",
   "wantToGoBackAndDiscardStat":"Are you sure you want to go back and discard ?",

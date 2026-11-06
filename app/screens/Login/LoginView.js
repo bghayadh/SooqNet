@@ -10,8 +10,8 @@ import {
   Modal,
   ScrollView,
 } from "react-native";
-import axios from "axios";
 import { ipAddress, port, webAppPath, url } from "@env";
+import apiClient from "../../Services/apiClient";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Navbar from "../../Navigations/Navbar";
@@ -81,8 +81,8 @@ const LoginScreen = () => {
       return;
     }
     try {
-      const response = await axios.post(
-        url + "/cltLoginAuthentication",
+      const response = await apiClient.post(
+        "/cltLoginAuthentication",
         new URLSearchParams({ loginIdentifier, password }),
       );
 

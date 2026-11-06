@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import apiClient from '../../Services/apiClient';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +21,12 @@ const MyAccount = () => {
 
   const handleSignOut = async () => {
     try {
+      // End the server session (and its cookie) before clearing the saved login data.
+      try {
+        await apiClient.post('/SooqNetClientLogout');
+      } catch (logoutError) {
+        // The local sign-out must still succeed when the server is unreachable.
+      }
 
       await AsyncStorage.setItem('loginDetails', JSON.stringify({
         loginIdentifier: "",  

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import axios from "axios";
-import { ipAddress, port, webAppPath, url } from "@env";
+import apiClient from '../../Services/apiClient';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -33,7 +32,7 @@ const handleContinueAction = async () => {
     } 
     else {
       try {
-        const response = await axios.get(url+'/CheckEmailAvailability', {
+        const response = await apiClient.get('/CheckEmailAvailability', {
           params: { email }
         });
         if (response.data.isAvailable === "false") { // An account is already created using this email

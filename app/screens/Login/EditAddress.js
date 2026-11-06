@@ -5,8 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from 'expo-router';
-import axios from 'axios';
-import {ipAddress,port,webAppPath,url} from "@env";
+import apiClient from '../../Services/apiClient';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -42,9 +41,7 @@ const EditAddress = () => {
   useEffect(() => {
     const fetchAddressData = async () => {
       try {
-        const response = await axios.get(url + '/GetSooqNetClientDetails', {
-          params: { loginIdentifier: loginIdentifier }
-        });
+        const response = await apiClient.get('/GetSooqNetClientDetails');
   
         if (response?.data?.clientDetailsList && response.data.clientDetailsList.length > 0) {
           const details = response.data.clientDetailsList[0];
@@ -191,11 +188,10 @@ const EditAddress = () => {
       alert(t('fillTheCity'));
       return;
     }
-    const response = await axios.post(url+'/SaveSooqNetClientAccountDetails',{}, {
-      params: {
-        target:"UpdateAddress",loginIdentifier:loginIdentifier,address:address,longitude:longitude,latitude:latitude,country:country,city:city
-      }
-    });
+    const response = await apiClient.post('/SaveSooqNetClientAccountDetails', new URLSearchParams({
+      target: "UpdateAddress", address: address, longitude: longitude, latitude: latitude,
+      country: country, city: city,
+    }));
     if (response.data.Status === "Success") {      
         setLatitude(latitude);
         setLongitude(longitude);

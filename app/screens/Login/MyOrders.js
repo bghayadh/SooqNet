@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator,TouchableOpacity } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import axios from 'axios';
-import { ipAddress, port, webAppPath, url } from "@env";
+import apiClient from '../../Services/apiClient';
 import { useRouter } from "expo-router";
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
@@ -11,7 +9,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const MyOrders = () => {
   const insets = useSafeAreaInsets();
-  const { loginIdentifier } = useLocalSearchParams();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -23,9 +20,7 @@ const MyOrders = () => {
   useEffect(() => {
     const GetClientDetails = async () => {
       try {
-        const response = await axios.get(url+'/GetSooqNetClientOrdersList', {
-          params: { loginIdentifier: loginIdentifier }
-        });
+        const response = await apiClient.get('/GetSooqNetClientOrdersList');
 
         if (response?.data?.clientOrdersList && response.data.clientOrdersList.length > 0) {
           const formattedOrders = response.data.clientOrdersList.map(order => ({
@@ -47,7 +42,7 @@ const MyOrders = () => {
     };
 
     GetClientDetails();
-  }, [loginIdentifier]);
+  }, []);
 
   const handleOrderPress = (orderId) => {
     router.push({

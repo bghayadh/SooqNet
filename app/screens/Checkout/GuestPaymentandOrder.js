@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
-import {ipAddress,port,webAppPath,url} from "@env";
-import axios from 'axios';
+import apiClient from '../../Services/apiClient';
 import { useLocalSearchParams } from 'expo-router'; 
 import { useRouter } from 'expo-router';
 import i18next from 'i18next';
@@ -139,7 +138,7 @@ const GuestPaymentandOrder = () => {
     } else {
       try {
         
-        const response = await axios.post(url + '/placeOrder', {
+        const response = await apiClient.post('/placeOrder', {
           "dictParameter": basketData.map((item) => {
             const retailDiscount = Number(item.discount || 0);
             const wholesaleDiscount = getWholesaleDiscount(item);

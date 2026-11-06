@@ -6,12 +6,11 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
-import { ipAddress, port, webAppPath,url } from '@env';
+import apiClient from '../../Services/apiClient';
 import { useFocusEffect, useRouter } from 'expo-router';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 
 
 const GuestPersonalInfo = () => {
@@ -78,10 +77,7 @@ const GuestPersonalInfo = () => {
           setIsLoggedIn(true);
           // Make axios request to fetch data
           try {
-            const response = await axios.get(url + '/GetSooqNetClientDetails', {
-           
-              params: { loginIdentifier: userData.loginIdentifier }, 
-            });
+            const response = await apiClient.get('/GetSooqNetClientDetails');
             if (response?.data?.clientDetailsList && response.data.clientDetailsList.length > 0) {
               const details = response.data.clientDetailsList[0]; 
               setFirstName(details[1] || "");  

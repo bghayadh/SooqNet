@@ -2,8 +2,7 @@ import React, { useState} from "react";
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
-import axios from 'axios';
-import {ipAddress,port,webAppPath,url} from "@env";
+import apiClient from '../../Services/apiClient';
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
@@ -41,11 +40,14 @@ const CreateAccount = () => {
     else{
       try {
 
-        const response = await axios.post(url+'/SaveSooqNetClientAccountDetails', new URLSearchParams({
+        const response = await apiClient.post('/SaveSooqNetClientAccountDetails', new URLSearchParams({
           target:"NewClient",firstName,lastName,gender:selectedGenderOption,mobileNumber,email:emailAddress,username,password
         }));
 
         if (response.data.Status === "Success") {
+          // The account exists now; log in once to create the server session.
+          await apiClient.post('/cltLoginAuthentication', new URLSearchParams({ loginIdentifier: emailAddress, password }));
+
           await AsyncStorage.setItem('loginDetails', JSON.stringify({
             loginIdentifier: emailAddress,
             clientName: firstName+' '+lastName,
@@ -76,7 +78,7 @@ const CreateAccount = () => {
     else {
       try {
 
-        const response = await axios.post(url+'/cltLoginAuthentication', new URLSearchParams({ loginIdentifier: emailAddress, password }));
+        const response = await apiClient.post('/cltLoginAuthentication', new URLSearchParams({ loginIdentifier: emailAddress, password }));
 
         if (response.data.Message === "Success") {
        
@@ -111,7 +113,7 @@ const CreateAccount = () => {
     }
   
     try {
-      const response = await axios.get(url+'/CheckUsernameAvailability', {
+      const response = await apiClient.get('/CheckUsernameAvailability', {
         params: { username: username.trim() }
       });
   
@@ -290,6 +292,7 @@ const CreateAccount = () => {
             placeholder={t('password')}  secureTextEntry
           />
         </View>
+        <Text style={styles.hint}>{t('passwordRule')}</Text>
         </View>
 
       </View>
@@ -474,6 +477,11 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginBottom: 8,
     color: "#333",
+  },
+  hint: {
+    marginTop: 6,
+    color: "#6b7280",
+    fontSize: 12,
   },
   inputContainer: {
     flexDirection: "row",

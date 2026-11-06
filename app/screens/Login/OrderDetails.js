@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, VirtualizedList, ActivityIndicator } from 'react-native';
-import axios from 'axios';
 import { useLocalSearchParams } from 'expo-router';
 import {ipAddress,port,webAppPath,url} from "@env";
+import apiClient from '../../Services/apiClient';
 import { MaterialIcons } from '@expo/vector-icons'; 
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
@@ -23,7 +23,7 @@ const OrderDetails = () => {
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
-         const response = await axios.get(url+'/GetSooqNetClientOrderDetails', {
+         const response = await apiClient.get('/GetSooqNetClientOrderDetails', {
           params: { orderID: orderID },
         });
         const { OrderItemsDetails, colorsImagesPath, relativePath, OrderAllDetails } = response.data;

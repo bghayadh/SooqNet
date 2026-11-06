@@ -2,8 +2,7 @@ import React, { useState,useEffect} from "react";
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert,BackHandler } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
-import axios from 'axios';
-import {ipAddress,port,webAppPath,url} from "@env";
+import apiClient from '../../Services/apiClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
@@ -33,9 +32,7 @@ const EditAccountDetails = () => {
   useEffect(() => {
     const GetClientDetails = async () => {
       try {
-        const response = await axios.get(url+'/GetSooqNetClientDetails', {
-          params: { loginIdentifier: loginIdentifier}
-        });
+        const response = await apiClient.get('/GetSooqNetClientDetails');
 
         if (response?.data?.clientDetailsList && response.data.clientDetailsList.length > 0) {
           const details = response.data.clientDetailsList[0]; 
@@ -65,11 +62,10 @@ const EditAccountDetails = () => {
     else{
       try {
 
-        const response = await axios.post(url+'/SaveSooqNetClientAccountDetails',{}, {
-          params: {
-            target:"UpdateClient",firstName:firstName, lastName:lastName,gender:selectedGenderOption,mobileNumber:mobileNumber,email:email,username:username
-          }
-        });
+        const response = await apiClient.post('/SaveSooqNetClientAccountDetails', new URLSearchParams({
+          target: "UpdateClient", firstName: firstName, lastName: lastName, gender: selectedGenderOption,
+          mobileNumber: mobileNumber, email: email,
+        }));
 
         if (response.data.Status === "Success") {
           const storedLoginDetails = await AsyncStorage.getItem('loginDetails');          

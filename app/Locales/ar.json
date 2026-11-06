@@ -163,6 +163,7 @@
 "oldPassword": "كلمة المرور القديمة",
 "newPassword": "كلمة المرور الجديدة",
 "confirmPassword": "تأكيد كلمة المرور",
+"passwordRule": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل و72 بايت كحد أقصى.",
 "newPasswordsDoNotMatchStat": "كلمات المرور الجديدة لا تتطابق",
 "passwordChangedSuccessfullyStat": "تم تغيير كلمة المرور بنجاح!",
 "wantToGoBackAndDiscardStat": "هل أنت متأكد أنك تريد العودة والتخلي عن التغييرات؟",

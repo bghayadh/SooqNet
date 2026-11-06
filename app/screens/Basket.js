@@ -18,8 +18,7 @@ import Navbar from "../Navigations/Navbar";
 import { useRouter } from "expo-router";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
-import axios from "axios";
-import { ipAddress, port, webAppPath, url } from "@env";
+import apiClient from "../Services/apiClient";
 import KeyboardScreen, {
   useKeyboardVisible,
 } from "../Components/KeyboardScreen";
@@ -166,8 +165,8 @@ const Basket = () => {
     try {
       const storedLoginDetails = await AsyncStorage.getItem("loginDetails");
 
-      const response = await axios.post(
-        url + "/GetAllItemAvailableQtySooqNet",
+      const response = await apiClient.post(
+        "/GetAllItemAvailableQtySooqNet",
         {
           dictParameter: basketData.map(
             ({
@@ -230,6 +229,9 @@ const Basket = () => {
           if (userData.isLoggedIn === "true") {
             // console.log("login identifier "+userData.loginIdentifier)
             router.push("/screens/Checkout/GuestPersonalInfo");
+          } else {
+            // A stored login that is no longer valid must not silently stop checkout.
+            router.push("/screens/Checkout/CheckoutLogin");
           }
         } else {
           console.log("Not logged in or nothing stored in local storage");

@@ -4,9 +4,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import { useFocusEffect, useRouter } from 'expo-router';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import apiClient from '../../Services/apiClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ipAddress, port, webAppPath, url } from '@env';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 
@@ -47,7 +46,7 @@ const CheckoutLogin = () => {
       return;
     }
     try {
-      const response = await axios.post(url+'/cltLoginAuthentication', new URLSearchParams({ loginIdentifier: email, password }));
+      const response = await apiClient.post('/cltLoginAuthentication', new URLSearchParams({ loginIdentifier: email, password }));
 
       if (response.data.Message === "Success") {
        

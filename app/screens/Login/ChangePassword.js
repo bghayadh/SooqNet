@@ -2,8 +2,7 @@ import React, { useState,useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet,BackHandler,Alert } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
-import axios from 'axios';
-import {ipAddress,port,webAppPath,url} from "@env";
+import apiClient from '../../Services/apiClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 import Navbar from '../../Navigations/Navbar';
@@ -39,12 +38,17 @@ const ChangePassword = () => {
       return;
     }
     try {
-      const response = await axios.post(url+'/SooqNetChangeAccountPassword', new URLSearchParams({
-        loginIdentifier, oldPassword, newPassword,
+      const response = await apiClient.post('/SooqNetChangeAccountPassword', new URLSearchParams({
+        oldPassword, newPassword,
       }));
    
       if (response.data.Status === "Success") {      
         Alert.alert("Account Update", t('passwordChangedSuccessfullyStat'));
+        try {
+          await apiClient.post('/SooqNetClientLogout');
+        } catch (logoutError) {
+          // Still send the user to the login screen when the server is unreachable.
+        }
         await AsyncStorage.setItem('loginDetails', JSON.stringify({
           loginIdentifier: "",  
           clientName: "",       
@@ -111,6 +115,7 @@ const ChangePassword = () => {
           <Ionicons name={showNewPassword ? 'eye-off' : 'eye'} size={24} color="#777" />
         </TouchableOpacity>
       </View>
+      <Text style={styles.hint}>{t('passwordRule')}</Text>
       <View style={[styles.inputContainer,{ flexDirection: isRTL ? 'row-reverse' : 'row' }]}>
         <TextInput style={styles.input} placeholder={t('confirmPassword')} secureTextEntry={!showConfirmPassword} value={confirmPassword} onChangeText={setConfirmPassword} />
         <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
@@ -156,6 +161,12 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     fontSize: 16,
+  },
+  hint: {
+    marginTop: -8,
+    marginBottom: 15,
+    color: '#6b7280',
+    fontSize: 13,
   },
   button: {
     backgroundColor: '#0d6efd',
