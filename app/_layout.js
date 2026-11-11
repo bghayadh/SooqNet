@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import i18next from "./Services/i18next";
+import { fetchAppApiKeys } from "./Services/appApiKeys";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
 export default function Layout() {
@@ -32,6 +33,12 @@ export default function Layout() {
       }
     };
     restoreAppPreferences();
+
+    // Refresh the API keys from the server in the background (never blocks
+    // the UI; the app keys service falls back to the last cached copy).
+    fetchAppApiKeys().catch((error) =>
+      console.warn("Unable to load app API keys:", error),
+    );
   }, []);
 
   if (!languageReady) return null;
