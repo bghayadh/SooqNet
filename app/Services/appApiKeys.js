@@ -1,5 +1,6 @@
 import apiClient from "./apiClient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { apiApplicationName } from "@env";
 
 /**
  * Loads the API keys this app is allowed to receive from the server, instead
@@ -20,8 +21,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const STORAGE_KEY = "appApiKeys";
 
-/** Application name registered in the API KEYS tab of the server (System Settings). */
-const APPLICATION_NAME = "SooqNet";
+/** Application name registered in the API KEYS tab of the server (System Settings).
+ *  Configured in .env as apiApplicationName, with SooqNet as fallback. */
+const APPLICATION_NAME = (apiApplicationName || "SooqNet").trim();
 
 let cachedKeys = null;
 
