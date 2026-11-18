@@ -26,9 +26,14 @@ const OrderDetails = () => {
          const response = await apiClient.get('/GetSooqNetClientOrderDetails', {
           params: { orderID: orderID },
         });
-        const { OrderItemsDetails, colorsImagesPath, relativePath, OrderAllDetails } = response.data;
+        const {
+          OrderItemsDetails = [],
+          colorsImagesPath = '',
+          relativePath = '0',
+          OrderAllDetails = [],
+        } = response.data || {};
 
-        const fetchedItems =OrderItemsDetails.map((item) => ({
+        const fetchedItems = (Array.isArray(OrderItemsDetails) ? OrderItemsDetails : []).map((item) => ({
           id: item[0], 
           size: item[1], 
           color: item[2],
@@ -42,10 +47,16 @@ const OrderDetails = () => {
           imageName: item[9],
           arabicname: item[10],
         }));
-        setOrderDetails({ items: fetchedItems, colorsImagesPath, relativePath , OrderAllDetails });
+        setOrderDetails({
+          items: fetchedItems,
+          colorsImagesPath,
+          relativePath,
+          OrderAllDetails: Array.isArray(OrderAllDetails) ? OrderAllDetails : [],
+        });
 
       } catch (error) {
         console.error('Error fetching order details:', error);
+        setOrderDetails({ items: [], colorsImagesPath: '', relativePath: '0', OrderAllDetails: [] });
       } finally {
         setLoading(false);
       }
@@ -131,27 +142,29 @@ const OrderDetails = () => {
     return <ActivityIndicator size="large" color="#007bff" style={styles.loader} />;
   }
 
+  const orderHeader = orderDetails?.OrderAllDetails?.[0];
+
   return (
     <View style={styles.container}>
-      {orderDetails ? (
+      {orderHeader ? (
         <>
       <View style={styles.orderInfo}>
             <Text style={styles.sectionTitle}>{t("orderSummary")}</Text>
             <View style={[styles.infoRow , isRTL && { flexDirection: 'row-reverse' }]}>
               <Text style={styles.label}>{t("order")}:</Text>
-              <Text style={styles.value}>{orderDetails.OrderAllDetails[0][0]}</Text>
+              <Text style={styles.value}>{orderHeader[0]}</Text>
             </View>
             <View style={[styles.infoRow, isRTL && { flexDirection: 'row-reverse' }]}>
               <Text style={styles.label}>{t("orderDate")}:</Text>
-              <Text style={styles.value}>{orderDetails.OrderAllDetails[0][2]}</Text>
+              <Text style={styles.value}>{orderHeader[2]}</Text>
             </View>
             <View style={[styles.infoRow, isRTL && { flexDirection: 'row-reverse' }]}>
               <Text style={styles.label}>{t("deliveryStatus")}:</Text>
-              <Text style={styles.value}>{t(orderDetails.OrderAllDetails[0][1])} </Text>
+              <Text style={styles.value}>{t(orderHeader[1])} </Text>
             </View>
             <View style={[styles.infoRow, isRTL && { flexDirection: 'row-reverse' }]}>
               <Text style={styles.label}>{t("total")}</Text>
-              <Text style={styles.value}>$ {orderDetails?.OrderAllDetails?.[0]?.[3] || '0.00'} </Text>
+              <Text style={styles.value}>$ {orderHeader[3] || '0.00'} </Text>
             </View>
           </View>
 
