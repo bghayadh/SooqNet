@@ -93,6 +93,21 @@ const Item = React.memo(({ item, isRTL, itemImagesPath, textColor }) => {
             </Text>
           </View>
         )}
+        {/* Item level verdict from the server (StockStatusService), so the card
+            label always matches what add-to-cart will accept. */}
+        {item.outOfStock ? (
+          <View
+            style={[
+              styles.oosBadge,
+              isRTL ? styles.oosBadgeRtl : styles.oosBadgeLtr,
+            ]}
+          >
+            <View style={styles.oosBadgeDot} />
+            <Text style={styles.oosBadgeText}>
+              {i18next.t("outOfStock")}
+            </Text>
+          </View>
+        ) : null}
       </View>
 
       <TouchableOpacity
@@ -238,6 +253,39 @@ const styles = StyleSheet.create({
   swiperContainer: {
     height: 290,
     overflow: "hidden",
+  },
+  oosBadge: {
+    position: "absolute",
+    top: 10,
+    zIndex: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: "#CC071E",
+    borderRadius: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.28,
+    shadowRadius: 5,
+    elevation: 5,
+    pointerEvents: "none", // the label must never swallow a tap on the image
+  },
+  oosBadgeLtr: { left: 10 },
+  oosBadgeRtl: { right: 10 },
+  oosBadgeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#fff",
+    marginRight: 5,
+  },
+  oosBadgeText: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
   },
   slide: {
     width: screenWidth / 2 - 4,

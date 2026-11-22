@@ -45,6 +45,7 @@ const onAddCartPress = async (
   minOrderQty,
   setDialogVisible,
   setMsg,
+  service,
 ) => {
   // Validate itemSize to make sure it's not null or empty
   console.log("Welcome to onAddCartPress");
@@ -89,7 +90,9 @@ const onAddCartPress = async (
     // console.log("availableQty "+availableQty)
     // Check if item is available; this need to be updated
     //  if quantity field added  to addToCart view so compare availableQty with typed quantity by user
-    if (availableQty < quantity && noQuantityCheck != 1) {
+    // A service has no stock to run out of, so it is never quantity-checked.
+    const isService = String(service) === "1";
+    if (availableQty < quantity && noQuantityCheck != 1 && !isService) {
       alert(t("itemOutOfStock")); // Add this translation key to your i18n files
       return;
     }
@@ -203,6 +206,9 @@ const AddToCartView = () => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [msg, setMsg] = useState("");
+  // Item level "Out of Stock" verdict, computed on the server by
+  // StockStatusService so the badge always matches what add-to-cart will accept.
+  const [outOfStock, setOutOfStock] = useState(false);
 
   /*  
   const MemoizedItemImages = React.memo(ItemImages);
@@ -253,6 +259,7 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
         setItemColorsImage(itemColorImages || []);
         setWholesaleTiers(tiers || []);
         setItemVideos(videos || []);
+        setOutOfStock(response?.data?.outOfStock === true);
         console.log(
           "itemColorsList[0][2] is: ",
           itemColorsList[0]?.[2] ?? null,
@@ -292,6 +299,7 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
         setItemColors([]);
         setItemSizes([]);
         setItemColorsImage([]);
+        setOutOfStock(false);
       } finally {
         setLoading(false); // Stop loading
       }
@@ -334,6 +342,13 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
     Math.max(1, parseInt(minOrderQty, 10) || 1),
     parseInt(selectedQuantity, 10) || 1,
   );
+  // The carousel collapses to zero height while scrolling, so the badge fades out
+  // with it instead of floating over the item details.
+  const outOfStockBadgeOpacity = scrollY.interpolate({
+    inputRange: [0, screenHeight * 0.5],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
   const retailUnitPrice =
     Number(itemData[0]?.[2] || 0) * (1 - Number(itemData[0]?.[3] || 0) / 100);
   const selectedWholesaleTier = wholesaleTiers.find(
@@ -380,6 +395,18 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
           imageHeight={imageHeight}
           isRTL={isRTL}
         />
+        {outOfStock && !isFullScreen && (
+          <Animated.View
+            style={[
+              styles.oosBadge,
+              isRTL ? styles.oosBadgeRtl : styles.oosBadgeLtr,
+              { opacity: outOfStockBadgeOpacity },
+            ]}
+          >
+            <View style={styles.oosBadgeDot} />
+            <Text style={styles.oosBadgeText}>{t("outOfStock")}</Text>
+          </Animated.View>
+        )}
       </Animated.View>
 
       <KeyboardScreen style={{ pointerEvents: "box-none" }}>
@@ -536,6 +563,7 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
                     minOrderQty,
                     setDialogVisible,
                     setMsg,
+                    itemData[0]?.[13],
                   );
                 }}
               >
@@ -566,6 +594,39 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     width: "100%",
+  },
+  oosBadge: {
+    position: "absolute",
+    top: 10,
+    zIndex: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "#CC071E",
+    borderRadius: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.28,
+    shadowRadius: 6,
+    elevation: 6,
+    pointerEvents: "none", // the label must never swallow a tap on the image
+  },
+  oosBadgeLtr: { left: 10 },
+  oosBadgeRtl: { right: 10 },
+  oosBadgeDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#fff",
+    marginRight: 6,
+  },
+  oosBadgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.6,
+    textTransform: "uppercase",
   },
   detailsContainer: {
     paddingTop: 0,
