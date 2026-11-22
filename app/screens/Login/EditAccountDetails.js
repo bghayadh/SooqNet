@@ -73,6 +73,7 @@ const EditAccountDetails = () => {
             const userData = JSON.parse(storedLoginDetails);
 
             await AsyncStorage.setItem('loginDetails', JSON.stringify({//Update the asyncStorage with the updatedName
+              ...userData,
               loginIdentifier: userData.loginIdentifier,
               clientName:firstName+' '+lastName,
               isLoggedIn:"true",

@@ -42,6 +42,7 @@ const onAddCartPress = async (
   noQuantityCheck,
   wholesaleTiers,
   quantity,
+  minOrderQty,
   setDialogVisible,
   setMsg,
 ) => {
@@ -71,6 +72,14 @@ const onAddCartPress = async (
     colorID = "";
     colorName = "";
   }
+
+  // A line may not be below the item's minimum order quantity.
+  const itemMinOrderQty = Math.max(1, parseInt(minOrderQty, 10) || 1);
+  if (quantity < itemMinOrderQty) {
+    alert(t("minOrderQtyError", { qty: itemMinOrderQty }));
+    return;
+  }
+
   try {
     const response = await axios.get(url + "/GetItemAvailableQtySooqNet", {
       params: { itemCode: itemCode, color: colorName, size: itemSize },
@@ -114,6 +123,8 @@ const onAddCartPress = async (
     arabicColorName,
     arabicItemName,
     wholesaleTiers,
+    // Kept on the cart line so the basket can clamp edits to the same minimum.
+    minOrderQty: itemMinOrderQty,
   };
 
   try {
@@ -135,6 +146,7 @@ const onAddCartPress = async (
       // Item already exists in the cart, so increment its quantity
       cartArray[existingItemIndex].quentity += quantity;
       cartArray[existingItemIndex].wholesaleTiers = wholesaleTiers;
+      cartArray[existingItemIndex].minOrderQty = itemMinOrderQty;
     } else {
       // Item does not exist, so add it to the cart with quantity 1
       cartArray.push(cartItem);
@@ -186,6 +198,8 @@ const AddToCartView = () => {
   const [noSizeNoColor, setNoSizeNoColor] = useState([]);
   const [noSize, setNoSize] = useState([]);
   const [noQuantityCheck, setNoQuantityCheck] = useState([]);
+  // Minimum order quantity for this item (itemDescList[0][12]); 1 = no minimum.
+  const [minOrderQty, setMinOrderQty] = useState(1);
   const [isScrolling, setIsScrolling] = useState(false);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [msg, setMsg] = useState("");
@@ -249,6 +263,9 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
         setNoSizeNoColor(itemDescList[0]?.[8] ?? null);
         setNoSize(itemDescList[0]?.[9] ?? null);
         setNoQuantityCheck(itemDescList[0]?.[10] ?? null);
+        var itemMinOrderQty = Math.max(1, parseInt(itemDescList[0]?.[12], 10) || 1);
+        setMinOrderQty(itemMinOrderQty);
+        setSelectedQuantity(String(itemMinOrderQty));
 
         if (response?.data?.imageBasePathDetails) {
           const details = response.data.imageBasePathDetails;
@@ -313,7 +330,10 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
     extrapolate: "clamp",
   });
 
-  const quantityNumber = Math.max(1, parseInt(selectedQuantity, 10) || 1);
+  const quantityNumber = Math.max(
+    Math.max(1, parseInt(minOrderQty, 10) || 1),
+    parseInt(selectedQuantity, 10) || 1,
+  );
   const retailUnitPrice =
     Number(itemData[0]?.[2] || 0) * (1 - Number(itemData[0]?.[3] || 0) / 100);
   const selectedWholesaleTier = wholesaleTiers.find(
@@ -425,7 +445,9 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
                   accessibilityLabel={t("decreaseQuantity")}
                   style={styles.quantityButton}
                   onPress={() =>
-                    setSelectedQuantity(String(Math.max(1, quantityNumber - 1)))
+                    setSelectedQuantity(
+                      String(Math.max(quantityNumber - 1, minOrderQty)),
+                    )
                   }
                 >
                   <Text style={styles.quantityButtonText}>−</Text>
@@ -437,7 +459,11 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
                   onChangeText={(value) =>
                     setSelectedQuantity(value.replace(/[^0-9]/g, ""))
                   }
-                  onBlur={() => setSelectedQuantity(String(quantityNumber))}
+                  onBlur={() =>
+                    setSelectedQuantity(
+                      String(Math.max(minOrderQty, quantityNumber)),
+                    )
+                  }
                   keyboardType="number-pad"
                   selectTextOnFocus
                 />
@@ -460,6 +486,16 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
               >
                 {t("unitPrice")}: ${selectedUnitPrice.toFixed(2)}
               </Text>
+              {minOrderQty > 1 && (
+                <Text
+                  style={[
+                    styles.minOrderQtyNote,
+                    { textAlign: isRTL ? "right" : "left" },
+                  ]}
+                >
+                  {t("minOrderQtyNote", { qty: minOrderQty })}
+                </Text>
+              )}
             </View>
           )}
 
@@ -497,6 +533,7 @@ const MemoizedItemDetailsComponent = React.memo(ItemDetailsComponent); */
                     noQuantityCheck,
                     wholesaleTiers,
                     quantityNumber,
+                    minOrderQty,
                     setDialogVisible,
                     setMsg,
                   );
@@ -595,6 +632,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "700",
     color: "#00757c",
+  },
+  minOrderQtyNote: {
+    marginTop: 6,
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#9a5b00",
   },
 });
 

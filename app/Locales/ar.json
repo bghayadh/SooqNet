@@ -6,6 +6,7 @@
 "all": "الكل",
 
 "language":"اللغة",
+"languageSaveFailed": "تعذر حفظ اللغة. يرجى المحاولة مرة أخرى.",
 
 "home": "الصفحة الرئيسية",
 "basket": "السلة",
@@ -47,6 +48,10 @@
   "itemAddedToBasketNoColorNoSize":"تم إضافى السلعة إلى السلة.",
   "itemAddedToBasketNoSize":"تم إضافة السلعة ذات اللون المختار إلى السلة.",
   "itemOutOfStockcheckout":"غير متوفر بالكمية المطلوبة.",
+  "minOrderQtyNote":"الحد الأدنى للطلب هو {{qty}} وحدة.",
+  "minOrderQtyError":"الحد الأدنى للطلب هو {{qty}} وحدة.",
+  "minimumOrderQtyTitle":"الحد الأدنى للطلب",
+  "minimumOrderQtyServerMessage":"بعض الأصناف أقل من الحد الأدنى للطلب: {{details}}",
 
   "checkout": "الدفع",
   "qtyCheckError": "تعذر التحقق من توفر الكمية. يرجى المحاولة مرة أخرى.",

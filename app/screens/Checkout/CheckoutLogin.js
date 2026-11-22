@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import apiClient from '../../Services/apiClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { applyAppLanguage, rememberProfileLanguage } from '../../Services/appLanguage';
 
 
 const CheckoutLogin = () => {
@@ -49,12 +50,20 @@ const CheckoutLogin = () => {
       const response = await apiClient.post('/cltLoginAuthentication', new URLSearchParams({ loginIdentifier: email, password }));
 
       if (response.data.Message === "Success") {
-       
+        const preferredLanguage = await rememberProfileLanguage(
+          response.data.preferredLanguage,
+        );
+
         await AsyncStorage.setItem('loginDetails', JSON.stringify({
           loginIdentifier: email,
           clientName: response.data.clientName,
           isLoggedIn:"true",
+          preferredLanguage: preferredLanguage,
         }));
+
+        // Keep the customer inside checkout: the translations follow the
+        // profile immediately, the native direction on the next app start.
+        await applyAppLanguage(preferredLanguage, { reload: false });
 
         router.push('/screens/Checkout/GuestPersonalInfo');
       } 

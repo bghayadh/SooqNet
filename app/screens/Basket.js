@@ -38,6 +38,10 @@ const Basket = () => {
   const lang = i18next.language;
   const isRTL = lang === "ar";
 
+  // Minimum order quantity of a cart line; carts saved before MOQ existed default to 1.
+  const getMinOrderQty = (item) =>
+    Math.max(1, parseInt(item.minOrderQty, 10) || 1);
+
   const getWholesaleDiscount = (item) => {
     const tier = (item.wholesaleTiers || []).find(
       ({ minQuantity, maxQuantity }) =>
@@ -74,9 +78,10 @@ const Basket = () => {
       const itemIndex = cartArray.findIndex((item) => item.ID === ID);
 
       if (itemIndex !== -1) {
-        // Update the quantity
+        // Update the quantity, never below the item's minimum order quantity
+        const minOrderQty = getMinOrderQty(cartArray[itemIndex]);
         const newQuantity = cartArray[itemIndex].quentity + increment;
-        cartArray[itemIndex].quentity = newQuantity > 0 ? newQuantity : 1; // Avoid negative quantities
+        cartArray[itemIndex].quentity = Math.max(minOrderQty, newQuantity); // Avoid quantities below the minimum
       }
 
       // Save the updated cart data to AsyncStorage
@@ -92,7 +97,6 @@ const Basket = () => {
   const updateQuantityInput = async (ID, value) => {
     try {
       if (!/^\d+$/.test(value)) return;
-      const newQuantity = Math.max(1, parseInt(value, 10));
       const storedCartData = await AsyncStorage.getItem("cartData");
       let cartArray = storedCartData ? JSON.parse(storedCartData) : [];
 
@@ -100,8 +104,12 @@ const Basket = () => {
       const itemIndex = cartArray.findIndex((item) => item.ID === ID);
 
       if (itemIndex !== -1) {
-        // Update the quantity
-        cartArray[itemIndex].quentity = newQuantity;
+        // Update the quantity, never below the item's minimum order quantity
+        const minOrderQty = getMinOrderQty(cartArray[itemIndex]);
+        cartArray[itemIndex].quentity = Math.max(
+          minOrderQty,
+          parseInt(value, 10),
+        );
       }
 
       // Save the updated cart data to AsyncStorage
@@ -359,6 +367,17 @@ const Basket = () => {
             </TouchableOpacity>
           </View>
 
+          {getMinOrderQty(item) > 1 && (
+            <Text
+              style={[
+                styles.minOrderQtyNote,
+                { textAlign: isRTL ? "right" : "left" },
+              ]}
+            >
+              {t("minOrderQtyNote", { qty: getMinOrderQty(item) })}
+            </Text>
+          )}
+
           <TouchableOpacity
             style={styles.removeIcon}
             onPress={() => removeCartItem(item.ID)}
@@ -584,6 +603,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     width: 30,
     textAlign: "center",
+  },
+  minOrderQtyNote: {
+    marginTop: 4,
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#9a5b00",
   },
   header: {
     flexDirection: "row",

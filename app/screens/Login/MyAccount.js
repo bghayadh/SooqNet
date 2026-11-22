@@ -9,16 +9,56 @@ import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LanguagePickerModal from '../../Components/LanguagePickerModal';
+import { applyAppLanguage, languageName, normalizeLanguage } from '../../Services/appLanguage';
 
 const MyAccount = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const {loggedClientFullName,loginIdentifier } = useLocalSearchParams();
   const [loggedUser, setLoggedUser] = useState(loggedClientFullName || "");
+  const [languagePickerVisible, setLanguagePickerVisible] = useState(false);
   const { t, i18n } = useTranslation(); 
   const lang = i18next.language;
   const isRTL = lang === 'ar'; 
+  const currentLanguage = normalizeLanguage(lang);
 
+  const handleLanguageChange = async (selected) => {
+    setLanguagePickerVisible(false);
+    if (selected === currentLanguage) {
+      return;
+    }
+
+    // The customer profile is the source of truth, so it is saved first and
+    // the device only changes when the server accepted the new value.
+    try {
+      const response = await apiClient.post(
+        "/SaveSooqNetClientLanguage",
+        new URLSearchParams({ preferredLanguage: selected }),
+      );
+      if (response?.data?.Status !== "Success") {
+        throw new Error("Language was not saved");
+      }
+    } catch (error) {
+      Alert.alert(t("language"), t("languageSaveFailed"));
+      return;
+    }
+
+    try {
+      const storedLoginDetails = await AsyncStorage.getItem("loginDetails");
+      if (storedLoginDetails) {
+        const details = JSON.parse(storedLoginDetails);
+        await AsyncStorage.setItem(
+          "loginDetails",
+          JSON.stringify({ ...details, preferredLanguage: selected }),
+        );
+      }
+    } catch (error) {
+      console.log("Unable to remember the selected language:", error);
+    }
+
+    await applyAppLanguage(selected);
+  };
   const handleSignOut = async () => {
     try {
       // End the server session (and its cookie) before clearing the saved login data.
@@ -100,6 +140,12 @@ const MyAccount = () => {
               icon: "card-outline"
             },
             {
+              title: t('language'),
+              value: languageName(currentLanguage),
+              icon: "globe-outline",
+              onPress: () => setLanguagePickerVisible(true),
+            },
+            {
               title: t('changePassword'),
               icon: "lock-closed-outline",
               onPress: () => router.push({
@@ -123,12 +169,20 @@ const MyAccount = () => {
             >
               <Ionicons name={item.icon} size={24} color="#555" style={styles.optionIcon} />
               <Text style={styles.optionText}>{item.title}</Text>
+              {item.value ? <Text style={styles.optionValue}>{item.value}</Text> : null}
               <Ionicons  name={isRTL ? 'chevron-back-outline' : 'chevron-forward-outline'} size={24} color="#555" style={styles.optionArrow} />
             </TouchableOpacity>
           ))}
         </View>
 
-      </ScrollView><Navbar activetab="myaccount" /></>
+      </ScrollView>
+      <LanguagePickerModal
+        visible={languagePickerVisible}
+        selected={currentLanguage}
+        onClose={() => setLanguagePickerVisible(false)}
+        onSelect={handleLanguageChange}
+      />
+      <Navbar activetab="myaccount" /></>
       );
 };
 
@@ -214,7 +268,7 @@ const styles = StyleSheet.create({
       shadowOpacity: 0.2,
       shadowRadius: 4,
       elevation: 5,
-      height:420,
+      height:490,
     },
     option: {
       flexDirection: "row",
@@ -231,6 +285,11 @@ const styles = StyleSheet.create({
       flex: 1,
       fontSize: 18,
       color: "#333",
+    },
+    optionValue: {
+      marginHorizontal: 8,
+      fontSize: 15,
+      color: "#6b7280",
     },
     optionArrow: {
       marginLeft: 10,

@@ -149,6 +149,16 @@ const GuestPaymentandOrder = () => {
         });
 
         if (response.status === 200) {
+          // The server rejects a basket that is below an item's minimum order quantity.
+          if (response.data && response.data.success === false) {
+            Alert.alert(
+              t('minimumOrderQtyTitle'),
+              response.data.message
+                ? t('minimumOrderQtyServerMessage', { details: response.data.message })
+                : t('minOrderQtyError', { qty: 1 }),
+            );
+            return;
+          }
           router.push('/screens/Checkout/ConfirmCheckout');
         } else {
           Alert.alert('Error', t('placingorderErrorAlert'));

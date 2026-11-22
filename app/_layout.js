@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Stack } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import i18next from "./Services/i18next";
+// Imported for its side effect: it registers the translation resources
+// before any screen calls i18next.changeLanguage.
+import "./Services/i18next";
+import { applyAppLanguage } from "./Services/appLanguage";
 import { fetchAppApiKeys } from "./Services/appApiKeys";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
@@ -15,7 +18,7 @@ export default function Layout() {
           AsyncStorage.getItem("appLanguage"),
           AsyncStorage.getItem("loginDetails"),
         ]);
-        if (language) await i18next.changeLanguage(language);
+        let restoreLanguage = language;
         if (loginDetails) {
           const userData = JSON.parse(loginDetails);
           if (Object.prototype.hasOwnProperty.call(userData, "password")) {
@@ -25,6 +28,17 @@ export default function Layout() {
               JSON.stringify(userData),
             );
           }
+          // A logged-in customer's profile language wins over the device value.
+          if (userData.isLoggedIn === "true" && userData.preferredLanguage) {
+            restoreLanguage = userData.preferredLanguage;
+          }
+        }
+        if (restoreLanguage) {
+          // Only the translations are restored here: the native direction was
+          // already applied by forceRTL when the language was last chosen, so a
+          // reload at start-up would only risk a reload loop on devices where
+          // that native setting did not stick.
+          await applyAppLanguage(restoreLanguage, { reload: false });
         }
       } catch (error) {
         console.warn("Unable to restore app preferences:", error);

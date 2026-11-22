@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useKeyboardVisible } from '../../Components/KeyboardScreen';
+import { normalizeLanguage, rememberProfileLanguage } from '../../Services/appLanguage';
 
 const CreateAccount = () => {
   const insets = useSafeAreaInsets();
@@ -41,7 +42,8 @@ const CreateAccount = () => {
       try {
 
         const response = await apiClient.post('/SaveSooqNetClientAccountDetails', new URLSearchParams({
-          target:"NewClient",firstName,lastName,gender:selectedGenderOption,mobileNumber,email:emailAddress,username,password
+          target:"NewClient",firstName,lastName,gender:selectedGenderOption,mobileNumber,email:emailAddress,username,password,
+          preferredLanguage: normalizeLanguage(i18next.language),
         }));
 
         if (response.data.Status === "Success") {
@@ -52,6 +54,7 @@ const CreateAccount = () => {
             loginIdentifier: emailAddress,
             clientName: firstName+' '+lastName,
             isLoggedIn:"true",
+            preferredLanguage: normalizeLanguage(i18next.language),
           }));
   
           router.push({
@@ -81,11 +84,14 @@ const CreateAccount = () => {
         const response = await apiClient.post('/cltLoginAuthentication', new URLSearchParams({ loginIdentifier: emailAddress, password }));
 
         if (response.data.Message === "Success") {
-       
+          const preferredLanguage = await rememberProfileLanguage(
+            response.data.preferredLanguage,
+          );
           await AsyncStorage.setItem('loginDetails', JSON.stringify({
             loginIdentifier: emailAddress,
             clientName: response.data.clientName,
             isLoggedIn:"true",
+            preferredLanguage: preferredLanguage,
           }));
   
           router.push({

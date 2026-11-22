@@ -7,8 +7,6 @@ import {
   Button,
   Alert,
   TouchableOpacity,
-  Modal,
-  ScrollView,
 } from "react-native";
 import { ipAddress, port, webAppPath, url } from "@env";
 import apiClient from "../../Services/apiClient";
@@ -17,19 +15,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Navbar from "../../Navigations/Navbar";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
-import { I18nManager } from "react-native";
-import * as Expo from "expo";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useKeyboardVisible } from "../../Components/KeyboardScreen"; // adjust the path
+import LanguagePickerModal from "../../Components/LanguagePickerModal";
+import {
+  applyAppLanguage,
+  languageName,
+  normalizeLanguage,
+  rememberProfileLanguage,
+} from "../../Services/appLanguage";
 
 const LoginScreen = () => {
   const keyboardVisible = useKeyboardVisible();
   const insets = useSafeAreaInsets();
-  const supportedLanguages = [
-    { code: "en", name: "English" },
-    { code: "ar", name: "عربي" },
-  ];
   const [loginIdentifier, setLoginIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [languagePickerVisible, setLanguagePickerVisible] = useState(false);
@@ -87,14 +86,22 @@ const LoginScreen = () => {
       );
 
       if (response.data.Message === "Success") {
+        // The language saved in the customer profile wins over whatever this
+        // device used before, and is remembered for the next start.
+        const preferredLanguage = await rememberProfileLanguage(
+          response.data.preferredLanguage,
+        );
         await AsyncStorage.setItem(
           "loginDetails",
           JSON.stringify({
             loginIdentifier: loginIdentifier,
             clientName: response.data.clientName,
             isLoggedIn: "true",
+            preferredLanguage: preferredLanguage,
           }),
         );
+
+        await applyAppLanguage(preferredLanguage);
 
         router.push({
           pathname: "/screens/Login/MyAccount",
@@ -117,16 +124,7 @@ const LoginScreen = () => {
 
   const handleLanguageChange = async (lang) => {
     setLanguagePickerVisible(false);
-    await i18next.changeLanguage(lang);
-    const shouldUseRTL = lang === "ar";
-    I18nManager.allowRTL(shouldUseRTL);
-    I18nManager.forceRTL(shouldUseRTL);
-    // Native layout direction is applied when the root view tree is recreated.
-    // Persist the language before reloading so the same language is restored.
-    await AsyncStorage.setItem("appLanguage", lang);
-    if (I18nManager.isRTL !== shouldUseRTL) {
-      await Expo.reloadAppAsync("Applying the selected interface direction");
-    }
+    await applyAppLanguage(lang);
   };
 
   return (
@@ -194,59 +192,17 @@ const LoginScreen = () => {
             style={styles.languagePickerButton}
           >
             <Text style={styles.languagePickerButtonText}>
-              {supportedLanguages.find(({ code }) => code === i18next.language)
-                ?.name || i18next.language}
+              {languageName(i18next.language)}
             </Text>
           </TouchableOpacity>
         </View>
       </KeyboardAwareScrollView>
-      <Modal
+      <LanguagePickerModal
         visible={languagePickerVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setLanguagePickerVisible(false)}
-      >
-        <View style={styles.languageModalBackdrop}>
-          <TouchableOpacity
-            accessibilityRole="button"
-            accessibilityLabel={t("close")}
-            style={StyleSheet.absoluteFill}
-            onPress={() => setLanguagePickerVisible(false)}
-          />
-          <View style={styles.languageModalCard}>
-            <Text style={styles.languageModalTitle}>{t("language")}</Text>
-            <ScrollView
-              style={styles.languageList}
-              contentContainerStyle={styles.languageListContent}
-            >
-              {supportedLanguages.map(({ code, name }) => {
-                const selected = i18next.language === code;
-                return (
-                  <TouchableOpacity
-                    key={code}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected }}
-                    onPress={() => handleLanguageChange(code)}
-                    style={[
-                      styles.languageOption,
-                      selected && styles.languageOptionSelected,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.languageOptionText,
-                        selected && styles.languageOptionTextSelected,
-                      ]}
-                    >
-                      {name}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+        selected={normalizeLanguage(i18next.language)}
+        onClose={() => setLanguagePickerVisible(false)}
+        onSelect={handleLanguageChange}
+      />
 
       {!keyboardVisible && <Navbar activetab="" />}
     </View>
@@ -341,56 +297,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     textAlign: "center",
-  },
-  languageOption: {
-    width: "100%",
-    minHeight: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 8,
-    borderRadius: 8,
-  },
-  languageOptionSelected: {
-    backgroundColor: "#00757c",
-  },
-  languageOptionText: {
-    color: "#334155",
-    fontSize: 15,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  languageOptionTextSelected: {
-    color: "#fff",
-  },
-  languageModalBackdrop: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-    backgroundColor: "rgba(15, 23, 42, 0.45)",
-  },
-  languageModalCard: {
-    width: "100%",
-    maxWidth: 360,
-    maxHeight: "75%",
-    padding: 18,
-    borderRadius: 16,
-    backgroundColor: "#fff",
-    elevation: 8,
-  },
-  languageModalTitle: {
-    marginBottom: 12,
-    color: "#1f2937",
-    fontSize: 18,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  languageList: {
-    width: "100%",
-  },
-  languageListContent: {
-    alignItems: "center",
-    gap: 8,
   },
 });
 
