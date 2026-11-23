@@ -26,6 +26,11 @@ function normalize(data) {
     currency: String((data && data.currency) || "").trim(),
     clickAndCollectEnabled: Boolean(data && data.clickAndCollectEnabled),
     collectionStores: Array.isArray(data && data.collectionStores) ? data.collectionStores : [],
+    creditCardEnabled: Boolean(data && data.creditCardEnabled),
+    cashOnDeliveryEnabled: data && data.cashOnDeliveryEnabled === undefined
+      ? true
+      : Boolean(data.cashOnDeliveryEnabled),
+    savedCards: Array.isArray(data && data.savedCards) ? data.savedCards : [],
   };
 }
 

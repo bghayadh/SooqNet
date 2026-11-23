@@ -14,6 +14,8 @@ const GuestPaymentandOrder = () => {
   const [basketData, setBasketData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState(null); 
+  // Selected saved card id for a Credit Card order (cards are managed in My Account).
+  const [selectedCardId, setSelectedCardId] = useState('');
   // Fulfilment method: Home Delivery (default) or Click & Collect. The store
   // selector only appears when the server has Click & Collect turned on.
   const [shippingMethod, setShippingMethod] = useState('delivery');
@@ -156,6 +158,11 @@ const GuestPaymentandOrder = () => {
         Alert.alert(t('selectStoreTitle'), t('selectStoreAlert'));
         return;
       }
+      // A card order needs a saved card chosen (cards are managed in My Account).
+      if (paymentMethod === 'Credit Card' && !selectedCardId) {
+        Alert.alert(t('selectCardTitle'), t('selectCardAlert'));
+        return;
+      }
       try {
         
         const response = await apiClient.post('/placeOrder', {
@@ -168,6 +175,7 @@ const GuestPaymentandOrder = () => {
             };
           }),
           "paymentMethod": paymentMethod,
+          "paymentCardId": paymentMethod === 'Credit Card' ? selectedCardId : "",
           "customerName": parsedFormData.firstName +' '+ parsedFormData.lastName,
           // Click & Collect has no delivery address; the pickup branch is stored
           // separately on the order.
@@ -310,44 +318,83 @@ const GuestPaymentandOrder = () => {
       <View style={styles.paymentMethodContainer}>
         <Text style={styles.paymentMethodTitle}>{t('selectPaymentMethod')}</Text>
 
-        <TouchableOpacity
-          style={[
-            styles.checkboxContainer,
-            paymentMethod === 'Cash On Delivery' && styles.selectedCheckbox,
-            { flexDirection: isRTL ? 'row-reverse' : 'row' }
-          ]}
-          onPress={() => handlePaymentMethodChange('Cash On Delivery')}
-        >
-          <View
+        {(appSettings == null || appSettings.cashOnDeliveryEnabled) && (
+          <TouchableOpacity
             style={[
-              styles.checkbox,
-              paymentMethod === 'Cash On Delivery' && styles.checkedCheckbox,
+              styles.checkboxContainer,
+              paymentMethod === 'Cash On Delivery' && styles.selectedCheckbox,
+              { flexDirection: isRTL ? 'row-reverse' : 'row' }
             ]}
+            onPress={() => handlePaymentMethodChange('Cash On Delivery')}
           >
-            {paymentMethod === 'Cash On Delivery' && <Text style={styles.checkmark}>✓</Text>}
-          </View>
-          <Text style={styles.paymentMethodText}>{t('cashOnDelivery')}</Text>
-        </TouchableOpacity>
+            <View
+              style={[
+                styles.checkbox,
+                paymentMethod === 'Cash On Delivery' && styles.checkedCheckbox,
+              ]}
+            >
+              {paymentMethod === 'Cash On Delivery' && <Text style={styles.checkmark}>✓</Text>}
+            </View>
+            <Text style={styles.paymentMethodText}>{t('cashOnDelivery')}</Text>
+          </TouchableOpacity>
+        )}
 
-        <TouchableOpacity
-          style={[
-            styles.checkboxContainer,
-            paymentMethod === 'creditCard' && styles.selectedCheckbox,
-            { flexDirection: isRTL ? 'row-reverse' : 'row' }
-          ]}
-          onPress={() => handlePaymentMethodChange('creditCard')}
-          disabled
-        >
-          <View
+        {appSettings != null && appSettings.creditCardEnabled && (
+          <TouchableOpacity
             style={[
-              styles.checkbox,
-              paymentMethod === 'creditCard' && styles.checkedCheckbox,
+              styles.checkboxContainer,
+              paymentMethod === 'Credit Card' && styles.selectedCheckbox,
+              { flexDirection: isRTL ? 'row-reverse' : 'row' }
             ]}
+            onPress={() => handlePaymentMethodChange('Credit Card')}
           >
-            {paymentMethod === 'creditCard' && <Text style={styles.checkmark}>✓</Text>}
+            <View
+              style={[
+                styles.checkbox,
+                paymentMethod === 'Credit Card' && styles.checkedCheckbox,
+              ]}
+            >
+              {paymentMethod === 'Credit Card' && <Text style={styles.checkmark}>✓</Text>}
+            </View>
+            <Text style={styles.paymentMethodText}>{t('creditCard')}</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Saved-card picker: only for a Credit Card order. */}
+        {paymentMethod === 'Credit Card' && (
+          <View style={styles.cardPicker}>
+            <Text style={styles.cardPickerLabel}>{t('savedCard')}</Text>
+            {(!appSettings || !appSettings.savedCards || appSettings.savedCards.length === 0) ? (
+              <Text style={styles.storeEmpty}>{t('noSavedCard')}</Text>
+            ) : (
+              appSettings.savedCards.map((card) => {
+                const selected = selectedCardId === card.id;
+                const expiry = card.expiryMonth && card.expiryYear
+                  ? String(card.expiryMonth).padStart(2, '0') + '/' + String(card.expiryYear).slice(-2)
+                  : '';
+                return (
+                  <TouchableOpacity
+                    key={card.id}
+                    style={[
+                      styles.storeRow,
+                      selected && styles.selectedStoreRow,
+                      { flexDirection: isRTL ? 'row-reverse' : 'row' },
+                    ]}
+                    onPress={() => setSelectedCardId(card.id)}
+                  >
+                    <View style={[styles.checkbox, selected && styles.checkedCheckbox]}>
+                      {selected && <Text style={styles.checkmark}>✓</Text>}
+                    </View>
+                    <View style={styles.storeText}>
+                      <Text style={styles.storeName}>{card.brand} •••• {card.lastFour}</Text>
+                      <Text style={styles.storeCity}>{card.cardholderName}{expiry ? '  (exp ' + expiry + ')' : ''}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })
+            )}
           </View>
-          <Text style={[styles.paymentMethodText, styles.disabledText]}> {t('creditCard')}</Text>
-        </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.lineDivider}></View>
@@ -455,6 +502,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  cardPicker: {
+    marginTop: 10,
+  },
+  cardPickerLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
   },
   paymentMethodText: {
     fontSize: 16,
