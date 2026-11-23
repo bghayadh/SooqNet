@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, BackHandler } from 'react-native';
-import { useRouter } from 'expo-router'; 
+import { useRouter, useLocalSearchParams } from 'expo-router'; 
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
 
 const ConfirmCheckout = () => {
   const router = useRouter(); 
+  const { shippingMethod, collectionStoreName } = useLocalSearchParams();
   const { t, i18n } = useTranslation(); 
 
   const lang = i18next.language;
@@ -50,6 +51,12 @@ const ConfirmCheckout = () => {
       <Text style={styles.thankYou}>
       {t('thanksStat')}
       </Text>
+
+      {shippingMethod === 'click_collect' && collectionStoreName ? (
+        <Text style={styles.collectionMessage}>
+          {t('collectionMessage', { store: collectionStoreName })}
+        </Text>
+      ) : null}
     </View>
   );
 };
@@ -80,6 +87,14 @@ const styles = StyleSheet.create({
     color: '#555', 
     fontStyle: 'italic',
     marginBottom: 30,
+  },
+  collectionMessage: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    color: '#2a9d8f',
+    marginBottom: 30,
+    paddingHorizontal: 20,
   },
 });
 
