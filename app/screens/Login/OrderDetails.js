@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, VirtualizedList, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import {ipAddress,port,webAppPath,url} from "@env";
-import apiClient from '../../Services/apiClient';
+import apiClient, { isAuthError } from '../../Services/apiClient';
 import { MaterialIcons } from '@expo/vector-icons'; 
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
@@ -55,8 +55,11 @@ const OrderDetails = () => {
         });
 
       } catch (error) {
-        console.error('Error fetching order details:', error);
-        setOrderDetails({ items: [], colorsImagesPath: '', relativePath: '0', OrderAllDetails: [] });
+        // A 401 (expired session) is handled by apiClient's redirect to login.
+        if (!isAuthError(error)) {
+          console.error('Error fetching order details:', error);
+          setOrderDetails({ items: [], colorsImagesPath: '', relativePath: '0', OrderAllDetails: [] });
+        }
       } finally {
         setLoading(false);
       }

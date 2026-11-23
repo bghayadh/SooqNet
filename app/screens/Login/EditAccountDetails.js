@@ -2,7 +2,7 @@ import React, { useState,useEffect} from "react";
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert,BackHandler } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
-import apiClient from '../../Services/apiClient';
+import apiClient, { isAuthError } from '../../Services/apiClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
@@ -45,7 +45,10 @@ const EditAccountDetails = () => {
           
         }
       } catch (error) {
-        console.error("There was an error!", error.message);
+        // A 401 (expired session) is handled by apiClient's redirect to login.
+        if (!isAuthError(error)) {
+          console.error("There was an error!", error.message);
+        }
       } finally {
       }
     };
@@ -84,8 +87,11 @@ const EditAccountDetails = () => {
 
         } 
       } catch (error) {
-        console.error("Error checking user status:", error);
-        Alert.alert("Error", "Unable to check email validation.");
+        // A 401 (expired session) is handled by apiClient's redirect to login.
+        if (!isAuthError(error)) {
+          console.error("Error checking user status:", error);
+          Alert.alert("Error", "Unable to check email validation.");
+        }
       }
     }
   };

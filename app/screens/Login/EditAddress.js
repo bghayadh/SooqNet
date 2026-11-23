@@ -14,7 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { useLocalSearchParams } from "expo-router";
-import apiClient from "../../Services/apiClient";
+import apiClient, { isAuthError } from "../../Services/apiClient";
 import Navbar from "../../Navigations/Navbar";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
@@ -67,8 +67,11 @@ const EditAddress = () => {
           Alert.alert("Error", t("unableToFetchAddressDataStat"));
         }
       } catch (error) {
-        console.error("Error fetching address data:", error);
-        Alert.alert("Error", t("fetchingAddressDataErrorStat"));
+        // A 401 (expired session) is handled by apiClient's redirect to login.
+        if (!isAuthError(error)) {
+          console.error("Error fetching address data:", error);
+          Alert.alert("Error", t("fetchingAddressDataErrorStat"));
+        }
       } finally {
         setLoading(false);
       }

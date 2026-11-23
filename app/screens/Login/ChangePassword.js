@@ -2,7 +2,7 @@ import React, { useState,useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet,BackHandler,Alert } from 'react-native';
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
-import apiClient from '../../Services/apiClient';
+import apiClient, { isAuthError } from '../../Services/apiClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from "expo-router";
 import Navbar from '../../Navigations/Navbar';
@@ -62,8 +62,11 @@ const ChangePassword = () => {
         Alert.alert("Password Update Failed", response.data.message || response.data.Message || t('somethingWentWrong'));
       }
     } catch (error) {
-      console.error("Error changing password:", error);
-      Alert.alert("Error", t('somethingWentWrong'));
+      // A 401 (expired session) is handled by apiClient's redirect to login.
+      if (!isAuthError(error)) {
+        console.error("Error changing password:", error);
+        Alert.alert("Error", t('somethingWentWrong'));
+      }
     }
   };
 

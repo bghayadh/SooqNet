@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import apiClient from '../../Services/apiClient';
+import apiClient, { isAuthError } from '../../Services/apiClient';
 import Navbar from '../../Navigations/Navbar';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +40,10 @@ const MyAccount = () => {
         throw new Error("Language was not saved");
       }
     } catch (error) {
-      Alert.alert(t("language"), t("languageSaveFailed"));
+      // A 401 (expired session) is handled by apiClient's redirect to login.
+      if (!isAuthError(error)) {
+        Alert.alert(t("language"), t("languageSaveFailed"));
+      }
       return;
     }
 

@@ -23,6 +23,11 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error && error.response && error.response.status === 401) {
+      // Flag the error so callers can stay silent: the session is gone, the
+      // stored login flag is cleared below and the user is sent to the login
+      // screen. A 401 here is an expected "please log in again", not a failure
+      // the screens should log or show an alert for.
+      error.isAuthError = true;
       try {
         const stored = await AsyncStorage.getItem("loginDetails");
         if (stored) {
@@ -39,5 +44,14 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+/**
+ * True when the request failed because the session expired / the user is not
+ * logged in (HTTP 401). Screens should skip their own error log / alert for
+ * these: {@link apiClient} already redirects to the login screen.
+ */
+export function isAuthError(error) {
+  return Boolean(error && error.isAuthError);
+}
 
 export default apiClient;

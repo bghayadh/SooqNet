@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import apiClient from "../../Services/apiClient";
+import apiClient, { isAuthError } from "../../Services/apiClient";
 import { useRouter } from "expo-router";
 import Navbar from "../../Navigations/Navbar";
 import i18next from "i18next";
@@ -51,8 +51,11 @@ const MyOrders = () => {
           setOrders([]); // No orders found
         }
       } catch (error) {
-        console.error("There was an error!", error.message);
-        setOrders([]);
+        // A 401 (expired session) is handled by apiClient's redirect to login.
+        if (!isAuthError(error)) {
+          console.error("There was an error!", error.message);
+          setOrders([]);
+        }
       } finally {
         setLoading(false);
       }

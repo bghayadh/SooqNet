@@ -6,7 +6,7 @@ import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; 
-import apiClient from '../../Services/apiClient';
+import apiClient, { isAuthError } from '../../Services/apiClient';
 import { useFocusEffect, useRouter } from 'expo-router';
 import i18next from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -99,8 +99,12 @@ const GuestPersonalInfo = () => {
               
             }
           } catch (error) {
-            console.error("Error fetching user data", error);
-            Alert.alert("Error", "Failed to load user data");
+            // A 401 means the session expired: apiClient already cleared the
+            // login flag and redirected to the login screen. Don't log or warn.
+            if (!isAuthError(error)) {
+              console.error("Error fetching user data", error);
+              Alert.alert("Error", "Failed to load user data");
+            }
           }
         }
       }
