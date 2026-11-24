@@ -66,7 +66,7 @@ const CategoryPath = ({ fullCatCode, fullCatTitle, fullArabicCatTitle, categorie
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    padding: 4,
   },
   pathContainer: {
     flexDirection: 'row', // Default for LTR
@@ -86,11 +86,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryText: {
-    fontSize: 14,
+    fontSize: 12.5,
     color: '#000',
   },
   separator: {
-    fontSize: 14,
+    fontSize: 12.5,
     color: '#aaa',
   },
 });

@@ -46,7 +46,7 @@ const Navbar = ({ activetab }) => {
       >
         <Ionicons 
           name="home"  // Use home icon
-          size={17}  // Adjust size
+          size={16}  // Adjust size
           color={activetab === 'home' ? 'black' : '#aaa'}  
         />
         <Text style={[styles.navItem, activetab === 'home' && styles.activeText]}>
@@ -61,7 +61,7 @@ const Navbar = ({ activetab }) => {
       >
         <Ionicons 
           name="cart"  // Use shopping cart icon
-          size={17}  // Adjust size
+          size={16}  // Adjust size
           color={activetab === 'basket' ? 'black' : '#aaa'}  
         />
         <Text style={[styles.navItem, activetab === 'basket' && styles.activeText]}> 
@@ -84,7 +84,7 @@ const Navbar = ({ activetab }) => {
         >
           <Ionicons 
             name="person" 
-            size={17}
+            size={16}
             color={activetab === 'myaccount' ? 'black' : '#aaa'}
           />
           <Text style={[styles.navItem, activetab === 'myaccount' && styles.activeText]}>
@@ -98,7 +98,7 @@ const Navbar = ({ activetab }) => {
         >
           <Ionicons 
             name="person"
-            size={17}
+            size={16}
             color={activetab === 'login' ? 'black' : '#aaa'}
           />
           <Text style={[styles.navItem, activetab === 'login' && styles.activeText]}>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: 'white',
-    paddingVertical: 5,  
+    paddingVertical: 3,  
     paddingHorizontal: 20,  
     position: 'absolute',
     bottom: 0,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   },
   navItem: {
     color: '#aaa',  
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 'bold',
     textTransform: 'uppercase',
   },

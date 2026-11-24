@@ -1,11 +1,10 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import {
   SafeAreaView,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import {
   FlatList,
-  StatusBar,
   StyleSheet,
   Text,
   View,
@@ -24,7 +23,7 @@ const { width: screenWidth } = Dimensions.get("window");
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
 
 // Item Component
-const Item = React.memo(({ item, isRTL, itemImagesPath, textColor }) => {
+const Item = React.memo(({ item, isRTL, itemImagesPath, textColor, imageHeight }) => {
   const validImages = item.imageData.filter((img) => img.name !== null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
@@ -67,7 +66,7 @@ const Item = React.memo(({ item, isRTL, itemImagesPath, textColor }) => {
 
   return (
     <View style={styles.item}>
-      <View style={styles.swiperContainer}>
+      <View style={[styles.swiperContainer, { height: imageHeight }]}>
         {validImages.length > 0 ? (
           <AnimatedFlatList
             horizontal
@@ -87,7 +86,7 @@ const Item = React.memo(({ item, isRTL, itemImagesPath, textColor }) => {
             showsHorizontalScrollIndicator={false}
           />
         ) : (
-          <View style={styles.noImageContainer}>
+          <View style={[styles.noImageContainer, { height: imageHeight }]}>
             <Text style={[styles.noImageText, { color: textColor }]}>
               No image found
             </Text>
@@ -179,11 +178,17 @@ const Item = React.memo(({ item, isRTL, itemImagesPath, textColor }) => {
 });
 
 // ItemList Component
-const ItemList = ({ data, itemImagesPath }) => {
+const ItemList = ({ data, itemImagesPath, onScroll, headerHeight = 0 }) => {
   const insets = useSafeAreaInsets();
   const [selectedId, setSelectedId] = useState(null);
   const lang = i18next.language;
   const isRTL = lang === "ar";
+
+  // Natural 2:3 card image (height = 1.5 * width). No height cap: capping made
+  // the image shorter than the fixed-width slide, which letterboxed it
+  // horizontally (text/path misaligned + phantom side gaps) and blinked on load.
+  const slideWidth = screenWidth / 2 - 4;
+  const imageHeight = Math.round(slideWidth * 1.5);
 
   // Adjust the data to prevent the last item from overflowing into both columns
   const adjustedData =
@@ -196,7 +201,7 @@ const ItemList = ({ data, itemImagesPath }) => {
   const renderItem = useCallback(
     ({ item }) => {
       if (item.itemCode === "empty") {
-        return <View style={styles.emptyItem} />;
+        return <View style={[styles.emptyItem, { height: imageHeight }]} />;
       }
 
       return (
@@ -205,10 +210,11 @@ const ItemList = ({ data, itemImagesPath }) => {
           isRTL={isRTL}
           itemImagesPath={itemImagesPath}
           textColor={getColor(item.itemCode)}
+          imageHeight={imageHeight}
         />
       );
     },
-    [selectedId],
+    [selectedId, imageHeight],
   );
 
   return (
@@ -221,9 +227,11 @@ const ItemList = ({ data, itemImagesPath }) => {
         numColumns={2}
         initialNumToRender={10}
         windowSize={5}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
         contentContainerStyle={[
           styles.flatListContent,
-          { paddingBottom: 72 + insets.bottom },
+          { paddingTop: headerHeight, paddingBottom: 72 + insets.bottom },
         ]}
         columnWrapperStyle={{
           //justifyContent: 'space-between',
@@ -239,16 +247,15 @@ const ItemList = ({ data, itemImagesPath }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
   },
   item: {
     flex: 1,
-    paddingVertical: 2,
-    margin: 2,
+    paddingVertical: 1,
+    margin: 1,
     borderRadius: 5,
   },
   title: {
-    fontSize: 15,
+    fontSize: 14,
   },
   swiperContainer: {
     height: 290,
@@ -311,7 +318,7 @@ const styles = StyleSheet.create({
   priceContainer: {
     //flexDirection: isRTL?'row-reverse' :'row',
     alignItems: "center",
-    marginTop: 5,
+    marginTop: 3,
     flexWrap: "wrap",
   },
   discountContainer: {
@@ -324,8 +331,8 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   textContainer: {
-    paddingHorizontal: 5,
-    marginTop: 5,
+    paddingHorizontal: 4,
+    marginTop: 3,
   },
   flatListContent: {
     paddingBottom: 40,

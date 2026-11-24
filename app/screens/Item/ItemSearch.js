@@ -14,6 +14,13 @@ const ItemSearch = ({ searchText, setSearchText,setShowFlatList, onSearchResults
  
   // when pressing the search button on the keyboard,this function is called
   const handleSubmitEditing = async () => {
+    // Empty search: do nothing (stay on the category grid) instead of
+    // rendering a blank results screen.
+    if (!searchText || !searchText.trim()) {
+      setShowFlatList(true);
+      Keyboard.dismiss();
+      return;
+    }
     try {
       const results = await handleSearch(searchText); // calling the function of axios to fetch data
       onSearchResults(results, false,'search'); // sending the result from the search request back to home page
@@ -77,23 +84,26 @@ useEffect(() => {
 }, [searchText]);
 
   return (
-    <View style={styles.searchBarContainer}>
-      <TextInput
-        style={[styles.searchInput,{ textAlign: isRTL ? 'right' : 'left' }]}
-        placeholder={i18next.t('searchPlaceholder')}
-        placeholderTextColor="#999"
-        onChangeText={handleChangeText}
-        onSubmitEditing={handleSubmitEditing}
-        value={searchText}
-        returnKeyType="search"
-      />
-      <TouchableOpacity onPress={handleSubmitEditing} 
-      style={[styles.iconContainer,
-       {position: 'absolute'},
-       isRTL ? styles.iconArabic : styles.iconEnglish // Align left for Arabic, right for English
-      ]}>
-        <Ionicons name="search" size={20} color="#fff"/>
-      </TouchableOpacity>
+    <View style={[styles.searchBarContainer, isRTL && styles.searchBarRtl]}>
+      <View style={[styles.field, isRTL && styles.fieldRtl]}>
+        <TextInput
+          ref={inputRef}
+          style={[styles.searchInput, { textAlign: isRTL ? 'right' : 'left' }]}
+          placeholder={i18next.t('searchPlaceholder')}
+          placeholderTextColor="#9AA0A6"
+          onChangeText={handleChangeText}
+          onSubmitEditing={handleSubmitEditing}
+          value={searchText}
+          returnKeyType="search"
+        />
+        <TouchableOpacity
+          onPress={handleSubmitEditing}
+          style={isRTL ? styles.searchIconRtl : styles.searchIconLtr}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons name="search" size={20} color="#333" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -102,32 +112,46 @@ const styles = StyleSheet.create({
   searchBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 10,
-    height: 40,
     marginHorizontal: 16,
-    marginTop: 10,
+    marginTop: 8,
+    marginBottom: 2,
+  },
+  searchBarRtl: {
+    flexDirection: 'row-reverse',
+  },
+  field: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 42,
+    backgroundColor: '#F4F4F6',
+    borderRadius: 22,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: '#E6E6E6',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  fieldRtl: {
+    flexDirection: 'row-reverse',
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 15,
     color: '#333',
-    height: 60,
-    marginHorizontal:2,
+    height: 42,
+    paddingVertical: 0,
+    includeFontPadding: false,
   },
-  iconContainer: {
-    backgroundColor: 'black',
-    height: 40,
-    width: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+  searchIconLtr: {
+    marginLeft: 8,
   },
-  iconArabic: {
-    start: 0
+  searchIconRtl: {
+    marginRight: 8,
   },
-  iconEnglish: {
-    end: 0
-  }
 });
 
 export default ItemSearch;

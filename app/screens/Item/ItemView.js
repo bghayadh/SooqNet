@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   ScrollView,
+  Animated,
 } from "react-native";
 import ItemList from "./ItemList";
 import CategoryList from "./CategoryList";
@@ -27,6 +28,7 @@ import i18next from "i18next";
 import KeyboardScreen, {
   useKeyboardVisible,
 } from "../../Components/KeyboardScreen";
+import { getAppSettings } from "../../Services/appSettings";
 
 function ItemView() {
   const keyboardVisible = useKeyboardVisible();
@@ -70,8 +72,73 @@ function ItemView() {
 
   const [itemImagesPath, setItemImagesPath] = useState("");
   const [catImagesPath, setCatImagesPath] = useState("");
+  const [currency, setCurrency] = useState("");
   const lang = i18next.language;
   const isRTL = lang === "ar"; // Check if the language is Arabic
+
+  // Collapsing region = category PATH + FILTERS only. The search bar and the
+  // sub-categories row stay fixed; this region slides up (native transform,
+  // clipped at the categories' bottom edge) while scrolling down and reappears
+  // while scrolling up. Native driver => no per-frame layout => no vibration.
+  const collapse = useRef(new Animated.Value(0)).current; // 0 = shown, 1 = hidden
+  const lastScrollY = useRef(0);
+  const collapseTarget = useRef(0);
+  const [catHeight, setCatHeight] = useState(0);
+  const [collapseHeight, setCollapseHeight] = useState(0);
+  const catMeasured = useRef(false);
+
+  const animateCollapse = (toValue) => {
+    if (collapseTarget.current === toValue) return;
+    collapseTarget.current = toValue;
+    Animated.timing(collapse, {
+      toValue,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handleCatLayout = (e) => {
+    if (catMeasured.current) return;
+    const h = e.nativeEvent.layout.height;
+    if (h > 0) {
+      catMeasured.current = true;
+      setCatHeight(h);
+    }
+  };
+
+  // Re-measured on every layout change (e.g. the Price panel expanding) so the
+  // wrapper is tall enough to show it. The collapse uses translateY (a transform),
+  // which does not change layout, so this never feeds back during the animation.
+  const handleCollapseLayout = (e) => {
+    const h = e.nativeEvent.layout.height;
+    if (h > 0 && h !== collapseHeight) {
+      setCollapseHeight(h);
+    }
+  };
+
+  const handleGridScroll = (e) => {
+    const y = e.nativeEvent.contentOffset.y;
+    const prev = lastScrollY.current;
+    lastScrollY.current = y;
+    if (y <= 8) {
+      animateCollapse(0); // back at the top: always show the header
+      return;
+    }
+    const delta = y - prev;
+    if (delta > 6) animateCollapse(1);
+    else if (delta < -6) animateCollapse(0);
+  };
+
+  const collapseTranslateY = collapse.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -collapseHeight],
+  });
+
+  // A filter dropdown must never be clipped/hidden: reveal the region while one
+  // is open.
+  useEffect(() => {
+    if (isDropdownOpen) animateCollapse(0);
+  }, [isDropdownOpen]);
 
   useEffect(() => {
     //Set the value of previous cat before searching each time the searchKey change
@@ -80,12 +147,32 @@ function ItemView() {
     }
   }, [searchText]);
 
+  // Currency code for the price filter chip (from SYSTEM_SETTINGS via app settings).
+  useEffect(() => {
+    let active = true;
+    getAppSettings()
+      .then((settings) => {
+        if (active && settings && settings.currency) {
+          setCurrency(settings.currency);
+        }
+      })
+      .catch(() => {
+        /* non-fatal: chip falls back to the localized "Price" label */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       if (!fullCatCode) return; // Prevent fetch if no category code
 
       try {
         setLoading(true);
+        collapse.setValue(0); // re-show the header on every (re)load
+        collapseTarget.current = 0;
+        lastScrollY.current = 0;
         priceRangeCustomized.current = false;
         setMaxPrice(0);
         setSelectedPriceRange([0, 0]);
@@ -432,39 +519,63 @@ function ItemView() {
                 <View style={styles.overlay} />
               </TouchableWithoutFeedback>
             )}
-            <CategoryList
-              data={catData}
-              catImagesPath={catImagesPath}
-              onCategoryPress={handleCategoryPress}
-              lastCatLevel={lastCatLevel}
-              selectedId={fullCatCode.split("-").pop()}
-            />
-
-            <CategoryPath
-              fullCatCode={fullCatCode}
-              fullCatTitle={fullCatTitles}
-              fullArabicCatTitle={fullArabicCatTitles}
-              categories={catData}
-              onCategoryPress={handlePathPress}
-            />
-            <Text></Text>
-            <View>
-              <ItemFilter
-                onSortChange={handleSortChange}
-                selectedSort={selectedSort}
-                onDropdownToggle={setIsDropdownOpen}
-                sizeOptions={sizeOptions}
-                selectedSizes={selectedSizes}
-                onSizeChange={handleSizeChange}
-                colorsOptions={colorsOptions}
-                selectedColors={selectedColors}
-                onColorChange={handleColorChange}
-                onRangeChange={handleRangeChange}
-                selectedPriceRange={selectedPriceRange}
-                maxPrice={maxPrice}
+            <View onLayout={handleCatLayout}>
+              <CategoryList
+                data={catData}
+                catImagesPath={catImagesPath}
+                onCategoryPress={handleCategoryPress}
+                lastCatLevel={lastCatLevel}
+                selectedId={fullCatCode.split("-").pop()}
               />
             </View>
-            <ItemList data={itemData} itemImagesPath={itemImagesPath} />
+
+            <Animated.View
+              style={[
+                styles.collapseWrapper,
+                { top: catHeight, height: collapseHeight > 0 ? collapseHeight : undefined },
+                collapseHeight > 0 && !isDropdownOpen && styles.collapseWrapperClip,
+              ]}
+              pointerEvents="box-none"
+            >
+              <Animated.View
+                style={[
+                  styles.collapseInner,
+                  { transform: [{ translateY: collapseTranslateY }] },
+                ]}
+                onLayout={handleCollapseLayout}
+              >
+                <CategoryPath
+                  fullCatCode={fullCatCode}
+                  fullCatTitle={fullCatTitles}
+                  fullArabicCatTitle={fullArabicCatTitles}
+                  categories={catData}
+                  onCategoryPress={handlePathPress}
+                />
+                <View>
+                  <ItemFilter
+                    onSortChange={handleSortChange}
+                    selectedSort={selectedSort}
+                    onDropdownToggle={setIsDropdownOpen}
+                    sizeOptions={sizeOptions}
+                    selectedSizes={selectedSizes}
+                    onSizeChange={handleSizeChange}
+                    colorsOptions={colorsOptions}
+                    selectedColors={selectedColors}
+                    onColorChange={handleColorChange}
+                    onRangeChange={handleRangeChange}
+                    selectedPriceRange={selectedPriceRange}
+                    maxPrice={maxPrice}
+                    currency={currency}
+                  />
+                </View>
+              </Animated.View>
+            </Animated.View>
+            <ItemList
+              data={itemData}
+              itemImagesPath={itemImagesPath}
+              onScroll={handleGridScroll}
+              headerHeight={collapseHeight}
+            />
           </View>
         ) : (
           <ScrollView
@@ -513,7 +624,22 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    padding: 10,
+    paddingHorizontal: 8,
+    paddingTop: 0,
+    paddingBottom: 2,
+  },
+  collapseWrapper: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    zIndex: 200,
+  },
+  collapseWrapperClip: {
+    overflow: "hidden",
+  },
+  collapseInner: {
+    backgroundColor: "white",
+    paddingHorizontal: 8,
   },
   resultsContainer: {
     marginTop: 50,

@@ -8,13 +8,28 @@ const Category = ({ item,isRTL, onPress, isSelected ,catImagesPath}) => {
     
 
     return (
-        <TouchableOpacity onPress={onPress} style={[styles.cat, { backgroundColor }]}>
-                  <View style={styles.imageContainer} >
-            <Image
-                source={{ uri: catImagesPath+ item[2] }}
-                style={styles.image}
-            /></View>
-            <Text style={[styles.title, { color: textColor }]}>
+        <TouchableOpacity
+            onPress={onPress}
+            style={[
+                styles.cat,
+                { backgroundColor },
+                isRTL ? styles.catRtl : styles.catLtr,
+            ]}
+        >
+            <View style={styles.imageContainer} >
+                <Image
+                    source={{ uri: catImagesPath+ item[2] }}
+                    style={styles.image}
+                />
+            </View>
+            <Text
+                numberOfLines={2}
+                style={[
+                    styles.title,
+                    { color: textColor },
+                    isRTL ? styles.titleRtl : styles.titleLtr,
+                ]}
+            >
             {isRTL ? item[5] : item[1]}
             </Text>
         </TouchableOpacity>
@@ -58,32 +73,49 @@ const CategoryList = ({ data, onCategoryPress, lastCatLevel, selectedId, catImag
 
 const styles = StyleSheet.create({
     title: {
-        fontSize: 16,
+        fontSize: 13,
+        maxWidth: 110,
     },
     cat: {
-        padding: 5,
-        margin: 5,
-        borderRadius: 5,
+        flexDirection: 'row',
         alignItems: 'center',
-        height: 130,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        marginHorizontal: 3,
+        marginVertical: 2,
+        borderRadius: 5,
+        height: 58,
+    },
+    catLtr: {
+        flexDirection: 'row',
+    },
+    catRtl: {
+        flexDirection: 'row-reverse',
+    },
+    titleLtr: {
+        marginLeft: 6,
+        textAlign: 'left',
+    },
+    titleRtl: {
+        marginRight: 6,
+        textAlign: 'right',
     },
     imageContainer: {
-        width: 75,
-        height:90,               
-        aspectRatio: 1,              
-        borderRadius: 50,         
-        overflow: 'hidden',       
+        width: 52,
+        height: 52,
+        borderRadius: 26,
+        overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'white',   
-      },
+        backgroundColor: 'white',
+    },
       image: {
         width: '100%',          
         height: '100%',
         resizeMode:'stretch',
       },
     horizontalList: {
-        paddingVertical: 5,
+        paddingVertical: 2,
     },
 });
 

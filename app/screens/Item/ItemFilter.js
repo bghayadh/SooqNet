@@ -135,6 +135,7 @@ const ItemFilter = ({
     currency = "",
 }) => {
     const [activeDropdown, setActiveDropdown] = useState(null);
+    const [showPrice, setShowPrice] = useState(false);
     const [range, setRange] = useState([0, 0]);
     const [minInput, setMinInput] = useState("0");
     const [maxInput, setMaxInput] = useState("0");
@@ -145,6 +146,8 @@ const ItemFilter = ({
 
     const { t } = useTranslation();
     const { height: screenHeight, width: screenWidth } = useWindowDimensions();
+    // Narrow phones (e.g. 320px) need tighter chips so the row stays usable.
+    const isSmallScreen = screenWidth < 360;
 
     const lang = i18next.language;
     const isRTL = lang === "ar";
@@ -332,6 +335,7 @@ const ItemFilter = ({
                         <TouchableOpacity
                             style={[
                                 styles.filterButton,
+                                isSmallScreen && styles.filterButtonSmall,
                                 {
                                     flexDirection: isRTL
                                         ? "row-reverse"
@@ -358,6 +362,7 @@ const ItemFilter = ({
                         <TouchableOpacity
                             style={[
                                 styles.filterButton,
+                                isSmallScreen && styles.filterButtonSmall,
                                 {
                                     flexDirection: isRTL
                                         ? "row-reverse"
@@ -380,6 +385,7 @@ const ItemFilter = ({
                         <TouchableOpacity
                             style={[
                                 styles.filterButton,
+                                isSmallScreen && styles.filterButtonSmall,
                                 {
                                     flexDirection: isRTL
                                         ? "row-reverse"
@@ -398,11 +404,41 @@ const ItemFilter = ({
                             />
                         </TouchableOpacity>
                     </View>
+
+                    {/* Price filter button: toggles the slider panel below */}
+                    {sliderMax > 0 && (
+                        <View style={styles.filterContainer}>
+                            <TouchableOpacity
+                                style={[
+                                    styles.filterButton,
+                                    isSmallScreen && styles.filterButtonSmall,
+                                    showPrice && styles.filterButtonActive,
+                                    {
+                                        flexDirection: isRTL
+                                            ? "row-reverse"
+                                            : "row",
+                                    },
+                                ]}
+                                onPress={() => setShowPrice((prev) => !prev)}
+                            >
+                                <Text style={styles.filterText}>
+                                    {currency
+                                        ? `${t("price")} (${currency})`
+                                        : t("priceusd")}{" "}
+                                </Text>
+                                <Icon
+                                    name={showPrice ? "up" : "down"}
+                                    size={14}
+                                    color="black"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
             </ScrollView>
 
-            {/* Price: full-width row, independent from the filter chips */}
-            {sliderMax > 0 && (
+            {/* Price: full-width row, shown only when the Price chip is active */}
+            {sliderMax > 0 && showPrice && (
                 <View
                     style={styles.priceRow}
                     onLayout={(event) =>
@@ -696,29 +732,41 @@ const styles = StyleSheet.create({
         flexGrow: 0,
     },
     chipRow: {
-        paddingVertical: 4,
+        flexGrow: 1,
+        justifyContent: 'center',
+        paddingVertical: 2,
         paddingHorizontal: 2,
     },
     filterContainer: {
-        marginRight: 10,
+        marginRight: 8,
     },
     filterButton: {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: "#F5F5F5",
-        height: 40,
-        minWidth: 90,
-        paddingHorizontal: 12,
+        height: 36,
+        minWidth: 72,
+        paddingHorizontal: 10,
         borderRadius: 6,
         justifyContent: "center",
     },
+    filterButtonActive: {
+        backgroundColor: "#BEBEBE",
+        borderColor: "black",
+        borderWidth: 1,
+    },
+    filterButtonSmall: {
+        minWidth: 64,
+        height: 34,
+        paddingHorizontal: 8,
+    },
     filterText: {
-        fontSize: 18,
+        fontSize: 14,
         color: "black",
     },
     priceRow: {
         paddingHorizontal: 4,
-        paddingTop: 6,
+        paddingTop: 4,
         paddingBottom: 2,
         backgroundColor: "white",
     },
@@ -727,10 +775,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         flexWrap: "wrap",
-        rowGap: 8,
+        rowGap: 4,
     },
     priceTitle: {
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: "600",
         color: "#333",
     },
@@ -740,14 +788,14 @@ const styles = StyleSheet.create({
         columnGap: 6,
     },
     priceInput: {
-        height: 36,
-        minWidth: 68,
+        height: 30,
+        minWidth: 54,
         borderWidth: 1,
         borderColor: "#ddd",
-        borderRadius: 6,
-        paddingHorizontal: 8,
+        borderRadius: 5,
+        paddingHorizontal: 6,
         paddingVertical: 0,
-        fontSize: 14,
+        fontSize: 13,
         color: "#333",
         backgroundColor: "#FAFAFA",
     },
@@ -757,8 +805,8 @@ const styles = StyleSheet.create({
     },
     sliderContainer: {
         alignSelf: "center",
-        height: 44,
-        marginTop: 2,
+        height: 34,
+        marginTop: 0,
     },
     sliderTrack: {
         height: 4,
@@ -786,7 +834,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         paddingHorizontal: 6,
-        marginTop: -8,
+        marginTop: -6,
     },
     boundText: {
         fontSize: 12,
