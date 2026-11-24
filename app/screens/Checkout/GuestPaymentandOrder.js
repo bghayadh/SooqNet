@@ -380,7 +380,7 @@ const GuestPaymentandOrder = () => {
                       selected && styles.selectedStoreRow,
                       { flexDirection: isRTL ? 'row-reverse' : 'row' },
                     ]}
-                    onPress={() => setSelectedCardId(card.id)}
+                    onPress={() => setSelectedCardId(selected ? '' : card.id)}
                   >
                     <View style={[styles.checkbox, selected && styles.checkedCheckbox]}>
                       {selected && <Text style={styles.checkmark}>✓</Text>}

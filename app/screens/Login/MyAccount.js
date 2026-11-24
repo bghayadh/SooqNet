@@ -140,7 +140,14 @@ const MyAccount = () => {
             },
             {
               title: t('paymentMethods'),
-              icon: "card-outline"
+              icon: "card-outline",
+              onPress: () => router.push({
+                pathname: '/screens/Login/PaymentMethods',
+                params: {
+                  loginIdentifier: loginIdentifier,
+                  loggedClientFullName: loggedUser,
+                },
+              })
             },
             {
               title: t('language'),
